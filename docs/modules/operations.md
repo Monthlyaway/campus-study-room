@@ -59,7 +59,7 @@ python3 scripts/studyroom.py status test
 
 `.gitlab-ci.yml` 在 push/MR/tag 触发，包含后端 verify、前端生成漂移/类型/单测/构建、独立 PostgreSQL 服务中的两应用 HTTP 与四类真实 JPA 集成、丢失已提交 BLOCK 响应后的原命令重试，以及源码制品归档。Python 运维校验也进入集成门禁。每个真实 JPA 套件必须产生非零且无 skip 的对应 JUnit，不能用默认跳过数据库测试冒充成功。
 
-CI 使用 `resource_group: studyroom-test` 串行化集成任务，秘密在每个 job 内随机生成。测试环境记录为 `test/ci-<pipeline>`；只有集成通过才允许打包。实际 pipeline、版本化 Docker 发布和完整自动部署的证据继续在进度表追踪；配置存在不等于门禁已执行。
+CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原 `k8s-amd64` 对应的 Runner 已长期离线。使用 `resource_group: studyroom-test` 串行化集成任务，秘密在每个 job 内随机生成。测试环境记录为 `test/ci-<pipeline>`；只有集成通过才允许打包。实际 pipeline、版本化 Docker 发布和完整自动部署的证据继续在进度表追踪；配置存在不等于门禁已执行。
 
 ## 已执行与待执行
 
