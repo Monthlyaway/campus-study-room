@@ -1,51 +1,50 @@
 # 开发进度与验收索引
 
-更新时间：2026-10-23。当前R2为`3350d5b`，已部署到独立portable入口；R2复验发现的实际问题正在修复，下一候选R3尚未构建。**P0仍为IN_PROGRESS**，不将旧镜像、工作区检查或安全单测冒充最终版本全量通过。
+更新时间：2026-10-23。当前运行候选为 R3 `r-20261022T161900-3c7a93c`，完整源码 `3c7a93cae56e68d2a96adb1e022f4fffc8112c5e`。已在独立便携安装入口通过浏览器6/6、真实慢网络回归及R3→B兼容回退。**P0仍为IN_PROGRESS**：R3性能、core真实重启及限定范围运行隐私审计已通过；正在准备包含后续CI和验收工具修正的R4完整源码包，尚未构建或验收。GitLab完整流水线/main合入及tag仍待闭环。
 
-用户确定的交付边界是本机与可迁移安装、GitLab、自主提交发版及本地Mailpit，见[ADR 0002](adr/0002-delivery-and-gitlab.md)。正式服务器、域名/TLS与外部SMTP收信未执行；P1 Agent未启动。原三份规格保留，业务与工程要求不因本次盘点缩减。
+用户确定本机与可迁移安装、GitLab、自主提交发版及本地Mailpit，见[ADR 0002](adr/0002-delivery-and-gitlab.md)。正式服务器、域名/TLS与外部SMTP收信未执行；P1 Agent未启动。原三份规格保留，业务与工程要求不缩减。
 
-## 已有行为证据与工程待项
+## 实际结果与待项
 
-[追踪表](requirements-traceability.md)逐条保留39项：31条业务需求和8条工程需求。每项均已关联实现和实际行为测试；已有证据覆盖账号/范围、配置、通知、M1/M2/M3状态机、跨模块并发、来源恢复与三项破坏反证。具体证据按运行版本记录，最终候选的验收尚未全部完成。
+[追踪表](requirements-traceability.md)保留39项：31条业务和8条工程需求。已有行为证据覆盖账号/范围、配置、通知、M1/M2/M3状态机、跨模块并发、来源恢复及三项破坏反证；运行身份分别记录，不将旧版通过自动移植到新镜像。
 
 | 阶段 | 状态 | 实际证据 / 尚待完成 |
 | --- | --- | --- |
-| MS0 工程底座 | IN_PROGRESS | 固定Java21/Node24/PG18；本机独立test首次Docker安装通过；默认完整check已真实通过。GitLab原四阶段682662成功，但新完整集成/发布门禁仍有真实失败，main自动整套部署待验 |
-| MS1 公共层 | IN_PROGRESS | 管理9项、共享7项真实PG；账号/范围/会话HTTP、真实SMTP失败/恢复、三类提醒实际收信均通过。最终镜像恢复、最终报告隐私和版本追踪随MS5/MS6闭环 |
-| MS2 M1 预约 | IN_PROGRESS | 同座20用户争抢、同用户跨室冲突、签到时间/每日码/第6次限流、取消边界、统计手算均通过；日期筛选与375px真实历史再约通过。R2原会话实际午夜签到成功，后被同室维修中断；真实进程停机补偿仍待最终候选运行 |
-| MS3 M2 审批 | IN_PROGRESS | 三账号两级批准/手机撤销、必填拒绝理由及申请人历史实际页面通过；自批/同人两级、并发同一步、审批/到期竞争、claim写后整笔回滚均通过。最终候选沿用既定浏览器链复验，PENDING过期重启由MS5验证 |
-| MS4 M3 维修 | IN_PROGRESS | 真实负面HTTP、三期限×9收件人、双来源、已提交响应丢失重放、BLOCK八次失败/RELEASE恢复均通过。R2开始→完工→验收链通过；重复报修加载竞态已修复并通过typecheck/unit/build，新镜像延迟回归待验。GitLab改派firstAssignedAt一致性失败仍在修复，R3整套未验 |
-| MS5 验收恢复 | IN_PROGRESS | 两轮完整性能含失败定位：修复后读p95 153.50ms/写252.93ms/5xx=0；repair20积压重启12.09秒。A/B兼容回退、保留卷重建、隔离恢复逐行摘要、启动故障自动恢复、每日备份触发与损坏负例已验。最终候选完整性能及core真实重启未执行 |
-| MS6 交接发布 | IN_PROGRESS | 多次逻辑commit、独立agent桌面/375px试用；B五镜像独立安装+浏览器6/6；R1和R2实际回退通过。R3最终完整浏览器、GitLab、精确回退目标、至少3版留存核对、最终离线包/tag/manifest仍待闭环 |
-| MS7 P1 Agent | NOT_STARTED | 可选附加项，P0优先，不用于替代P0验收 |
+| MS0 工程底座 | IN_PROGRESS | 固定Java21/Node24/PG18；独立test首次安装、默认完整check通过；最终GitLab及main自动整套部署待验 |
+| MS1 公共层 | IN_PROGRESS | 管理9项、共享7项真实PG，账号/范围/会话HTTP、SMTP失败恢复、三类实际邮件通过；R3限定范围运行日志隐私审计已归档 |
+| MS2 M1 预约 | IN_PROGRESS | 20用户争抢、同用户冲突、签到时间/码/限流、取消/统计已验；R3手机历史再约/409通过；跨升级实际午夜签到后被维修中断，core真实10任务补偿及65秒去重通过 |
+| MS3 M2 审批 | IN_PROGRESS | 自批/同人两级、并发同一步、审批/到期竞争及事务回滚已验；R3两级批准/撤销/拒绝页面通过；真实进程重启PENDING→EXPIRED通过 |
+| MS4 M3 维修 | IN_PROGRESS | 真实HTTP、三期限×9收件人、双来源、响应丢失和网络恢复已验；纳秒与PG微秒往返缺陷已严格复现并修复；R3手机报修→维修→独立验收及1800ms延迟回归通过，R3完整远端集成通过 |
+| MS5 验收恢复 | IN_PROGRESS | 旧诊断镜像完整性能复测通过；A/B回退、保留卷重建、隔离备份恢复、启动失败自动恢复及每日备份已验；R3读p95 154.36ms/写231.88ms/5xx0，repair20任务7.926秒，core10任务11.183秒及65秒去重通过 |
+| MS6 交接发布 | IN_PROGRESS | 独立agent实际试用；R3浏览器6/6、报告隐私及R3→B回退通过；A/B/R3清单和R3五镜像包已留存；最终离线导入核对通过；R3运行产物扫描已归档；R4打包验收及GitLab/main/tag待闭环 |
+| MS7 P1 Agent | NOT_STARTED | 可选附加项，不替代P0验收 |
 
-## 最近已关闭的具体缺口
+## 已关闭的真实缺陷
 
-- `8bc7558`的[默认完整check](evidence/core/default-check.md)实际exit0：18项HTTP、65项真实PG、27个期限收件人断言和提交响应丢失重放。GitLab使用同一函数与套件清单；`--unit-only`明确不是完整验收。检查保留本轮数据卷/0600凭据，只停止自有进程与容器，已有native PID不变。
-- `8b8a3d3`为12个旧runner入口补环境锁；使用构建产物时继续取得workspace锁，fixture函数不嵌套加锁。`247b02d`补原生build/migrate/copy/readiness全生命周期锁及精确PID归属校验。真实无关子进程未收到信号，迁移/复制异常后锁释放；该批全Python运维105/105通过（含当时新增8项恢复脚本安全测试），没有借此声称执行了真正重启。既有8081/8082只读身份及健康检查均通过。
-- `ee51e6e`补[真实历史再约和拒绝页面](../tests/browser/REVIEW.md#同一旧-b-版补充历史复用与拒绝页面)：375px新时段、新编号、原订单逐字段不变；拒绝理由必填、仅一次请求、申请人可见理由和终态操作消失。这些已经实测，不再列为未操作缺口。
-- R1完整浏览器首轮5/6失败保留。实际DOM确认残留loading图标污染确认按钮可访问名称；`3350d5b`提供稳定aria-label与真实aria-busy，测试恢复精确角色定位并保持409禁用/响应/表单约束。独立只读review通过，未以CSS定位绕过问题。
-- 审计快照`8b8a3d3`：381个跟踪文件和近8提交的411个唯一blob，对46个私有来源的89个实际secret/cookie及484种明文/常见编码变体检查，命中0。旧项目名路径/内容命中0（仅排除pnpm integrity中3个随机子串），代理端口写入命中0。该有界扫描不代替最终候选新提交和运行报告扫描。
+- [默认完整check](evidence/core/default-check.md)实际exit0：18项HTTP、65项真实PG、27个期限收件人断言和已提交响应丢失重放。保留本轮卷/凭据，只停止自有进程；原native PID不变。
+- `8b8a3d3`统一12个旧runner的环境→workspace锁；`247b02d`覆盖原生build/migrate/copy/readiness全生命周期，精确校验PID归属，拒绝向无关进程发信号。相关锁与PID回归通过；当前支持工具修正后完整Python运维回归112项通过。
+- R1浏览器5/6暴露隐藏loading图标污染确认按钮可访问名称；`3350d5b`提供稳定aria-label和aria-busy，严格按钮定位未弱化。R2主维修链通过，但第二次报修打开时房间仍加载，弹窗永久捕获空选项。真实1800ms延迟复现后，`a5695c3`使入口等到数据就绪，并给出失败/空结果反馈；R3同条件及完整6流程均通过。见[最终前端证据](evidence/frontend-release.md)。
+- GitLab682941及682949真实失败于改派前后firstAssignedAt严格一致性，并非SMTP。固定纳秒Clock+真实PostgreSQL/HTTP复现第一次响应纳秒与回读微秒不同；`3c7a93c`在写入前统一至数据库微秒精度，原严格Python断言不变。两个期限HTTP及四个PG回归全部通过，见[时间精度反证与修复](evidence/repair-timestamp-precision.md)。
 
-## R2实际结果与当前未闭环问题
+## 发布证据与边界
 
-独立portable入口为`http://localhost:19282`，Mailpit为`http://localhost:19227`。R2运行提交`3350d5b`；原B=`66f2b92`的[独立安装](evidence/release/portable-install.json)和[浏览器6/6](../tests/browser/REVIEW.md)仍作为旧版本证据保留，不转记R2/R3成功。
+最终本机入口 `http://localhost:19282`，本地Mailpit `http://localhost:19227`。R3三服务身份一致；[浏览器6/6](evidence/frontend-release.md)使用Chromium、1440×1000及375×812，无mock、无跳过/隐藏重试。另有真实失败报告隐私反证1/1通过。
 
-R1创建的预约保留原Cookie跨升级到R2，在真实午夜后通过375px页面完成签到。证据保留在`output/browser-release-final/checkin/`；后续同室维修使其INTERRUPTED，不能标记为自然完成。R2完整浏览器为5/6：维修开始、完工、验收已实际通过，但同轮第二次报修时房间列表尚未加载，按钮可点而弹窗捕获空options。旧R2在真实网络延迟1800ms下复现该竞态。`a5695c3`增加roomsPending/roomsReady准入、错误与空结果反馈，typecheck/unit/build通过；新增延迟回归尚未在修复后的运行镜像执行，与R3完整六流程一并待验。
+R1预约保留原Cookie跨升级到R2，于真实午夜后通过375px页面签到；后续同室维修使其INTERRUPTED，违约为0。此项不写成自然COMPLETED，也不冒称在R3重复签到。原始分版本证据位于`output/browser-release-final/checkin/`。
 
-GitLab682703/682861的早期失败未曾定位为SMTP；之后682941已明确失败于`repair_acceptance_http.py`的`test_03`第189行：改派前后`firstAssignedAt`不相等。Linux纳秒与PostgreSQL微秒是待验证解释，维修代理正在复现和修复。失败必须继续阻断后续发布/合并，不能降低时间断言或把旧四阶段成功当作当前门禁通过。
+[R3→B兼容证明](evidence/release/final-compatibility.json)和[实际rollback](evidence/release/final-actual-rollback.json)均通过：三镜像、两原会话、三类业务、新增assigned_to_name列与实际Flyway历史保持。回退不降级数据库。已有[A/B、备份恢复、保留卷重建和启动故障恢复](evidence/release/README.md)仍保留各自版本和条件。
 
-隔离负面门禁分支`ycy/ci-negative-gate`以`d6a4d29`故意触发JUnit失败，非draft [MR !2](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/2)已显示“Pipeline must succeed”限制。Pipeline 682968已因该测试实际失败，页面显示唯一合并阻断为流水线成功要求；integration、container-release与package均跳过。测试MR已关闭，破坏提交不在交付分支中。[负向门禁证据](evidence/gitlab-negative-gate.md)已归档。
+GitLab [MR !1](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/1)保持Draft等待完整验收。用户要求的Fast-forward、默认不squash、pipeline必须成功且skipped不算成功已实际配置。隔离故意失败的[MR !2 / pipeline682968](evidence/gitlab-negative-gate.md)已验证非Draft状态也阻止合并，后续integration/container-release/package跳过；测试MR已关闭，破坏提交不在交付分支。
 
-R1→B正式rollback已通过，保留`repair.repair_order.assigned_to_name`、两名用户原会话、三类业务与新schema，见本机`output/release-candidate-actual-rollback.json`。R2→B兼容探针`output/release-final-v2-compatibility.json`与实际rollback `output/release-final-v2-actual-rollback.json`均已通过，核对三镜像、两原Cookie、三类业务和扩展schema。最终R3仍需绑定自身清单与已验证回退目标。早期[A/B、备份恢复、保留卷重建及启动故障恢复](evidence/release/README.md)不再列为未执行；无相关机制变更时无需全部重复。
+[源码审计](evidence/final-source-audit.md)快照d5b4f84：387跟踪文件、近8提交404唯一blob，对140个实际secret/cookie及563变体命中0。可读项目名已统一，锁文件随机摘要保留；临时下载代理没有固化。[R3运行隐私审计](evidence/final-runtime-audit.md)随后归档：116份运行产物（含15份限定日志）及HTML内嵌ZIP，对181个实际已知值/727种形式为0命中；收尾412份源码/新增文档以174个当时已知值/701种形式补扫，同样0命中。扫描截止时间、源码HEAD与镜像身份独立记录；远端GitLab日志、截止后的活动及未来R4不在范围，旧源码快照未改写。
 
-新增[core重启验收脚本](../tests/integration/core_restart_recovery.py)已提交`e70b917`，安全/负面断言8/8通过；真实Docker执行尚未发生。计划在最终候选完整性能之后，对独立性能环境正常stop/start同一core容器，核对10项积压任务、NO_SHOW/COMPLETED/EXPIRED、过期提醒不补发、唯一通知/违约及65秒后无重复，不改现有业务记录或删除卷。
+R4用于把后续修正纳入同一可迁移源码包与版本标签：CI环境名称、旧Runner可选探针兼容、性能验收工具版本标签/身份门禁、恢复采集器完整JSON解析及真实数据规模报告已修正，工具提交为`4a83b6e`。主业务代码与R3一致，既有R3通过事实保留；R4尚未构建，不能继承为已通过的R4运行证据。
 
-## 下一步闭环顺序
+## 剩余闭环顺序
 
-1. 严格复验改派时间一致性修复，与已提交的UI加载修复一起冻结R3完整提交和三个镜像；在新镜像运行房间加载延迟回归。
-2. 在最终组合执行既定浏览器6流程和隐私门禁；执行原规格6分钟性能、同座争抢、repair积压与core跨提醒真实重启，保留全部原始结果。
-3. 让同提交GitLab完整流水线真实通过，保留失败阻断与合并门禁证据；Fast-forward合入main后验证整套test自动更新。
-4. 核对最终兼容回退目标、至少三套成功版本留存、最终五镜像离线包及tag/manifest；归档最终代码和运行报告秘密扫描、MR/pipeline/版本链接，再逐项关闭39条追踪。
+1. R3完整性能、SQL计划与真实repair/core恢复已通过。core首轮采集器JSON解析错误保留；修复后完整第二轮正常停启、10任务/3终态/零过期提醒、唯一通知/违约及65秒稳定性均通过，原数据不变。
+2. R3五镜像包实际导入核对及限定范围隐私扫描已通过。构建包含上述修正的R4完整源码/五镜像组合，再按其实际清单执行既定浏览器、性能/恢复、兼容回退与离线导入核对，保留原数据；R4结果尚待执行。
+3. R3 backend/frontend/integration已通过，container-release因Runner17.2可选探针在PodPending时提前失败；两次18秒失败证据保留，已按官方源码修正，完整流水线仍须复验。通过后按Fast-forward、不squash合入main，再验main自动整套部署/E2E；发版tag与清单精确绑定。
+4. R4运行完成后另行扫描对应源码、报告与限定日志，将机器结果、MR/pipeline/tag/manifest关联到原39条追踪，按实际证据关闭门禁。R3审计不覆盖未来运行。
 
-本机既有入口还包括Docker test `http://localhost:18082`、邮件`http://localhost:18027`及原生开发前端`http://localhost:8000`，与portable环境的数据库、会话、秘密分离。另一台服务器/AMD64、正式TLS/外部邮箱未实测；按既定交付边界保留限制，不扩充本轮范围，也不冒充已验。
+既有Docker test 18082/邮件18027和原生开发8000为分离的旧运行环境，不标记为R3。另一服务器、正式TLS/外部邮箱未实测，按ADR保留限制。
