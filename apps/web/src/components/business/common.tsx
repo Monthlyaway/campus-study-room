@@ -306,6 +306,10 @@ export function useAction(onSuccess?: (result: any) => void) {
         okButtonProps={{
           danger: spec?.danger,
           disabled: (error as ApiError)?.status === 409,
+          // Loading icons can outlive their exit animation while a dialog is hidden.
+          // Keep the action name stable for assistive technology and expose progress separately.
+          "aria-label": (error as ApiError)?.status === 0 ? "重试原请求" : "确认",
+          "aria-busy": busy,
         }}
         forceRender
         afterClose={() => form.resetFields()}

@@ -89,3 +89,11 @@ pnpm build
 Docker test 发布入口 `http://localhost:18082` 的独立生产静态页检查通过：使用 test 独立随机密码登录、375px 搜索真实可用座位；document/body 宽度均为 375px，无水平溢出。生产控制台无 CSP 拒绝、无脚本异常、无 Umi 开发警告，仅首次未登录 `auth/me` 的预期 401。截图 `output/playwright/docker-mobile-seats.png`。GET `/internal/v1/resource-commands`、`/internal/anything`、`/%69nternal/v1/resource-commands`、`/actuator/jobs`、`/actuator/health` 全部为 404。该检查没有创建新业务，避免与并行容器 HTTP 回归争用同一时段。
 
 真实资源断网下发现「超时后点击重试，文案恢复但轮询未重启」的问题，已修复并通过真实请求计数复验。独立环境身份、初次夹具失败、修复前后证据及同步恢复进展见 [前端同步故障验收](../evidence/frontend-sync.md)。最终发布包仍需按其精确 commit 单独运行完整浏览器套件。
+
+## 2026-10-23 确认按钮可访问名称回归
+
+候选 `14b9813d9f59676cb9b9618e4a3e3dd97406c102` 首次完整浏览器验收为 **5/6 通过**：维修“提交完工”已填写，但精确角色定位器始终没有找到“确认”按钮，点击步骤超时，没有发出该次 `/complete` 请求。原报告保存于 `output/browser-release-final-first/`。后续 M3 定向通过只能说明没有每次触发，不能视作修复证据。
+
+在同版真实预约409流程中，捕获了共用确认弹窗的可访问树与DOM：按钮名称是 `loading 确 认`，遗留的图标处于 `width:0/opacity:0/scale(0)` 离场动画，按钮本身已没有 loading 类。故障报告中的完工按钮视觉正常、输入保留，而点击步骤等不到其精确名称；这一证据支持共用按钮名称受隐藏动画图标影响。没有观测到表单被 `afterClose` 清空，因此未改动该生命周期。原始可访问树保留于 `output/browser-release-final-diagnostic-m1/`。
+
+共用 Modal 的确认按钮显式提供稳定的 `aria-label`（确认/重试原请求），并以 `aria-busy` 独立表示忙碌。409回归恢复精确名称定位，并检查 disabled 与 busy=false；维修快速连续“开始→完工”也检查可访问名称与忙碌状态。失败诊断同时保留点击及响应等待结果，优先报告真实点击失败，避免响应超时掩盖未点击的原因；只输出字段长度与按钮状态，不输出表单值或秘密。TypeScript、6项客户端测试及生产构建通过。新镜像真实浏览器结果在 `tests/browser/REVIEW.md` 中单独按运行版本记录。

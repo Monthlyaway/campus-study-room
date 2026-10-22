@@ -63,10 +63,25 @@ export async function actor(browser, username, mobile = false) {
 }
 
 export async function confirm(page, path, expectedStatus = [200, 201, 202, 204]) {
-  const [response] = await Promise.all([
+  const results = await Promise.allSettled([
     page.waitForResponse((response) => new URL(response.url()).pathname === `/api/v1${path}` && response.request().method() !== 'GET'),
     modal(page).getByRole('button', { name: /^确\s*认$/ }).click(),
   ]);
+  if (results.some((result) => result.status === 'rejected')) {
+    const diagnostic = await page.evaluate(() => {
+      const dialog = [...document.querySelectorAll('.ant-modal')].find((node) => node.getBoundingClientRect().width > 0);
+      const ancestry = [];
+      for (let node = dialog; node; node = node.parentElement)
+        ancestry.push({ tag: node.tagName, class: node.className, hidden: node.getAttribute('aria-hidden'), inert: node.hasAttribute('inert') });
+      return { ancestry, fields: [...(dialog?.querySelectorAll('input,textarea') || [])].map((field) => ({ tag: field.tagName, length: field.value.length })),
+        buttons: [...(dialog?.querySelectorAll('button') || [])].map((button) => ({ text: button.textContent, disabled: button.disabled, label: button.getAttribute('aria-label'), busy: button.getAttribute('aria-busy'), iconLabels: [...button.querySelectorAll('[role=img]')].map(icon => icon.getAttribute('aria-label')) })) };
+    });
+    // No request bodies, input values, credentials or cookies are included.
+    console.error('Confirmation diagnostic:', JSON.stringify({ path, ...diagnostic }));
+    // A response timeout must not mask an actual failed click from the same Promise group.
+    throw (results[1].status === 'rejected' ? results[1].reason : results[0].reason);
+  }
+  const response = results[0].value;
   expect(expectedStatus, `Unexpected status from ${path}`).toContain(response.status());
   const payload = response.status() === 204 ? {} : await response.json();
   if (response.ok()) await expect(modal(page)).toHaveCount(0);

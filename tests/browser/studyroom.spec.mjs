@@ -50,9 +50,10 @@ test('M1 availability, real stale 409 and mobile history reuse create a new rese
     await second.close();
     await card.getByRole('button', { name: '取消预约', exact: true }).click();
     await confirm(page, `/reservations/${id}/cancel`, [409]);
-    const staleConfirm = modal(page).locator('.ant-modal-footer button.ant-btn-primary');
+    const staleConfirm = modal(page).getByRole('button', { name: '确认', exact: true });
     await expect(staleConfirm).toHaveText(/^确\s*认$/);
     await expect(staleConfirm).toBeDisabled();
+    await expect(staleConfirm).toHaveAttribute('aria-busy', 'false');
     await expect(modal(page).getByText('已刷新服务器数据，请返回后重新选择操作。')).toBeVisible();
     await screenshot(page, info, 'real-stale-version-conflict');
     await modal(page).getByRole('button', { name: '返回并重新选择' }).click();
@@ -243,6 +244,7 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await expect(drawer(worker.page).getByRole('button', { name: '验收通过', exact: true })).toHaveCount(0);
     await drawer(worker.page).getByRole('button', { name: '提交完工', exact: true }).click();
     await modal(worker.page).getByLabel('维修处理情况').fill('已检查模拟问题，测试完成后恢复教室资源。');
+    await expect(modal(worker.page).getByRole('button', { name: '确认', exact: true })).toHaveAttribute('aria-busy', 'false');
     await confirm(worker.page, `/repairs/${id}/complete`);
     await expect(drawer(worker.page).getByText('等待验收，座位仍保持下架')).toBeVisible();
     await screenshot(worker.page, info, 'desktop-repair-awaiting-acceptance');
