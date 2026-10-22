@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run repair JPA/deadline/concurrency tests in an isolated local PostgreSQL database."""
+from runner_locks import local_runner_lock
 import importlib.util
 from pathlib import Path
 import subprocess
@@ -14,7 +15,7 @@ def psql(sql, database="studyroom"):
     return ops.compose("local", "exec", "-T", "postgres", "psql", "-v", "ON_ERROR_STOP=1", "-U", "studyroom_bootstrap", "-d", database, "-tAc", sql, capture=True).stdout.strip()
 
 
-def main():
+def run_local():
     database = "studyroom_repair_integration"
     if not psql("SELECT 1 FROM pg_database WHERE datname='studyroom_repair_integration'"):
         psql("CREATE DATABASE studyroom_repair_integration OWNER studyroom_migration")
@@ -34,6 +35,11 @@ def main():
     env["DB_URL"] = env["DB_URL"].rsplit("/", 1)[0] + "/" + database
     env["STUDYROOM_REPAIR_DB_TESTS"] = "true"
     ops.run([ROOT / "mvnw", "-B", "-ntp", "-pl", "services/repair-service", "-am", "-Dtest=RepairPersistenceTest", "-Dsurefire.failIfNoSpecifiedTests=false", "test"], env=env)
+
+
+def main():
+    with local_runner_lock(ops, workspace=True):
+        run_local()
 
 
 if __name__ == "__main__":

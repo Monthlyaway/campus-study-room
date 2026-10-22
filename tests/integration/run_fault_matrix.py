@@ -25,6 +25,7 @@ import urllib.parse
 import uuid
 
 from run_core_persistence import ROOT, ops, psql
+from runner_locks import local_runner_lock
 
 STATE = ROOT / '.local/fault-matrix'
 OUTPUT = ROOT / 'output/fault-matrix'
@@ -355,7 +356,7 @@ def main():
     STATE.mkdir(parents=True, exist_ok=True)
     STATE.chmod(0o700)
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    with (STATE / 'environment.lock').open('a') as lock:
+    with local_runner_lock(ops, workspace=action_name in ('setup', 'all')), (STATE / 'environment.lock').open('a') as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
         if action_name == 'all':
             all_steps()

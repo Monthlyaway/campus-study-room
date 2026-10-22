@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """M3-07: isolated repair PG/clock, real core APIs and recipient scope assertions."""
+from runner_locks import local_runner_lock
 import json
 import os
 import unittest
@@ -74,7 +75,7 @@ def run_local():
 
 def main():
     from run_core_persistence import ops
-    with ops.environment_lock('local'):
+    with local_runner_lock(ops, workspace=True):
         run_local()
 
 

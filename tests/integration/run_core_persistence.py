@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run core resource/deadline tests on an isolated, migrated PostgreSQL database."""
+from runner_locks import local_runner_lock
 import importlib.util
 import re
 from pathlib import Path
@@ -36,9 +37,14 @@ def persistence_environment(database='studyroom_core_integration'):
     env['CONTROL_DIR'] = str(control)
     return env
 
-def main():
+def run_local():
     env = persistence_environment()
     ops.run([ROOT / 'mvnw', '-B', '-ntp', '-pl', 'services/core-service', '-am', '-Dtest=CorePersistenceTest', '-Dsurefire.failIfNoSpecifiedTests=false', 'test'], env=env)
+
+def main():
+    with local_runner_lock(ops, workspace=True):
+        run_local()
+
 
 if __name__ == '__main__':
     main()

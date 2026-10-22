@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run real resource response-loss recovery locally, restoring the normal repair process afterward."""
+from runner_locks import local_runner_lock
 import importlib.util
 import json
 import os
@@ -50,7 +51,7 @@ def start_repair(state, core_url="http://localhost:8081"):
     ops.wait_http("http://localhost:8082/actuator/health/readiness")
 
 
-def main():
+def run_local():
     state, _ = ops.config("local")
     events = state / ("repair-fault-events-" + str(int(time.time())) + ".jsonl")
     stop_owned(state / "repair.pid")
@@ -72,6 +73,11 @@ def main():
         proxy.terminate()
         proxy.wait(timeout=10)
         start_repair(state)
+
+
+def main():
+    with local_runner_lock(ops, workspace=False):
+        run_local()
 
 
 if __name__ == "__main__":

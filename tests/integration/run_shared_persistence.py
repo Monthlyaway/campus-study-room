@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run core resource/deadline tests on an isolated, migrated PostgreSQL database."""
+from runner_locks import local_runner_lock
 import importlib.util
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
@@ -10,7 +11,7 @@ spec.loader.exec_module(ops)
 def psql(sql, database='studyroom'):
     return ops.compose('local', 'exec', '-T', 'postgres', 'psql', '-v', 'ON_ERROR_STOP=1', '-U', 'studyroom_bootstrap', '-d', database, '-tAc', sql, capture=True).stdout.strip()
 
-def main():
+def run_local():
     database = 'studyroom_shared_integration'
     if not psql("SELECT 1 FROM pg_database WHERE datname='studyroom_shared_integration'"):
         psql('CREATE DATABASE studyroom_shared_integration OWNER studyroom_migration')
@@ -33,6 +34,11 @@ def main():
     (control / 'jobs-paused').touch()
     env['CONTROL_DIR'] = str(control)
     ops.run([ROOT / 'mvnw', '-B', '-ntp', '-pl', 'services/core-service', '-am', '-Dtest=SharedPersistenceTest', '-Dsurefire.failIfNoSpecifiedTests=false', 'test'], env=env)
+
+def main():
+    with local_runner_lock(ops, workspace=True):
+        run_local()
+
 
 if __name__ == '__main__':
     main()

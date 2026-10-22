@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run M3 public API acceptance against the native local pair and actual Mailpit."""
+from runner_locks import local_runner_lock
 from run_core_persistence import ops, ROOT
 
 
@@ -13,7 +14,7 @@ def run_local():
 
 def main():
     from run_core_persistence import ops
-    with ops.environment_lock('local'):
+    with local_runner_lock(ops, workspace=False):
         run_local()
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """D-06 real Mailpit SMTP + unavailable-peer recovery on isolated PostgreSQL."""
+from runner_locks import local_runner_lock
 from run_core_persistence import persistence_environment, ops, ROOT
 
 
@@ -16,7 +17,7 @@ def run_local():
 
 def main():
     from run_core_persistence import ops
-    with ops.environment_lock('local'):
+    with local_runner_lock(ops, workspace=True):
         run_local()
 
 
