@@ -278,8 +278,16 @@ class RepairAcceptanceTests(unittest.TestCase):
             time.sleep(1)
         self.assertIsNotNone(received, 'CLOSED notification did not reach real Mailpit SMTP')
         self.assertIn(recipient, [r['Address'] for r in received['To']])
-        delivered = self.notices('self_worker', order, 'CLOSED')[0]
-        self.assertEqual(notice['id'], delivered['id'])
+        # Mailpit can expose an accepted message before the sender commits SENT.
+        # Share the SMTP deadline; never give the delivery acknowledgment extra time.
+        while True:
+            delivered_rows = self.notices('self_worker', order, 'CLOSED')
+            self.assertEqual(1, len(delivered_rows), 'CLOSED event/recipient must remain unique')
+            delivered = delivered_rows[0]
+            self.assertEqual(notice['id'], delivered['id'])
+            if delivered['status'] == 'SENT' or time.monotonic() >= end:
+                break
+            time.sleep(min(.5, max(0, end - time.monotonic())))
         self.assertEqual('SENT', delivered['status'])
         self.assertGreaterEqual(delivered['attempts'], 1)
 
