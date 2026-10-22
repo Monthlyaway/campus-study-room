@@ -1,0 +1,84 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "6c464dbc89781a8f90f559d24aedde86f8c568fa",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "scripts/private_artifacts.py",
+      "additions": {
+        "human": 43
+      }
+    },
+    {
+      "new_path": "tests/browser/artifact-safety.test.mjs",
+      "additions": {
+        "human": 92
+      }
+    },
+    {
+      "new_path": "tests/browser/privacy-reporter.mjs",
+      "additions": {
+        "human": 43
+      }
+    },
+    {
+      "new_path": "tests/ops/test_private_artifacts.py",
+      "additions": {
+        "human": 42
+      }
+    },
+    {
+      "old_path": "tests/browser/README.md",
+      "new_path": "tests/browser/README.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/browser/helpers.mjs",
+      "new_path": "tests/browser/helpers.mjs",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/browser/package.json",
+      "new_path": "tests/browser/package.json",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/browser/playwright.config.mjs",
+      "new_path": "tests/browser/playwright.config.mjs",
+      "additions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "tests/browser/studyroom.spec.mjs",
+      "new_path": "tests/browser/studyroom.spec.mjs",
+      "additions": {
+        "human": 29
+      },
+      "deletions": {
+        "human": 4
+      }
+    }
+  ]
+}
