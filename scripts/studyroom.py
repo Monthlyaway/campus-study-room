@@ -159,7 +159,30 @@ def web_command(*args):
 
 
 def build_backend():
-    run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+    from integration_harness import workspace_lock
+    with workspace_lock():
+        run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+
+
+def check(unit_only=False):
+    from integration_harness import PERSISTENCE_SUITES, run_local, workspace_lock
+    with workspace_lock():
+        env = java_env()
+        # Real suites run explicitly below, with isolated database credentials.
+        for _, _, flag in PERSISTENCE_SUITES:
+            env.pop(flag, None)
+        run([ROOT / "mvnw", "-B", "-ntp", "verify"], env=env)
+        run(web_command("generate"), cwd=ROOT / "apps/web")
+        run(["git", "diff", "--exit-code", "--", "apps/web/src/services/generated"])
+        run(web_command("typecheck"), cwd=ROOT / "apps/web")
+        run(web_command("test"), cwd=ROOT / "apps/web")
+        run(web_command("build"), cwd=ROOT / "apps/web")
+        compose("local", "config", "--quiet")
+        run([sys.executable, "-m", "unittest", "discover", "-s", "tests/ops", "-v"])
+        if unit_only:
+            print("UNIT-ONLY: real PostgreSQL, HTTP, SMTP and backend contract checks were NOT run; this is not full acceptance.", flush=True)
+        else:
+            run_local(env)
 
 
 def native_stop(environment):
@@ -671,8 +694,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["deps", "native-up", "native-stop", "native-restart", "install", "migrate", "seed", "check", "web", "status", "stop", "build-release", "deploy", "rollback", "backup", "restore", "export-release"])
     parser.add_argument("arguments", nargs="*")
+    parser.add_argument("--unit-only", action="store_true", help="check only: explicitly skip real PG/HTTP/SMTP/backend contract suites")
     options = parser.parse_args()
     command, args = options.command, options.arguments
+    if options.unit_only and command != "check":
+        parser.error("--unit-only is supported only by check")
+    if command == "check":
+        if args and args != ["local"]:
+            parser.error("check uses its own disposable environment; no runtime environment may be targeted")
+        check(unit_only=options.unit_only)
+        return
     environment = args[0] if args else "local"
     if command == "web":
         run(web_command(*args), cwd=ROOT / "apps/web")
@@ -709,15 +740,6 @@ def main():
                 compose(environment, "stop")
     elif command == "status":
         compose(environment, "ps")
-    elif command == "check":
-        run([ROOT / "mvnw", "-B", "-ntp", "verify"], env=java_env())
-        run(web_command("generate"), cwd=ROOT / "apps/web")
-        run(["git", "diff", "--exit-code", "--", "apps/web/src/services/generated"])
-        run(web_command("typecheck"), cwd=ROOT / "apps/web")
-        run(web_command("test"), cwd=ROOT / "apps/web")
-        run(web_command("build"), cwd=ROOT / "apps/web")
-        compose(environment, "config", "--quiet")
-        run([sys.executable, "-m", "unittest", "discover", "-s", "tests/ops", "-v"])
     elif command == "backup":
         with environment_lock(environment):
             backup(environment)
