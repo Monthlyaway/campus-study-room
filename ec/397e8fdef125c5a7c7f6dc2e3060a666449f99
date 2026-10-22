@@ -1,0 +1,45 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "ec397e8fdef125c5a7c7f6dc2e3060a666449f99",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "db/migration/core/V20261022150000__reservation_operator_note.sql",
+      "additions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "docs/modules/release-operations.md",
+      "new_path": "docs/modules/release-operations.md",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/integration/release_compatibility.py",
+      "new_path": "tests/integration/release_compatibility.py",
+      "additions": {
+        "human": 34
+      },
+      "deletions": {
+        "human": 9
+      }
+    }
+  ]
+}
