@@ -1,0 +1,83 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "d4291e25b176b6c06aa188e464f34f1ae500fa39",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/modules/bootstrap.md",
+      "additions": {
+        "human": 59
+      }
+    },
+    {
+      "new_path": "infra/ansible/bootstrap.yml",
+      "additions": {
+        "human": 233
+      }
+    },
+    {
+      "new_path": "infra/ansible/files/setup-state.py",
+      "additions": {
+        "human": 98
+      }
+    },
+    {
+      "new_path": "infra/ansible/inventory.example.json",
+      "additions": {
+        "human": 19
+      }
+    },
+    {
+      "new_path": "infra/ansible/networks.yml",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "infra/ansible/requirements.txt",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "infra/ansible/runtime-lock.json",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "scripts/bootstrap",
+      "additions": {
+        "human": 172
+      }
+    },
+    {
+      "new_path": "tests/ops/test_bootstrap.py",
+      "additions": {
+        "human": 180
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
