@@ -83,7 +83,7 @@ integration:
   resource_group: studyroom-test
   interruptible: false
   environment:
-    name: test/ci-$CI_PIPELINE_ID
+    name: test/ci-$CI_PIPELINE_IID
     action: start
     auto_stop_in: 1 day
   before_script:
@@ -133,7 +133,7 @@ container-release:
   resource_group: studyroom-container-test
   interruptible: false
   environment:
-    name: test/container-$CI_PIPELINE_ID
+    name: test/container-$CI_PIPELINE_IID
     action: start
     auto_stop_in: 1 day
   before_script:

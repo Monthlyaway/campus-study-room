@@ -65,6 +65,8 @@ python3 scripts/studyroom.py status test
 
 CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原 `k8s-amd64` 对应的 Runner 已长期离线。使用 `resource_group: studyroom-test` 串行化集成任务，秘密在每个 job 内随机生成。测试环境记录为 `test/ci-<pipeline>`；只有集成通过才允许打包。实际 pipeline、版本化 Docker 发布和完整自动部署的证据继续在进度表追踪；配置存在不等于门禁已执行。
 
+环境名称使用项目内唯一的 `CI_PIPELINE_IID`。真实任务4478645曾显示空后缀 `test/ci-`：`CI_PIPELINE_ID`属于job-only/persisted变量，不支持在GitLab预先展开的`environment:name`中使用。运行时脚本仍使用完整`CI_PIPELINE_ID`形成release/Compose项目身份，私有daemon隔离不受名称问题影响。变量可用阶段依据[GitLab变量定义](https://docs.gitlab.com/ci/variables/predefined_variables/)和[展开规则](https://docs.gitlab.com/ci/variables/where_variables_can_be_used/#persisted-variables)；修正后的UI名称需在下一轮流水线核对。
+
 ## 已执行与待执行
 
 已执行：独立 test Compose 首次安装；容器入口管理 2 项、预约/审批 5 项、维修 2 项真实 HTTP；Linux 0600 秘密读取启动；维护 503、任务排空、内部接口 404 和恢复 200；隔离数据库备份恢复；三个应用生产入口与 375px 浏览器试用。
