@@ -1,0 +1,70 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "e68cedbe108f242b10230a273362a900c847b663",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "old_path": "apps/web/src/pages/Notifications.tsx",
+      "new_path": "apps/web/src/pages/Notifications.tsx",
+      "additions": {
+        "human": 41
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "apps/web/src/pages/Reservations.tsx",
+      "new_path": "apps/web/src/pages/Reservations.tsx",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/administration.ts",
+      "new_path": "apps/web/src/services/generated/core/api/administration.ts",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/masterData.ts",
+      "new_path": "apps/web/src/services/generated/core/api/masterData.ts",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "new_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 3
+      }
+    }
+  ]
+}
