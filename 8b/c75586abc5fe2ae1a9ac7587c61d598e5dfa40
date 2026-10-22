@@ -1,0 +1,57 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "8bc75586abc5fe2ae1a9ac7587c61d598e5dfa40",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "infra/compose/check.yml",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "scripts/integration_harness.py",
+      "additions": {
+        "human": 439
+      }
+    },
+    {
+      "new_path": "tests/ops/test_check.py",
+      "additions": {
+        "human": 188
+      }
+    },
+    {
+      "old_path": "scripts/ci-integration.py",
+      "new_path": "scripts/ci-integration.py",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 170
+      }
+    },
+    {
+      "old_path": "scripts/studyroom.py",
+      "new_path": "scripts/studyroom.py",
+      "additions": {
+        "human": 32
+      },
+      "deletions": {
+        "human": 10
+      }
+    },
+    {
+      "old_path": "tests/integration/repair_acceptance_http.py",
+      "new_path": "tests/integration/repair_acceptance_http.py",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
