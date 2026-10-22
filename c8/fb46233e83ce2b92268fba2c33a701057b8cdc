@@ -1,0 +1,100 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "c8fb46233e83ce2b92268fba2c33a701057b8cdc",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/release/README.md",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/actual-rollback.json",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/backup-and-recreate.json",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/current-release.json",
+      "additions": {
+        "human": 31
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/portable-install.json",
+      "additions": {
+        "human": 31
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/r-20261022T132000-66f2b928550f--r-20261022T131500-6c9c47359404.json",
+      "additions": {
+        "human": 95
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/schema-release.json",
+      "additions": {
+        "human": 103
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/startup-recovery.json",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "tests/integration/release_startup_recovery.py",
+      "additions": {
+        "human": 92
+      }
+    },
+    {
+      "old_path": "docs/modules/portable-release.md",
+      "new_path": "docs/modules/portable-release.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 5
+      }
+    }
+  ]
+}
