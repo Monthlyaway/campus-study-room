@@ -1,0 +1,381 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "releaseId": "r-20261022T170200-3012051",
+  "releaseCandidateCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "sourceHeadCommit": "9f5fbab98e48d99f19389faa42922f7b441e0cb3",
+  "runtimeCaptureStartedAt": "2026-10-22T17:24:41.345808+00:00",
+  "sourceIncrementScanStartedAt": "2026-10-22T17:28:38.170287+00:00",
+  "completedAt": "2026-10-22T17:28:38.511066+00:00",
+  "sourceScope": {
+    "baselineCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+    "mode": "Files changed since R4 candidate, including committed delta, current staged/unstaged bytes, and nonignored new source/documentation; no full Git history rescan.",
+    "fileCount": 29,
+    "paths": [
+      "README.md",
+      "docs/evidence/core/restart-recovery-v4.json",
+      "docs/evidence/core/restart-recovery-v4.md",
+      "docs/evidence/frontend-release-v4.md",
+      "docs/evidence/performance.md",
+      "docs/evidence/performance/20261022T170955Z-actual-container-limits.json",
+      "docs/evidence/performance/20261022T170955Z-artifacts.json",
+      "docs/evidence/performance/20261022T170955Z-contention.json",
+      "docs/evidence/performance/20261022T170955Z-data-scale.json",
+      "docs/evidence/performance/20261022T170955Z-database-samples.json",
+      "docs/evidence/performance/20261022T170955Z-environment.json",
+      "docs/evidence/performance/20261022T170955Z-page-query-counts.json",
+      "docs/evidence/performance/20261022T170955Z-queries-summary.txt",
+      "docs/evidence/performance/20261022T170955Z-query-plans.json",
+      "docs/evidence/performance/20261022T170955Z-recovery.json",
+      "docs/evidence/performance/20261022T170955Z-release-binding.json",
+      "docs/evidence/performance/20261022T170955Z-release-manifest.json",
+      "docs/evidence/performance/20261022T170955Z-result.json",
+      "docs/evidence/performance/20261022T170955Z-sql-after.json",
+      "docs/evidence/performance/20261022T170955Z-sql-before.json",
+      "docs/evidence/performance/20261022T170955Z-sql-counts.json",
+      "docs/evidence/release/README.md",
+      "docs/evidence/release/v4-actual-rollback.json",
+      "docs/evidence/release/v4-compatibility.json",
+      "docs/evidence/release/v4-portable-import.json",
+      "docs/modules/web.md",
+      "docs/progress.md",
+      "docs/requirements-traceability.md",
+      "tests/browser/REVIEW.md"
+    ],
+    "sourceInventorySha256": "04943d3c54e895b82681f1cf43757129c54c40c82ac991d3759b1f424b1bcbff",
+    "workingTreeIncluded": true,
+    "untrackedFilesIncluded": true,
+    "selfReportsScannedSeparately": [
+      "docs/evidence/runtime-audit-v4.json",
+      "docs/evidence/runtime-audit-v4.md"
+    ],
+    "explicitlyExcluded": [
+      {
+        "path": "docs/evidence/gitlab-dind-startup.md",
+        "reason": "Concurrent GitLab diagnostic plan was still being edited at cutoff; excluded by coordination and requires its own later scan.",
+        "subsequentlyCoveredBy": "closingSourceSupplement"
+      }
+    ],
+    "filesChangedDuringScan": [],
+    "headUnchangedDuringScan": true,
+    "applicationAndRuntimeProductionFilesMatchCandidate": true,
+    "previousR3AuditsPreserved": true
+  },
+  "runtimeScope": {
+    "artifactGroups": [
+      {
+        "path": "output/browser-release-v4",
+        "files": 62,
+        "bytes": 8491817
+      },
+      {
+        "path": "output/performance/20261022T170955Z",
+        "files": 13,
+        "bytes": 14077302
+      },
+      {
+        "path": "output/performance/core-recovery-20261022T171658Z-d7d55f26",
+        "files": 8,
+        "bytes": 32036
+      }
+    ],
+    "collectedLogs": [
+      {
+        "path": "output/final-runtime-audit-v4/portable-install-core.log",
+        "environment": "portable-install",
+        "service": "core",
+        "imageId": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+        "bytes": 142589,
+        "sha256": "4fd31e3613c1ee4bbb9b5f91f11d052aec82b54d3ec5f7daef1785524dbddf86"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/portable-install-repair.log",
+        "environment": "portable-install",
+        "service": "repair",
+        "imageId": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+        "bytes": 33186,
+        "sha256": "f702ada6bedabcbcf73fec821ae407084f383f3df251b02a2931156bb2ffc811"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/portable-install-web.log",
+        "environment": "portable-install",
+        "service": "web",
+        "imageId": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4",
+        "bytes": 115667,
+        "sha256": "76ebea27a22413e7ae0140b31df25cb49a256fe516e62f6285d572414ea81eea"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-core.log",
+        "environment": "performance",
+        "service": "core",
+        "imageId": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+        "bytes": 34773431,
+        "sha256": "8683590a30c87636166a42976cd11d88ed4e4c13f09b9ed4c0d40e7108576a1b"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-repair.log",
+        "environment": "performance",
+        "service": "repair",
+        "imageId": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+        "bytes": 6039173,
+        "sha256": "f2cc80157019e868ac422fa6db5d5f021e899db86e427a302f8f0c9f68d01cb1"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-web.log",
+        "environment": "performance",
+        "service": "web",
+        "imageId": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4",
+        "bytes": 13117799,
+        "sha256": "44b68a18b124666b3df445e816fd88d0fad2b7f239fa5fb940e004e4be018281"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/release-final-v4-build.log",
+        "source": "output/release-final-v4-build.log",
+        "bytes": 20144,
+        "sha256": "e728bcaf0a9b33eb82c9c020d122230db90fe73842c223f49d76f579b1cc93f5"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/release-final-v4-export.log",
+        "source": "output/release-final-v4-export.log",
+        "bytes": 98,
+        "sha256": "4f049a1a10034e071c52cdfa575a89d07e7325964957a0dd34b710dfc959ce0d"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/release-final-v4-import.log",
+        "source": "output/release-final-v4-import.log",
+        "bytes": 4444,
+        "sha256": "a6f368496a6cf2cd4926441a405b9ebcc535c1fab2713e6c52772e358edfe1b3"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-final-v4-queries.log",
+        "source": "output/performance-final-v4-queries.log",
+        "bytes": 241,
+        "sha256": "b56358dd8234493d1851608b01a00316c07cfc951d5cc6d03c766f462ad97b73"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-final-v4-run.log",
+        "source": "output/performance-final-v4-run.log",
+        "bytes": 8706,
+        "sha256": "9ddfda149466793f2ec7b200415207d9fc165a799e37c8b57b7777e45a79bdb9"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/core-recovery-v4-run.log",
+        "source": "output/core-recovery-v4-run.log",
+        "bytes": 250,
+        "sha256": "1d7db49322d620ce896876db31df51d5785a7a0b24eeabe8163d06839a54df51"
+      },
+      {
+        "path": "output/final-runtime-audit-v4/performance-v4-refresh.log",
+        "source": "output/performance-v4-refresh.log",
+        "bytes": 3546,
+        "sha256": "dc6311d270ec6d20ab421fd78bd6d9333b1e4b2af2564ced76bc822a3a80ff7c",
+        "collectedAt": "2026-10-22T17:28:38.098482+00:00"
+      }
+    ],
+    "collectedLogCount": 13,
+    "dockerLogCutoffUtc": "2026-10-22T17:24:41.785941Z",
+    "artifactFileCount": 97,
+    "artifactInventorySha256": "3985df93f3908d1f3c09e3544e82cc4bd45ae88059864556dba12b61368a9561",
+    "artifactsChangedDuringScan": [],
+    "importVerificationIncluded": true,
+    "remoteGitLabLogsIncluded": false
+  },
+  "runningVersionsAtCapture": {
+    "portable-install": {
+      "web": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      }
+    },
+    "performance": {
+      "web": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      }
+    }
+  },
+  "runningVersionsAtSourceScan": {
+    "portable-install": {
+      "web": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      }
+    },
+    "performance": {
+      "web": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+        "releaseId": "r-20261022T170200-3012051",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      }
+    }
+  },
+  "method": {
+    "privateSourceFileCount": 55,
+    "liveSessionCounts": {
+      "portable-install": 11,
+      "performance": 21
+    },
+    "liveSessionsReadInReadOnlyTransactions": true,
+    "knownUniquePrivateValuesIncludingTextDecoding": 184,
+    "uniqueEncodingVariants": 741,
+    "privateNeedlesPersisted": false,
+    "encodings": [
+      "raw UTF-8",
+      "Base64 standard and URL-safe, padded and unpadded",
+      "lowercase and uppercase hexadecimal",
+      "URL percent and form encoding",
+      "JSON string escaping",
+      "HTML escaping"
+    ],
+    "matching": "fixed-string byte matching; patterns supplied through anonymous memory pipes",
+    "embeddedArchives": {
+      "archivesScanned": 1,
+      "membersScanned": 2,
+      "uncompressedBytesScanned": 273286,
+      "unreadableArchives": []
+    }
+  },
+  "results": {
+    "knownSecretMatchingPaths": [],
+    "embeddedSecretMatchingPaths": [],
+    "legacyTemporaryNameMatchesInSourceIncrement": [],
+    "temporaryDownloadProxyConfigurationMatchesInSourceIncrement": []
+  },
+  "acceptanceContext": {
+    "browser": {
+      "expected": 6,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "duration": 100806.12599999999
+    },
+    "browserVerificationExitCode": 0,
+    "performanceRunId": "20261022T170955Z",
+    "performancePassed": true,
+    "repairRecoveryPassed": true,
+    "coreRecoveryRunId": "d7d55f26-583a-4a0c-8a59-0f8d76f5a903",
+    "coreRecoveryPassed": true,
+    "coreOriginalBusinessUnchanged": true,
+    "coreStillRunningAtExit": true,
+    "allVersionApisAndImmutableImagesMatchR4": true
+  },
+  "limitations": [
+    "Only the declared R4 artifact groups, captured logs and source increment are covered; this is not a full-history source rescan.",
+    "Remote GitLab job logs are outside this snapshot. The diagnostic plan excluded during the initial source scan is included by the closing source supplement.",
+    "Docker logs are bounded by the recorded cutoff; later activity and later edits need a separate scan.",
+    "Known-value byte matching cannot prove absence of arbitrary unknown secrets.",
+    "Image files are scanned as bytes without OCR; real failing-browser-report privacy probing has separate browser evidence.",
+    "Prior R3 source/runtime audits and the earlier failed core collector evidence remain unchanged.",
+    "Privacy scanning does not replace business, recovery, GitLab merge, deployment or tag gates."
+  ],
+  "closingSourceSupplement": {
+    "startedAt": "2026-10-22T17:29:56.216088+00:00",
+    "completedAt": "2026-10-22T17:29:56.498813+00:00",
+    "sourceHeadCommit": "9f5fbab98e48d99f19389faa42922f7b441e0cb3",
+    "scannedPaths": [
+      "docs/progress.md",
+      "docs/evidence/gitlab-dind-startup.md"
+    ],
+    "scannedFileCount": 2,
+    "previousIncrementInventoryUnchanged": true,
+    "finalSourceIncrementFileCount": 30,
+    "finalSourceIncrementPaths": [
+      "README.md",
+      "docs/evidence/core/restart-recovery-v4.json",
+      "docs/evidence/core/restart-recovery-v4.md",
+      "docs/evidence/frontend-release-v4.md",
+      "docs/evidence/gitlab-dind-startup.md",
+      "docs/evidence/performance.md",
+      "docs/evidence/performance/20261022T170955Z-actual-container-limits.json",
+      "docs/evidence/performance/20261022T170955Z-artifacts.json",
+      "docs/evidence/performance/20261022T170955Z-contention.json",
+      "docs/evidence/performance/20261022T170955Z-data-scale.json",
+      "docs/evidence/performance/20261022T170955Z-database-samples.json",
+      "docs/evidence/performance/20261022T170955Z-environment.json",
+      "docs/evidence/performance/20261022T170955Z-page-query-counts.json",
+      "docs/evidence/performance/20261022T170955Z-queries-summary.txt",
+      "docs/evidence/performance/20261022T170955Z-query-plans.json",
+      "docs/evidence/performance/20261022T170955Z-recovery.json",
+      "docs/evidence/performance/20261022T170955Z-release-binding.json",
+      "docs/evidence/performance/20261022T170955Z-release-manifest.json",
+      "docs/evidence/performance/20261022T170955Z-result.json",
+      "docs/evidence/performance/20261022T170955Z-sql-after.json",
+      "docs/evidence/performance/20261022T170955Z-sql-before.json",
+      "docs/evidence/performance/20261022T170955Z-sql-counts.json",
+      "docs/evidence/release/README.md",
+      "docs/evidence/release/v4-actual-rollback.json",
+      "docs/evidence/release/v4-compatibility.json",
+      "docs/evidence/release/v4-portable-import.json",
+      "docs/modules/web.md",
+      "docs/progress.md",
+      "docs/requirements-traceability.md",
+      "tests/browser/REVIEW.md"
+    ],
+    "finalSourceInventorySha256": "b07403d6c95f510ad69ba1e52b74648f9aea2d2cbec04f433f6b6606fb37d87d",
+    "reason": "Final frozen CI cancellation status in the progress index and the separately authored GitLab diagnostic plan, now frozen, were checked before closing.",
+    "previouslyExcludedDiagnosticPlanNowCovered": true,
+    "knownPrivateValues": 184,
+    "encodingVariants": 741,
+    "knownSecretMatchingPaths": [],
+    "legacyTemporaryNameMatches": [],
+    "temporaryDownloadProxyConfigurationMatches": [],
+    "filesChangedDuringSupplement": [],
+    "headUnchangedDuringSupplement": true,
+    "originalRuntimeArtifactInventoryUnchanged": true
+  }
+}

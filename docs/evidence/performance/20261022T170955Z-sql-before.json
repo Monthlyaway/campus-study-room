@@ -1,0 +1,302 @@
+[
+  {
+    "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+    "calls": 43,
+    "total_exec_time": 1.1403420000000002,
+    "rows": 43
+  },
+  {
+    "query": "select cre1_0.id,cre1_0.version from core.config_revision cre1_0 where cre1_0.id=$1 for share of cre1_0",
+    "calls": 20,
+    "total_exec_time": 0.599793,
+    "rows": 20
+  },
+  {
+    "query": "SELECT pg_stat_statements_reset()",
+    "calls": 1,
+    "total_exec_time": 0.078499,
+    "rows": 1
+  },
+  {
+    "query": "select bg1_0.user_id from core.booking_guard bg1_0 where bg1_0.user_id=$1 for no key update of bg1_0",
+    "calls": 20,
+    "total_exec_time": 28.792294999999996,
+    "rows": 20
+  },
+  {
+    "query": "insert into core.resource_claim (created_by,created_request_id,end_at,release_request_id,released_at,room_id,seat_id,source_id,source_type,source_version,start_at,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+    "calls": 1,
+    "total_exec_time": 1.013834,
+    "rows": 1
+  },
+  {
+    "query": "select re1_0.room_id from core.reservation re1_0 where re1_0.id=$1",
+    "calls": 1,
+    "total_exec_time": 0.025166,
+    "rows": 1
+  },
+  {
+    "query": "select distinct pe1_0.code from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id where ure1_0.user_id=$1 and re1_0.enabled=$2 order by pe1_0.code",
+    "calls": 20,
+    "total_exec_time": 1.266081,
+    "rows": 260
+  },
+  {
+    "query": "select re1_0.id,re1_0.cancel_reason,re1_0.checked_in_at,re1_0.config_version,re1_0.created_at,re1_0.end_at,re1_0.ended_at,re1_0.max_duration_hours,re1_0.room_id,re1_0.seat_id,re1_0.start_at,re1_0.status,re1_0.updated_at,re1_0.user_id,re1_0.version from core.reservation re1_0 where re1_0.id=$1 for no key update of re1_0",
+    "calls": 1,
+    "total_exec_time": 0.011833,
+    "rows": 1
+  },
+  {
+    "query": "select se1_0.id,se1_0.code,se1_0.enabled,se1_0.has_power,se1_0.room_id,se1_0.version from core.seat se1_0 where se1_0.id=$1",
+    "calls": 20,
+    "total_exec_time": 0.26704,
+    "rows": 20
+  },
+  {
+    "query": "select ce1_0.id,ce1_0.created_by,ce1_0.created_request_id,ce1_0.end_at,ce1_0.release_request_id,ce1_0.released_at,ce1_0.room_id,ce1_0.seat_id,ce1_0.source_id,ce1_0.source_type,ce1_0.source_version,ce1_0.start_at from core.resource_claim ce1_0 where ce1_0.source_type=$1 and ce1_0.source_id=$2",
+    "calls": 1,
+    "total_exec_time": 0.018042000000000002,
+    "rows": 1
+  },
+  {
+    "query": "insert into core.idempotency_record (actor_id,actor_type,canonical_path,created_at,expires_at,http_status,key,method,request_hash,response_data_json,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
+    "calls": 2,
+    "total_exec_time": 0.836792,
+    "rows": 2
+  },
+  {
+    "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+    "calls": 1,
+    "total_exec_time": 0.10083400000000001,
+    "rows": 1
+  },
+  {
+    "query": "select ste1_0.id,ste1_0.attempts,ste1_0.dedup_key,ste1_0.due_at,ste1_0.last_error_code,ste1_0.lease_owner,ste1_0.lease_until,ste1_0.next_attempt_at,ste1_0.source_id,ste1_0.source_type,ste1_0.status,ste1_0.task_type from core.scheduled_task ste1_0 where ste1_0.id=$1",
+    "calls": 4,
+    "total_exec_time": 1.3742080000000003,
+    "rows": 0
+  },
+  {
+    "query": "SELECT json_agg(json_build_object($1,r.id,$2,extract($3 FROM r.assign_due_at))) FROM generate_series($4,$5) n JOIN repair.repair_order r ON r.id=md5($6||n)::uuid",
+    "calls": 1,
+    "total_exec_time": 0.127375,
+    "rows": 1
+  },
+  {
+    "query": "select ce1_0.id,ce1_0.created_by,ce1_0.created_request_id,ce1_0.end_at,ce1_0.release_request_id,ce1_0.released_at,ce1_0.room_id,ce1_0.seat_id,ce1_0.source_id,ce1_0.source_type,ce1_0.source_version,ce1_0.start_at from core.resource_claim ce1_0 where ce1_0.id=$1",
+    "calls": 1,
+    "total_exec_time": 0.683708,
+    "rows": 0
+  },
+  {
+    "query": "BEGIN READ ONLY",
+    "calls": 1,
+    "total_exec_time": 0.015667,
+    "rows": 0
+  },
+  {
+    "query": "select ie1_0.id,ie1_0.actor_id,ie1_0.actor_type,ie1_0.canonical_path,ie1_0.created_at,ie1_0.expires_at,ie1_0.http_status,ie1_0.key,ie1_0.method,ie1_0.request_hash,ie1_0.response_data_json from core.idempotency_record ie1_0 where ie1_0.id=$1",
+    "calls": 2,
+    "total_exec_time": 1.287458,
+    "rows": 0
+  },
+  {
+    "query": "insert into core.scheduled_task (attempts,dedup_key,due_at,last_error_code,lease_owner,lease_until,next_attempt_at,source_id,source_type,status,task_type,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+    "calls": 4,
+    "total_exec_time": 0.7507929999999999,
+    "rows": 4
+  },
+  {
+    "query": "insert into core.audit_event (action,actor_id,actor_type,after_json,before_json,created_at,object_id,object_type,reason,request_id,room_id,source_id,source_type,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+    "calls": 4,
+    "total_exec_time": 2.3153340000000004,
+    "rows": 4
+  },
+  {
+    "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+    "calls": 1,
+    "total_exec_time": 0.033708,
+    "rows": 2
+  },
+  {
+    "query": "select cast(row_to_json(q) as text) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.id=$1) q",
+    "calls": 2,
+    "total_exec_time": 0.044749,
+    "rows": 2
+  },
+  {
+    "query": "ROLLBACK",
+    "calls": 19,
+    "total_exec_time": 0.015290000000000002,
+    "rows": 0
+  },
+  {
+    "query": "select re1_0.id from core.reservation re1_0 where re1_0.user_id=$1 and re1_0.status in ($2 /*, ... */) and re1_0.start_at<$3 and re1_0.end_at>$4 fetch first $5 rows only",
+    "calls": 20,
+    "total_exec_time": 0.46996299999999996,
+    "rows": 0
+  },
+  {
+    "query": "SELECT coalesce(json_agg(q),$1) FROM (SELECT query,calls,rows,total_exec_time,shared_blks_hit,shared_blks_read FROM pg_stat_statements WHERE query NOT LIKE $2 ORDER BY total_exec_time DESC) q",
+    "calls": 1,
+    "total_exec_time": 0.07025,
+    "rows": 1
+  },
+  {
+    "query": "BEGIN",
+    "calls": 84,
+    "total_exec_time": 0.10896100000000006,
+    "rows": 0
+  },
+  {
+    "query": "BEGIN READ ONLY",
+    "calls": 24,
+    "total_exec_time": 0.519586,
+    "rows": 0
+  },
+  {
+    "query": "BEGIN",
+    "calls": 2,
+    "total_exec_time": 0.0013340000000000001,
+    "rows": 0
+  },
+  {
+    "query": "INSERT INTO repair.scheduled_task(id,task_type,source_type,source_id,dedup_key,cycle,due_at,status,next_attempt_at,created_at)\n    SELECT md5($1||n)::uuid,$2,$3,r.id,$4||r.id,$5,r.assign_due_at,$6,r.assign_due_at,r.created_at FROM generate_series($7,$8) n JOIN repair.repair_order r ON r.id=md5($9||n)::uuid",
+    "calls": 1,
+    "total_exec_time": 1.611375,
+    "rows": 20
+  },
+  {
+    "query": "select re1_0.id,re1_0.cancel_reason,re1_0.checked_in_at,re1_0.config_version,re1_0.created_at,re1_0.end_at,re1_0.ended_at,re1_0.max_duration_hours,re1_0.room_id,re1_0.seat_id,re1_0.start_at,re1_0.status,re1_0.updated_at,re1_0.user_id,re1_0.version from core.reservation re1_0 where re1_0.id=$1",
+    "calls": 1,
+    "total_exec_time": 0.07420800000000001,
+    "rows": 0
+  },
+  {
+    "query": "select ie1_0.id,ie1_0.actor_id,ie1_0.actor_type,ie1_0.canonical_path,ie1_0.created_at,ie1_0.expires_at,ie1_0.http_status,ie1_0.key,ie1_0.method,ie1_0.request_hash,ie1_0.response_data_json from core.idempotency_record ie1_0 where ie1_0.actor_type=$1 and ie1_0.actor_id=$2 and ie1_0.method=$3 and ie1_0.canonical_path=$4 and ie1_0.key=$5",
+    "calls": 21,
+    "total_exec_time": 35.674457000000004,
+    "rows": 0
+  },
+  {
+    "query": "SELECT count(*) FROM core.resource_claim WHERE seat_id=$1 AND released_at IS NULL AND start_at=$2::timestamptz AND end_at=$3::timestamptz",
+    "calls": 1,
+    "total_exec_time": 0.034083,
+    "rows": 1
+  },
+  {
+    "query": "select count(rse1_0.id)>$6 from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$1 and re1_0.enabled=$7 and pe1_0.code=$2 and (rse1_0.scope_type=$8 or (rse1_0.scope_type=$9 and rse1_0.room_id=$3) or (rse1_0.scope_type=$10 and rse1_0.department_id=$4) or (rse1_0.scope_type=$11 and $5=$12))",
+    "calls": 1,
+    "total_exec_time": 0.044292000000000005,
+    "rows": 1
+  },
+  {
+    "query": "select rr1_0.id,rr1_0.comment,rr1_0.created_at,rr1_0.order_id,rr1_0.reporter_id,rr1_0.score from repair.repair_rating rr1_0 where rr1_0.order_id in ($1 /*, ... */)",
+    "calls": 1,
+    "total_exec_time": 0.004249,
+    "rows": 0
+  },
+  {
+    "query": "select se1_0.room_id from core.seat se1_0 where se1_0.id=$1",
+    "calls": 20,
+    "total_exec_time": 1.7607109999999995,
+    "rows": 20
+  },
+  {
+    "query": "COMMIT",
+    "calls": 19,
+    "total_exec_time": 0.010332000000000001,
+    "rows": 0
+  },
+  {
+    "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+    "calls": 21,
+    "total_exec_time": 2.653791,
+    "rows": 21
+  },
+  {
+    "query": "select $2 from pg_advisory_xact_lock(hashtextextended($1,$3))",
+    "calls": 25,
+    "total_exec_time": 0.501297,
+    "rows": 25
+  },
+  {
+    "query": "select ste1_0.id from core.scheduled_task ste1_0 where ste1_0.dedup_key=$1 fetch first $2 rows only",
+    "calls": 4,
+    "total_exec_time": 1.0975419999999998,
+    "rows": 0
+  },
+  {
+    "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where r1_0.id=$1",
+    "calls": 1,
+    "total_exec_time": 0.007873999999999999,
+    "rows": 1
+  },
+  {
+    "query": "update core.resource_claim set created_by=$1,created_request_id=$2,end_at=$3,release_request_id=$4,released_at=$5,room_id=$6,seat_id=$7,source_id=$8,source_type=$9,source_version=$10,start_at=$11 where id=$12",
+    "calls": 1,
+    "total_exec_time": 0.08079199999999999,
+    "rows": 1
+  },
+  {
+    "query": "insert into core.reservation (cancel_reason,checked_in_at,config_version,created_at,end_at,ended_at,max_duration_hours,room_id,seat_id,start_at,status,updated_at,user_id,version,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)",
+    "calls": 1,
+    "total_exec_time": 1.8993339999999999,
+    "rows": 1
+  },
+  {
+    "query": "WITH rows AS (SELECT n,md5($1||n)::uuid id,clock_timestamp()+interval $2 due FROM generate_series($3,$4) n)\n    INSERT INTO repair.repair_order(id,reporter_id,room_id,title,description,status,submitted_at,assign_due_at,created_at,updated_at)\n    SELECT id,md5($5||n)::uuid,md5($6||n)::uuid,$7,$8,$9,due-interval $10,due,due-interval $11,due-interval $12 FROM rows",
+    "calls": 1,
+    "total_exec_time": 1.26775,
+    "rows": 20
+  },
+  {
+    "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where r1_0.id=$1 for no key update of r1_0",
+    "calls": 21,
+    "total_exec_time": 3809.6493339999997,
+    "rows": 21
+  },
+  {
+    "query": "select ro1_0.id,ro1_0.accept_due_at,ro1_0.acceptance_round,ro1_0.accepted_at,ro1_0.assign_due_at,ro1_0.assigned_at,ro1_0.assigned_by,ro1_0.assigned_to,ro1_0.assigned_to_name,ro1_0.closed_at,ro1_0.created_at,ro1_0.description,ro1_0.first_assigned_at,ro1_0.last_work_note,ro1_0.reporter_id,ro1_0.resource_version,ro1_0.room_id,ro1_0.status,ro1_0.submitted_at,ro1_0.title,ro1_0.updated_at,ro1_0.version,ro1_0.work_completed_at,ro1_0.work_due_at from repair.repair_order ro1_0 where ro1_0.reporter_id=$1 order by ro1_0.submitted_at desc,ro1_0.id offset $2 rows fetch first $3 rows only",
+    "calls": 1,
+    "total_exec_time": 0.672083,
+    "rows": 6
+  },
+  {
+    "query": "select count(ce1_0.id)>$6 from core.resource_claim ce1_0 where ce1_0.room_id=$1 and ce1_0.released_at is null and ce1_0.start_at<$2 and (ce1_0.end_at is null or ce1_0.end_at>$3) and ($4 is null or ce1_0.seat_id is null or ce1_0.seat_id=$5)",
+    "calls": 20,
+    "total_exec_time": 0.392502,
+    "rows": 20
+  },
+  {
+    "query": "select ore1_0.id,ore1_0.end_minute,ore1_0.room_id,ore1_0.start_minute,ore1_0.weekday from core.opening_rule ore1_0 where ore1_0.room_id=$1",
+    "calls": 20,
+    "total_exec_time": 0.436334,
+    "rows": 140
+  },
+  {
+    "query": "select sce1_0.key,sce1_0.updated_at,sce1_0.updated_by,sce1_0.value_json,sce1_0.version from core.system_config sce1_0 where sce1_0.key=$1",
+    "calls": 20,
+    "total_exec_time": 0.345837,
+    "rows": 20
+  },
+  {
+    "query": "update core.reservation set cancel_reason=$1,checked_in_at=$2,config_version=$3,created_at=$4,end_at=$5,ended_at=$6,max_duration_hours=$7,room_id=$8,seat_id=$9,start_at=$10,status=$11,updated_at=$12,user_id=$13,version=$14 where id=$15 and version=$16",
+    "calls": 1,
+    "total_exec_time": 0.08050099999999999,
+    "rows": 1
+  },
+  {
+    "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+    "calls": 42,
+    "total_exec_time": 1.819458,
+    "rows": 84
+  },
+  {
+    "query": "select aee1_0.id,aee1_0.action,aee1_0.actor_id,aee1_0.actor_type,aee1_0.after_json,aee1_0.before_json,aee1_0.created_at,aee1_0.object_id,aee1_0.object_type,aee1_0.reason,aee1_0.request_id,aee1_0.room_id,aee1_0.source_id,aee1_0.source_type from core.audit_event aee1_0 where aee1_0.id=$1",
+    "calls": 4,
+    "total_exec_time": 1.665166,
+    "rows": 0
+  }
+]

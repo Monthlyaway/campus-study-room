@@ -1,0 +1,12 @@
+{
+  "room-list-1": 13,
+  "room-list-20": 13,
+  "reservation-list-1": 9,
+  "reservation-list-20": 11
+}
+{
+  "reservation-history-page": 0.324,
+  "reservation-history-count": 5.815,
+  "availability-page": 0.571,
+  "availability-count": 4.096
+}

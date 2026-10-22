@@ -1,0 +1,262 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-22T17:20:22.488977+00:00",
+  "requirements": [
+    "T50-03",
+    "REQ-M1-05",
+    "REQ-M2-03",
+    "REQ-D-06"
+  ],
+  "passed": true,
+  "release": {
+    "releaseId": "r-20261022T170200-3012051",
+    "releaseCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+    "manifestSha256": "b24dc2ae24c6dea3ca159290602741fe546793082a896c18a16b1b2ac1f936f6"
+  },
+  "project": "studyroom-performance",
+  "performanceBaseline": {
+    "runId": "20261022T170955Z",
+    "resultSha256": "440009bfe430ccad101d4066d9d8a5274080d7ce4deb38df52632422748d9296"
+  },
+  "runtimeLimits": {
+    "core": {
+      "id": "d064254955c07b0c95898b1032f769d5e0e2fa21c3f5d98a89d77a112b601f17",
+      "image": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+      "cpuSet": "0-3",
+      "memory": 2147483648,
+      "memorySwap": 2147483648
+    },
+    "mailpit": {
+      "id": "6db3b3c076e61991523e7b4dab16f88c2976079bd7909f5855aaf10999468c20",
+      "image": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "cpuSet": "0-3",
+      "memory": 536870912,
+      "memorySwap": 536870912
+    },
+    "postgres": {
+      "id": "247767f5fe49341a01a28cf8152a02fe7784b15f8112406d034a4ae3c516a6fb",
+      "image": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "cpuSet": "0-3",
+      "memory": 3221225472,
+      "memorySwap": 3221225472
+    },
+    "repair": {
+      "id": "7a984f1cf19d5104f9cdd2f138f2451b8084fcb15e35422a8c4befee940bae68",
+      "image": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+      "cpuSet": "0-3",
+      "memory": 2147483648,
+      "memorySwap": 2147483648
+    },
+    "web": {
+      "id": "8a2a249a479a48bbbfb340e7c33b4a6627e09bce3c6708fe6912d8b60a3af121",
+      "image": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4",
+      "cpuSet": "0-3",
+      "memory": 536870912,
+      "memorySwap": 536870912
+    }
+  },
+  "versionApisAfterRecovery": {
+    "web": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "core": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "repair": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    }
+  },
+  "allVersionApisMatchManifest": true,
+  "dockerHost": {
+    "Architecture": "aarch64",
+    "NCPU": 10,
+    "MemTotal": 8217448448,
+    "OperatingSystem": "Docker Desktop",
+    "KernelVersion": "6.12.54-linuxkit",
+    "ServerVersion": "28.5.2"
+  },
+  "hostLimit": "Docker services share CPUs 0-3 and total 8GiB; host and Docker VM are shared, not dedicated hardware.",
+  "runId": "d7d55f26-583a-4a0c-8a59-0f8d76f5a903",
+  "normalStop": {
+    "ExitCode": 143,
+    "OOMKilled": false,
+    "FinishedAt": "2026-10-22T17:16:59.087621092Z"
+  },
+  "restartRequestedAt": "2026-10-22T17:17:00.915138+00:00",
+  "firstProcessingObservedSeconds": 12.860354875010671,
+  "allProcessedObservedSeconds": 14.056990792014403,
+  "healthyObservedSeconds": 10.421530042018276,
+  "firstProcessingLimitSeconds": 60,
+  "requiredStabilitySeconds": 65,
+  "snapshotObservationWindowSeconds": 65.393776,
+  "actualStabilityAndFinalCheckSeconds": 66.80035087498254,
+  "testSource": {
+    "workingTreeHeadAtRun": "9f5fbab98e48d99f19389faa42922f7b441e0cb3",
+    "actualScriptSha256": "6a1f86b715d1f97ad22e02d967c52eef1b2618ddc573b6ca741d706a2847bc52",
+    "scriptMatchesReleaseCommit": true,
+    "collectorPatchWasUncommittedAtRun": false
+  },
+  "fixture": {
+    "kind": "synthetic-overdue-orders-in-isolated-performance-database",
+    "note": "Only new UUID historical orders and original PENDING tasks were inserted while core was stopped. Real production scheduler performed every asserted transition. No clock change or task-handler call.",
+    "retained": true,
+    "orders": [
+      {
+        "sourceType": "M1",
+        "initialStatus": "RESERVED",
+        "initialVersion": 0,
+        "actualStatus": "NO_SHOW",
+        "actualVersion": 1,
+        "endedAt": "2026-10-22T17:17:13.552826+00:00"
+      },
+      {
+        "sourceType": "M2",
+        "initialStatus": "PENDING",
+        "initialVersion": 0,
+        "actualStatus": "EXPIRED",
+        "actualVersion": 1,
+        "endedAt": null
+      },
+      {
+        "sourceType": "M1",
+        "initialStatus": "CHECKED_IN",
+        "initialVersion": 1,
+        "actualStatus": "COMPLETED",
+        "actualVersion": 2,
+        "endedAt": "2026-10-21T03:00:00+00:00"
+      }
+    ]
+  },
+  "beforeRestart": {
+    "orderStatuses": {
+      "RESERVED": 1,
+      "PENDING": 1,
+      "CHECKED_IN": 1
+    },
+    "taskStatuses": {
+      "PENDING": 10
+    },
+    "auditCount": 0,
+    "notificationCount": 0,
+    "violationCount": 0
+  },
+  "afterRecovery": {
+    "taskStatuses": {
+      "DONE": 10
+    },
+    "taskTypes": {
+      "M1_COMPLETE": 2,
+      "M1_PRE_START": 2,
+      "M2_COMPLETE": 1,
+      "M2_EXPIRE": 1,
+      "M1_NO_SHOW": 2,
+      "M1_LATE": 2
+    },
+    "taskAttempts": 0,
+    "releasedClaims": 2,
+    "violationCount": 1,
+    "notificationCount": 1,
+    "notificationTypes": {
+      "NO_SHOW": 1
+    },
+    "auditActionsAndActorTypes": {
+      "RESERVATION_NO_SHOW:JOB": 1,
+      "APPLICATION_EXPIRED:JOB": 1,
+      "RESOURCE_RELEASED:USER": 2,
+      "RESERVATION_COMPLETED:JOB": 1
+    },
+    "expiredPreStartLateNotifications": 0,
+    "allStableAcrossTwoScans": true
+  },
+  "dataBefore": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100002,
+    "reservations": 130862,
+    "claims": 130862,
+    "historicalTasks": 200020
+  },
+  "dataAfter": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100003,
+    "reservations": 130864,
+    "claims": 130864,
+    "historicalTasks": 200030
+  },
+  "originalBusinessFingerprints": {
+    "reservation": {
+      "count": 130862,
+      "rowDigestMd5": "dcbde3c2f163978bdc9f57d708039db3"
+    },
+    "room_application": {
+      "count": 2,
+      "rowDigestMd5": "76b4c919ea9f6b41eab14dad4b7f6228"
+    },
+    "resource_claim": {
+      "count": 130862,
+      "rowDigestMd5": "84ef68c23d84c35fe68c3d1d18cfc32c"
+    }
+  },
+  "originalBusinessUnchanged": true,
+  "coreRunningAndHealthyAtExit": true,
+  "artifacts": {
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/after-recovery.json": {
+      "bytes": 6224,
+      "sha256": "d4ffddfab7db6f7156203fa904dfc17beb8e638d5744e2a18f5972e3ffd4d099"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/after-two-scans.json": {
+      "bytes": 6224,
+      "sha256": "bf0c9b28c37ee7e2d16d22e7e7c0f3c9f58f20f16d82a8eacb0807010b7bcde8"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/before-restart.json": {
+      "bytes": 3981,
+      "sha256": "68707296b2b704d056ad6238affb1a3ef50b2a7c1c2ca2d6fb5bb776f989784d"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/fixture.json": {
+      "bytes": 4345,
+      "sha256": "7493ba6ea934ca22b135bd82d6dee9a0c476f8679e3243a3c82e7a013f30633f"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/fixture.sql": {
+      "bytes": 7303,
+      "sha256": "df2dd14900f38589040cc0621069379170c7b0b4257208f53bfcbcbbd4cbb400"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/original-business-after.json": {
+      "bytes": 306,
+      "sha256": "d5e88404f57c2f894559801da1da0c8e123ed1d03f5cea566543593b46d621ab"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/original-business-before.json": {
+      "bytes": 306,
+      "sha256": "d5e88404f57c2f894559801da1da0c8e123ed1d03f5cea566543593b46d621ab"
+    },
+    "output/performance/core-recovery-20261022T171658Z-d7d55f26/result.json": {
+      "bytes": 3347,
+      "sha256": "b03133648665f4dd05942d17880c724ffd6c10d7b85f52d80257f335502bb3e2"
+    }
+  },
+  "executionLog": {
+    "path": "output/core-recovery-v4-run.log",
+    "bytes": 250,
+    "sha256": "1d7db49322d620ce896876db31df51d5785a7a0b24eeabe8163d06839a54df51"
+  },
+  "privacy": {
+    "scope": "Raw performance files, core recovery files and three execution logs, before evidence copies; actual repository-local private values and current performance session IDs.",
+    "privateSourceFileCount": 55,
+    "knownUniqueValuesIncludingTextDecoding": 173,
+    "encodingVariants": 697,
+    "livePerformanceSessionCount": 21,
+    "matchingPaths": [],
+    "privateNeedlesPersisted": false
+  },
+  "limitations": [
+    "Synthetic overdue fixtures are not evidence of natural UI time progression.",
+    "The observations cover these 10 tasks, not arbitrary backlog sizes.",
+    "Original data and all earlier failed and passed evidence were retained.",
+    "R3 evidence was not modified or relabeled; R4 source and image identities are independent."
+  ]
+}
