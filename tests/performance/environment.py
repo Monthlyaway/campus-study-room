@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import urllib.request
 
 ROOT=Path(__file__).resolve().parents[2]
 PROJECT='studyroom-performance'
@@ -32,6 +33,12 @@ def initialize(release_manifest=None):
     image_ids={name:ops.image_id(ref) for name,ref in source.items()}
     services={name:{'cpuset':'0-3','mem_limit':mem,'memswap_limit':mem} for name,mem in [('postgres','3g'),('core','2g'),('repair','2g'),('mailpit','512m'),('web','512m')]}
     for name,image in image_ids.items():services[name].update(image=image,pull_policy='never')
+    # Persist runtime identity alongside immutable image IDs. Every later Compose
+    # operation, including the recovery restart, must use the same labels.
+    runtime_identity={'RELEASE_ID':manifest['releaseId'] if manifest else 'development',
+                      'RELEASE_COMMIT':manifest['commit'] if manifest else 'working-tree',
+                      'GIT_COMMIT':manifest['commit'] if manifest else 'working-tree'}
+    for name in ('core','repair'):services[name]['environment']=runtime_identity.copy()
     services['migrate']={'image':image_ids['core'],'pull_policy':'never','cpuset':'0-3','mem_limit':'1g','memswap_limit':'1g'}
     services['postgres']['command']=['postgres','-c','shared_preload_libraries=pg_stat_statements','-c','track_io_timing=on','-c','log_lock_waits=on','-c','deadlock_timeout=100ms']
     override={'name':PROJECT,'services':services}
@@ -84,8 +91,30 @@ def capture_actual_limits():
     if {c['service'] for c in limits}!={'postgres','core','repair','web','mailpit'}:raise RuntimeError('Expected exactly five running performance services')
     if not all(c['cpuSet']=='0-3' and c['memory']>0 and c['memorySwap']==c['memory'] for c in limits):raise RuntimeError('Performance CPU/memory limits drifted')
     if sum(c['memory'] for c in limits)!=8*1024**3:raise RuntimeError('Performance memory total must equal 8GiB')
-    expected=json.loads((OUTPUT/'environment.json').read_text())['images']
+    metadata_path=OUTPUT/'environment.json'
+    metadata=json.loads(metadata_path.read_text())
+    expected=metadata['images']
     for c in limits:
         if c['service'] in expected and c['image']!=expected[c['service']]:raise RuntimeError('Performance image drift: '+c['service'])
+    versions={}
+    for service,path in [('web','/version.json'),('core','/api/v1/version'),('repair','/api/v1/repairs/version')]:
+        try:
+            with urllib.request.urlopen(BASE_URL+path,timeout=10) as response:
+                payload=json.load(response)
+            value=payload.get('data',payload)
+            if not all(isinstance(value.get(key),str) and value[key] for key in ('releaseId','commit')):
+                raise ValueError('Missing version fields')
+            versions[service]={key:value[key] for key in ('releaseId','commit')}
+        except (OSError,ValueError,TypeError,AttributeError) as error:
+            raise RuntimeError('Performance version probe failed: '+service) from error
+    release_mode=metadata.get('releaseId') is not None or metadata.get('releaseCommit') is not None
+    mismatches=[name for name,value in versions.items()
+                if value['releaseId']!=metadata.get('releaseId') or value['commit']!=metadata.get('releaseCommit')]
+    metadata['observedVersions']=versions
+    metadata['releaseVersionCheck']=('failed' if mismatches else 'passed') if release_mode else 'not-applicable'
+    # Only current preparation metadata is updated; archived run directories are immutable.
+    metadata_path.write_text(json.dumps(metadata,indent=2)+'\n')
+    if release_mode and mismatches:
+        raise RuntimeError('Performance release version mismatch: '+', '.join(mismatches))
     (OUTPUT/'actual-container-limits.json').write_text(json.dumps(limits,indent=2)+'\n')
     return limits

@@ -155,6 +155,21 @@ class CoreRestartRecoverySafetyTests(unittest.TestCase):
             (run / 'environment.json').write_text(json.dumps(environment))
             (run / 'result.json').write_text(json.dumps(result))
             self.assertEqual(run_id, probe.completed_performance(manifest)['runId'])
+            for total in (99999, 100000, 100002):
+                with self.subTest(historicalReservations=total):
+                    observed = {**result, 'dataBefore': {**result['dataBefore'], 'historicalReservations': total}}
+                    (run / 'result.json').write_text(json.dumps(observed))
+                    if total < 100000:
+                        with self.assertRaisesRegex(RuntimeError, 'wrong data scale'):
+                            probe.completed_performance(manifest)
+                    else:
+                        self.assertEqual(run_id, probe.completed_performance(manifest)['runId'])
+                    self.assertEqual(observed, json.loads((run / 'result.json').read_text()))
+            for key, invalid in [('accounts', 999), ('accounts', 1001), ('rooms', 19), ('rooms', 21), ('seats', 999), ('seats', 1001)]:
+                with self.subTest(key=key, invalid=invalid):
+                    (run / 'result.json').write_text(json.dumps({**result, 'dataBefore': {**result['dataBefore'], key: invalid}}))
+                    with self.assertRaisesRegex(RuntimeError, 'wrong data scale'):
+                        probe.completed_performance(manifest)
             for field, invalid in (('measurementSeconds', 30), ('warmupSeconds', 0), ('concurrency', 1), ('passed', False)):
                 (run / 'result.json').write_text(json.dumps({**result, field: invalid}))
                 with self.assertRaisesRegex(RuntimeError, 'full passing'):

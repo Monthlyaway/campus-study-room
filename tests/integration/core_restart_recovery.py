@@ -206,7 +206,8 @@ def completed_performance(manifest):
     environment = json.loads((perf.OUTPUT / name / 'environment.json').read_text())
     require(result.get('passed') is True and result.get('warmupSeconds') == 60 and result.get('measurementSeconds') == 300 and result.get('concurrency') == 20, 'Run the full passing performance measurement before recovery')
     require(environment.get('releaseId') == manifest['releaseId'] and environment.get('releaseCommit') == manifest['commit'] and environment.get('images') == {k: v['id'] for k, v in manifest['images'].items()}, 'Performance result was not measured on this final release')
-    require(all(result['dataBefore'].get(key) == value for key, value in {'accounts': 1000, 'rooms': 20, 'seats': 1000, 'historicalReservations': 100000}.items()), 'Performance result has the wrong data scale')
+    require(all(result['dataBefore'].get(key) == value for key, value in {'accounts': 1000, 'rooms': 20, 'seats': 1000}.items())
+            and result['dataBefore'].get('historicalReservations', 0) >= 100000, 'Performance result has the wrong data scale')
     return {'runId': name, 'resultSha256': hashlib.sha256((perf.OUTPUT / name / 'result.json').read_bytes()).hexdigest()}
 
 
@@ -343,7 +344,7 @@ def main():
                           'orders': ['M1 RESERVED -> NO_SHOW', 'M1 CHECKED_IN -> COMPLETED', 'M2 PENDING -> EXPIRED'],
                           'tasks': 10, 'firstProcessingLimitSeconds': FIRST_PROCESSING_LIMIT,
                           'duplicateObservationSeconds': STABILITY_SECONDS,
-                          'retainedFixtureEffect': 'COMPLETED count increases by one; perform the fixed 100000-history load measurement first.'}, indent=2))
+                          'retainedFixtureEffect': 'COMPLETED count increases by one; retain and report all history. The load baseline requires at least 100000 completed reservations.'}, indent=2))
         return
     if args.release_manifest is None:
         parser.error('--release-manifest is required for preflight/run')

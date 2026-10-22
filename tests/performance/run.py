@@ -121,10 +121,16 @@ def sampler(stop,started,probe,records,first_seen):
         stop.wait(1)
 
 
+def validate_data_scale(initial):
+    # Recovery fixtures accumulate legitimate history; keep it instead of deleting it.
+    if initial['accounts']!=1000 or initial['rooms']!=20 or initial['seats']!=1000 or initial['historicalReservations']<100000:
+        raise RuntimeError('Dataset differs from acceptance baseline (at least 100000 historical reservations): '+str(initial))
+
+
 def main():
     capture_actual_limits()
     initial=counts()
-    if initial['accounts']!=1000 or initial['rooms']!=20 or initial['seats']!=1000 or initial['historicalReservations']!=100000:raise RuntimeError('Dataset differs from fixed acceptance baseline: '+str(initial))
+    validate_data_scale(initial)
     run_id=dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ');directory=OUTPUT/run_id;directory.mkdir()
     for name in ['environment.json','actual-container-limits.json','data-scale.json']:
         shutil.copy2(OUTPUT/name,directory/name)
