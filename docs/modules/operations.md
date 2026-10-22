@@ -76,3 +76,11 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 流水线682547的后端verify已通过；前端进一步暴露 slim Node 镜像没有系统CA，无法直接通过HTTPS安装CA包。CI先用该固定Node镜像内置的根证书建立临时APT信任文件，保持证书链和包签名校验，装好系统CA/Git后删除临时文件；相同镜像的本机容器复现实测通过，GitLab复跑仍以实际job为准。
 
 [682607](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682607)证实根证书引导通过，但Runner到Debian官方源443端口仍连接超时。`scripts/ci-apt`把临时CI容器的发行版源改为TUNA的HTTPS镜像，保持发行版签名/有效期和TLS校验，并让索引获取失败明确退出。依据[TUNA Debian](https://mirrors.tuna.tsinghua.edu.cn/help/debian/)与[Ubuntu](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)说明；该脚本不修改本机或部署服务器的系统源。固定Node镜像实测安装成功。
+
+### 隔离容器发布门禁
+
+`container-release`在独立DinD服务中按完整commit构建core/repair/web，执行正式deploy入口、健康与内部路径检查，再用固定Playwright包点击真实同源页面。独立数据库集成测试通过后才允许进入容器部署；源码打包还必须等待真实浏览器验收通过。清单、运行版本、结构化日志与浏览器JUnit/截图留作90天制品，不上传秘密、会话、数据库或Docker TLS私钥。
+
+Docker CLI/daemon固定28.5.2及内容摘要，Compose2.40.3；client通过2376验证TLS，证书置于共享builds目录内、checkout之外的每job目录，避免checkout清除证书。使用已存在的`amd64-build` Runner，不修改共享Runner权限、不挂宿主Docker socket。如果其配置不支持隔离DinD，门禁会明确失败，不能改成放行。依据[GitLab DinD](https://docs.gitlab.com/ci/docker/docker_in_docker/)及[共享builds目录](https://docs.gitlab.com/ci/services/#shared-builds-directory)说明；实际运行结果在发布证据中记录。
+
+该job中的test环境只在任务寿命内存在；结束时正常停止应用且不执行删卷。GitLab未启用容器仓库，不能把此临时构建当成远程镜像已发布；本机留存与可迁移五镜像包由正式发布步骤提供。

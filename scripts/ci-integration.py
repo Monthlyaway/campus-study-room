@@ -90,7 +90,7 @@ try:
         http_counts[test.stem] = require_unittest_report(output / (test.stem + ".txt"))
     # Every JPA suite gets its own migrated database and a paused scheduler.
     persistence = [("core", "CorePersistenceTest"), ("core", "AdminPersistenceTest"),
-                   ("core", "SharedPersistenceTest"), ("core", "CoreAcceptanceMatrixTest"), ("core", "CoreSmtpAcceptanceTest"), ("core", "CoreContractTest"),
+                   ("core", "SharedPersistenceTest"), ("core", "CoreAcceptanceMatrixTest"), ("core", "CoreSmtpAcceptanceTest"), ("core", "CoreContractTest"), ("core", "CoreInputBoundaryTest"),
                    ("repair", "RepairPersistenceTest"), ("repair", "RepairDeadlineHttpTest")]
     for service, test_class in persistence:
         database = "studyroom_ci_" + test_class.lower()
@@ -111,7 +111,7 @@ try:
         test_env = {**common, "DB_URL": jdbc, "DB_USERNAME": "studyroom_" + service,
                     "DB_PASSWORD": env[service.upper() + "_DB_PASSWORD"], "CONTROL_DIR": str(control),
                     "STUDYROOM_CORE_DB_TESTS": "true", "STUDYROOM_MATRIX_DB_TESTS": "true", "STUDYROOM_ADMIN_DB_TESTS": "true", "STUDYROOM_REPAIR_DB_TESTS": "true", "STUDYROOM_SMTP_DB_TESTS": "true",
-                    "STUDYROOM_REPAIR_DEADLINE_TESTS": "true", "STUDYROOM_CONTRACT_DB_TESTS": "true"}
+                    "STUDYROOM_REPAIR_DEADLINE_TESTS": "true", "STUDYROOM_CONTRACT_DB_TESTS": "true", "STUDYROOM_INPUT_DB_TESTS": "true"}
         if test_class == "RepairDeadlineHttpTest":
             sys.path.insert(0, str(root / "tests/integration"))
             from run_repair_deadlines import prepare_fixture, assert_recipients
@@ -167,3 +167,7 @@ finally:
             process.kill()
 
     integration_lock.close()
+    from private_artifacts import protect_reports
+    protect_reports([output], [demo_password, common['INTERNAL_PASSWORD'], common['CHECKIN_CODE_ENCRYPTION_KEY'],
+                              env['CORE_DB_PASSWORD'], env['REPAIR_DB_PASSWORD'], env['MIGRATION_DB_PASSWORD']],
+                    root / '.local/private-ci-artifacts')

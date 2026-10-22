@@ -6,7 +6,7 @@ workflow:
       when: never
     - if: '$CI_COMMIT_BRANCH'
 
-stages: [verify, integration, package]
+stages: [verify, integration, release-test, package]
 
 default:
   tags: [amd64]
@@ -101,7 +101,7 @@ integration:
 package:
   stage: package
   image: $STUDYROOM_CI_REGISTRY/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
-  needs: [backend, frontend, integration]
+  needs: [backend, frontend, integration, container-release]
   before_script:
     - ./scripts/ci-apt git ca-certificates
   script:
@@ -112,4 +112,37 @@ package:
   artifacts:
     name: studyroom-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
     paths: [output/release/]
+    expire_in: 90 days
+
+container-release:
+  stage: release-test
+  tags: [amd64-build]
+  image: $STUDYROOM_CI_REGISTRY/docker:28.5.2-cli@sha256:625d9431a9f54c5a2bc90f24f0e1c3d55b1349fd857dd85035f98c2c9acbdd4d
+  needs: [backend, frontend, integration]
+  services:
+    - name: $STUDYROOM_CI_REGISTRY/docker:28.5.2-dind@sha256:2a232a42256f70d78e3cc5d2b5d6b3276710a0de0596c145f627ecfae90282ac
+      alias: docker
+      command: ["--registry-mirror=https://docker.m.daocloud.io"]
+      variables:
+        HEALTHCHECK_TCP_PORT: '2376'
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID
+    DOCKER_CERT_PATH: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID/client
+    DOCKER_TLS_VERIFY: '1'
+  resource_group: studyroom-container-test
+  interruptible: false
+  environment:
+    name: test/container-$CI_PIPELINE_ID
+    action: start
+    auto_stop_in: 1 day
+  before_script:
+    - apk add --no-cache python3 git
+  script:
+    - python3 scripts/ci-release.py
+  artifacts:
+    when: always
+    paths: [output/container-release/, output/browser/]
+    reports:
+      junit: output/browser/junit.xml
     expire_in: 90 days
