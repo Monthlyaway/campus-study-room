@@ -159,7 +159,30 @@ def web_command(*args):
 
 
 def build_backend():
-    run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+    from integration_harness import workspace_lock
+    with workspace_lock():
+        run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+
+
+def check(unit_only=False):
+    from integration_harness import PERSISTENCE_SUITES, run_local, workspace_lock
+    with workspace_lock():
+        env = java_env()
+        # Real suites run explicitly below, with isolated database credentials.
+        for _, _, flag in PERSISTENCE_SUITES:
+            env.pop(flag, None)
+        run([ROOT / "mvnw", "-B", "-ntp", "verify"], env=env)
+        run(web_command("generate"), cwd=ROOT / "apps/web")
+        run(["git", "diff", "--exit-code", "--", "apps/web/src/services/generated"])
+        run(web_command("typecheck"), cwd=ROOT / "apps/web")
+        run(web_command("test"), cwd=ROOT / "apps/web")
+        run(web_command("build"), cwd=ROOT / "apps/web")
+        compose("local", "config", "--quiet")
+        run([sys.executable, "-m", "unittest", "discover", "-s", "tests/ops", "-v"])
+        if unit_only:
+            print("UNIT-ONLY: real PostgreSQL, HTTP, SMTP and backend contract checks were NOT run; this is not full acceptance.", flush=True)
+        else:
+            run_local(env)
 
 
 def native_stop(environment):
@@ -486,17 +509,43 @@ def environment_lock(environment):
 
 
 def backup(environment):
-    state, _ = config(environment)
+    """Caller holds the environment lock, shared with deployment and scheduled backups."""
+    state, values = config(environment)
     directory = state / "backups"
+    if directory.is_symlink():
+        raise RuntimeError("Refusing to write backups through a directory symlink")
     directory.mkdir(exist_ok=True, mode=0o700)
     name = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     path = directory / f"{name}.dump"
-    with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as output:
+    partial = directory / f"{name}.dump.partial"
+    database = database_inventory(environment)
+    started = dt.datetime.now(dt.timezone.utc).isoformat()
+    with os.fdopen(os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as output:
         command = ["docker", "compose", "--env-file", str(state / "compose.env"), "-f", str(BASE), "exec", "-T", "postgres", "pg_dump", "-U", "studyroom_bootstrap", "-d", "studyroom", "-Fc"]
-        subprocess.run(command, check=True, cwd=ROOT, stdout=output)
-    os.chmod(path, 0o600)
-    compose(environment, "exec", "-T", "postgres", "pg_restore", "--list", input=path.read_bytes(), text=False, capture=True)
-    (directory / f"{name}.json").write_text(json.dumps({"file": path.name, "sha256": digest(path), "createdAt": name}, indent=2))
+        subprocess.run(command, check=True, cwd=ROOT, env={**os.environ, **values}, stdout=output)
+        output.flush()
+        os.fsync(output.fileno())
+    # The TOC alone can remain readable when a compressed data block is truncated.
+    # Decode every archive entry without connecting to or modifying any database.
+    for validation in ("--list", "--file=/dev/null"):
+        with partial.open("rb") as archive:
+            compose(environment, "exec", "-T", "postgres", "pg_restore", validation,
+                    stdin=archive, text=False, capture=True)
+    partial.replace(path)
+    current = state / "current-release.json"
+    release = json.loads(current.read_text()) if current.exists() else None
+    metadata = {"formatVersion": 2, "file": path.name, "sha256": digest(path), "createdAt": name,
+                "startedAt": started, "completedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "environment": environment, "project": values.get("COMPOSE_PROJECT_NAME", "studyroom-" + environment),
+                "database": database, "release": release,
+                "validation": {"archiveTocReadable": True, "fullArchiveDecoded": True},
+                "recoveryPoint": "Consistent PostgreSQL snapshot taken during pg_dump; later writes are not included."}
+    meta = directory / f"{name}.json"
+    with os.fdopen(os.open(meta, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as output:
+        json.dump(metadata, output, indent=2)
+        output.write("\n")
+        output.flush()
+        os.fsync(output.fileno())
     print(path)
     return path
 
@@ -671,8 +720,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["deps", "native-up", "native-stop", "native-restart", "install", "migrate", "seed", "check", "web", "status", "stop", "build-release", "deploy", "rollback", "backup", "restore", "export-release"])
     parser.add_argument("arguments", nargs="*")
+    parser.add_argument("--unit-only", action="store_true", help="check only: explicitly skip real PG/HTTP/SMTP/backend contract suites")
     options = parser.parse_args()
     command, args = options.command, options.arguments
+    if options.unit_only and command != "check":
+        parser.error("--unit-only is supported only by check")
+    if command == "check":
+        if args and args != ["local"]:
+            parser.error("check uses its own disposable environment; no runtime environment may be targeted")
+        check(unit_only=options.unit_only)
+        return
     environment = args[0] if args else "local"
     if command == "web":
         run(web_command(*args), cwd=ROOT / "apps/web")
@@ -709,15 +766,6 @@ def main():
                 compose(environment, "stop")
     elif command == "status":
         compose(environment, "ps")
-    elif command == "check":
-        run([ROOT / "mvnw", "-B", "-ntp", "verify"], env=java_env())
-        run(web_command("generate"), cwd=ROOT / "apps/web")
-        run(["git", "diff", "--exit-code", "--", "apps/web/src/services/generated"])
-        run(web_command("typecheck"), cwd=ROOT / "apps/web")
-        run(web_command("test"), cwd=ROOT / "apps/web")
-        run(web_command("build"), cwd=ROOT / "apps/web")
-        compose(environment, "config", "--quiet")
-        run([sys.executable, "-m", "unittest", "discover", "-s", "tests/ops", "-v"])
     elif command == "backup":
         with environment_lock(environment):
             backup(environment)
