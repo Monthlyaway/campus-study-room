@@ -99,12 +99,31 @@ def capture(environment, manifest_path, fixture_path, column):
         start = (dt.datetime.now(dt.timezone(dt.timedelta(hours=8))) + dt.timedelta(days=2)).replace(hour=10, minute=0, second=0, microsecond=0)
         booking = student.call("POST", "/api/v1/reservations", {"seatId": seat["id"], "startAt": start.isoformat(), "endAt": (start + dt.timedelta(hours=1)).isoformat()})
         repair = student.call("POST", "/api/v1/repairs", {"roomId": room["id"], "title": "兼容性演练报修", "description": "此记录只存在于隔离演练环境，用于验证升级和回退的数据保留。"})
+        applicant = Client(config["PUBLIC_BASE_URL"])
+        applicant_me = applicant.login("applicant", password)
+        application_start = start + dt.timedelta(hours=3)
+        application = applicant.call("POST", "/api/v1/room-applications", {
+            "roomId": room["id"], "startAt": application_start.isoformat(),
+            "endAt": (application_start + dt.timedelta(hours=1)).isoformat(),
+            "purposeTitle": "兼容性演练整室申请", "purposeDescription": "验证升级与旧版回退后的审批数据、占用和取消。"})
+        for username in ("dept-approver", "space-approver"):
+            approver = Client(config["PUBLIC_BASE_URL"])
+            approver.login(username, password)
+            application = approver.call("POST", f"/api/v1/room-applications/{application['id']}/decisions",
+                                        {"expectedVersion": application["version"], "decision": "APPROVE"})
+        if application["status"] != "APPROVED" or len(application["actions"]) != 2:
+            raise RuntimeError("Baseline application was not approved by both independent approvers")
         fixture = {"formatVersion": 1, "capturedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
                    "baselineManifestSha256": ops.object_digest(manifest), "cookie": student.session_cookie(), "userId": me["userId"],
+                   "applicantCookie": applicant.session_cookie(), "applicantId": applicant_me["userId"],
                    "reads": [{"path": f"/api/v1/reservations/{booking['id']}", "expected": {key: booking[key] for key in ("id", "status", "version", "seatId")}},
-                             {"path": f"/api/v1/repairs/{repair['id']}", "expected": {key: repair[key] for key in ("id", "status", "version", "reporterId")}}],
+                             {"path": f"/api/v1/repairs/{repair['id']}", "expected": {key: repair[key] for key in ("id", "status", "version", "reporterId")}},
+                             {"actor": "applicant", "path": f"/api/v1/room-applications/{application['id']}",
+                              "expected": {key: application[key] for key in ("id", "status", "version", "actions")}}],
                    "writes": [{"path": f"/api/v1/reservations/{booking['id']}/cancel", "body": {"expectedVersion": booking["version"], "reason": "兼容演练验证旧版写入"}, "expected": {"id": booking["id"], "status": "CANCELLED"}},
-                              {"path": f"/api/v1/repairs/{repair['id']}/cancel", "body": {"expectedVersion": repair["version"], "reason": "兼容演练验证旧版写入"}, "expected": {"id": repair["id"], "status": "CANCELLED"}}],
+                              {"path": f"/api/v1/repairs/{repair['id']}/cancel", "body": {"expectedVersion": repair["version"], "reason": "兼容演练验证旧版写入"}, "expected": {"id": repair["id"], "status": "CANCELLED"}},
+                              {"actor": "applicant", "path": f"/api/v1/room-applications/{application['id']}/cancel",
+                               "body": {"expectedVersion": application["version"]}, "expected": {"id": application["id"], "status": "CANCELLED"}}],
                    "expandedColumn": {"schema": parts[0], "table": parts[1], "column": parts[2], "id": booking["id"], "value": "retained-" + uuid.uuid4().hex}}
         path.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
@@ -153,11 +172,15 @@ def verify(environment, source_path, target_path, fixture_path, output):
     fixture = json.loads(fixture_path.read_text())
     if fixture.get("baselineManifestSha256") != ops.object_digest(target):
         raise RuntimeError("The session fixture was not captured against the target V1 manifest")
-    if not fixture.get("cookie") or any(c in fixture["cookie"] for c in "\r\n"):
-        raise RuntimeError("Invalid private session fixture")
+    for key in ("cookie", "applicantCookie"):
+        if not fixture.get(key) or any(c in fixture[key] for c in "\r\n"):
+            raise RuntimeError("Invalid private session fixture")
     if output.exists():
         raise RuntimeError("Do not overwrite a previous compatibility proof")
     client = Client(config["PUBLIC_BASE_URL"], fixture["cookie"])
+    applicant = Client(config["PUBLIC_BASE_URL"], fixture["applicantCookie"])
+    def actor(probe):
+        return applicant if probe.get("actor") == "applicant" else client
     flags = [state / "control/maintenance", state / "control/jobs-paused"]
     with ops.environment_lock(environment):
         if any(path.exists() for path in flags):
@@ -167,8 +190,9 @@ def verify(environment, source_path, target_path, fixture_path, output):
         if not any(row.get("success") is True for row in before["migrations"]):
             raise RuntimeError("No applied migration inventory found")
         assert_subset(client.call("GET", "/api/v1/auth/me"), {"userId": fixture["userId"]}, "V1 session after V2 upgrade")
+        assert_subset(applicant.call("GET", "/api/v1/auth/me"), {"userId": fixture["applicantId"]}, "V1 applicant session after V2 upgrade")
         for probe in fixture["reads"]:
-            assert_subset(client.call("GET", probe["path"]), probe["expected"], "pre-rehearsal business data")
+            assert_subset(actor(probe).call("GET", probe["path"]), probe["expected"], "pre-rehearsal business data")
         expanded_value(environment, fixture, initialize=True)
         try:
             for path in flags:
@@ -180,14 +204,15 @@ def verify(environment, source_path, target_path, fixture_path, output):
             flags[0].unlink()
             ops.wait_status(config["PUBLIC_BASE_URL"], 200)
             assert_subset(client.call("GET", "/api/v1/auth/me"), {"userId": fixture["userId"]}, "old session on core")
+            assert_subset(applicant.call("GET", "/api/v1/auth/me"), {"userId": fixture["applicantId"]}, "old applicant session on core")
             client.call("GET", "/api/v1/repairs?view=mine")
             for probe in fixture["reads"]:
-                assert_subset(client.call("GET", probe["path"]), probe["expected"], "business data on old images")
+                assert_subset(actor(probe).call("GET", probe["path"]), probe["expected"], "business data on old images")
             for write in fixture["writes"]:
-                if not re.fullmatch(r"/api/v1/(reservations|repairs)/[0-9a-f-]{36}/cancel", write["path"]):
+                if not re.fullmatch(r"/api/v1/(reservations|repairs|room-applications)/[0-9a-f-]{36}/cancel", write["path"]):
                     raise RuntimeError("Only isolated reservation/repair cancellation probes are accepted")
-                assert_subset(client.call("POST", write["path"], write["body"]), write["expected"], "old application write")
-                assert_subset(client.call("GET", write["path"].rsplit("/", 1)[0]), write["expected"], "persisted old application write")
+                assert_subset(actor(write).call("POST", write["path"], write["body"]), write["expected"], "old application write")
+                assert_subset(actor(write).call("GET", write["path"].rsplit("/", 1)[0]), write["expected"], "persisted old application write")
             expanded_value(environment, fixture)
             if ops.database_inventory(environment) != before:
                 raise RuntimeError("Application-only switch unexpectedly modified PostgreSQL/Flyway state")
