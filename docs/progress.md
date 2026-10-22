@@ -1,16 +1,18 @@
 # 开发进度与验收索引
 
-更新时间：2026-10-22。目标仍在执行，尚未声明 P0 全量完成。
+更新时间：2026-10-22。当前仍在执行P0，不以已通过的部分测试替代全量验收。
 
-| 阶段 | 状态 | 当前证据 / 后续门禁 |
+| 阶段 | 状态 | 实际证据 / 尚待完成 |
 | --- | --- | --- |
-| MS0 工程底座 | IN_PROGRESS | 已读取基线、划分任务、确认 Java21/Node24/Docker、GitLab SSH 与页面权限；安装脚本/CI/迁移正在实现 |
-| MS1 公共层 | IN_PROGRESS | core agent 实现身份、资源、通知、审计；待真实 PG 验收 |
-| MS2 M1 预约 | IN_PROGRESS | 核心后端与前端并行；待集成 |
-| MS3 M2 审批 | IN_PROGRESS | 核心后端与前端并行；待集成 |
-| MS4 M3 维修 | IN_PROGRESS | repair agent 实现真实 HTTP 与持久化 outbox；待集成 |
-| MS5 验收恢复 | NOT_STARTED | 全量行为、故障、并发、兼容、备份恢复验证 |
-| MS6 交接发布 | NOT_STARTED | 独立 agent 使用安装文档与浏览器试用后冻结 |
-| MS7 P1 Agent | NOT_STARTED | P0 优先 |
+| MS0 工程底座 | IN_PROGRESS | Java21/Node24/PG18运行；GitLab仓库已改名；`./install.sh test`完整Docker安装通过；GitLab pipeline已实际触发，正在处理执行环境与门禁 |
+| MS1 公共层 | IN_PROGRESS | 管理9项、共享7项真实PG；账号/范围/会话HTTP2项通过；完整重启补偿/邮件组合待补 |
+| MS2 M1 预约 | IN_PROGRESS | 20用户争抢及同用户跨室并发HTTP；签到边界/期限/来源锁PG；独立桌面与手机试用通过；日期历史筛选已修复并通过PG11/HTTP6及375px实操 |
+| MS3 M2 审批 | IN_PROGRESS | 真实三账号两级审批、版本冲突及撤销通过；M1/M2竞争、同一步并发、审批/到期竞争及claim写后回滚专项通过 |
+| MS4 M3 维修 | IN_PROGRESS | 单元10项/PG4项/HTTP2项；丢失已提交BLOCK响应后相同命令重试通过；同室五态级联PG专项通过，完整负面API矩阵待补 |
+| MS5 验收恢复 | IN_PROGRESS | 独立恢复库验证备份；3项故意破坏均被测试捕获；容量性能首轮失败后复测达标（读p95 154ms/写253ms/5xx为0），重启积压12.09秒；跨schema应用回退待真实演练 |
+| MS6 交接发布 | IN_PROGRESS | 多次逻辑commit；两名代理实际试用并修复UI；离线安装包/发布流程与GitLab流水线验证进行中 |
+| MS7 P1 Agent | NOT_STARTED | P0优先，不启动可选P1 |
 
-当前交付范围按 [ADR 0002](adr/0002-delivery-and-gitlab.md)。详细验收以 `docs/evidence/` 下实际日志摘要和需求追踪表为准。
+已部署入口：Docker测试环境`http://localhost:18082`、Mailpit`http://localhost:18027`；原生开发前端`http://localhost:8000`。两者独立数据库、会话和随机密钥。完整容器入口下管理HTTP2项、核心HTTP5项、维修HTTP2项全部通过，内部公开路径404。生产构建375px浏览器试用无横向溢出、无CSP错误。
+
+用户选择本机与可迁移交付、使用本地邮件测试服务，见[ADR 0002](adr/0002-delivery-and-gitlab.md)。详细剩余项逐条记录于[39条P0需求追踪](requirements-traceability.md)，实现与证据分别见`docs/modules/`及`docs/evidence/`。正式服务器、域名与真实SMTP验收未执行，不计为已完成。

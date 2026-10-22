@@ -14,7 +14,7 @@ cd campus-study-room
 ./install.sh local
 ```
 
-该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。当前正在验证首次完整启动。
+该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。默认 local 端口如下；本次 test 实例使用应用 `18082`、邮件 `18027`。
 
 - 应用：`http://localhost:18080`
 - 本地邮件收件箱：`http://localhost:18025`
@@ -35,7 +35,7 @@ cd campus-study-room
 ./scripts/check            # 后端验证、类型检查、前端构建、Compose 校验
 ```
 
-开发用数据库端口为本机 `15432`，SMTP 为 `11025`；正常容器安装不发布数据库端口。原生进程日志在 `.local/local/`。所有时间按 Asia/Shanghai 展示。
+开发用数据库端口为本机 `15432`，SMTP 为 `11025`；正常容器安装不发布数据库端口。原生进程日志在 `.local/local/`；构建输出与正在运行的 JAR 分开存放。更新代码后使用 `python3 scripts/studyroom.py native-restart local`，该命令等待旧进程正常退出后再构建、迁移和启动。所有时间按 Asia/Shanghai 展示。
 
 ## 架构与仓库
 
@@ -74,5 +74,9 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 - [模块与公共层归属](docs/adr/0001-module-and-shared-layer-ownership.md)
 - [实施分工](docs/team.md)、[进度](docs/progress.md)、[风险记录](docs/ethics-and-risks.md)
 - [精确依赖与镜像基线](docs/dependency-baseline.json)
+- [安装与运维](docs/modules/operations.md)、[离线安装包](docs/modules/portable-release.md)
+- [账号管理](docs/modules/administration.md)、[核心预约与审批](docs/modules/core.md)、[维修](docs/modules/repair.md)、[前端](docs/modules/web.md)
+- [请求关联与运行日志](docs/modules/observability.md)
+- [39 条 P0 需求追踪](docs/requirements-traceability.md)
 
 前端采用 Sites skill 的本地设计指导并使用 Playwright 调试，不注册或发布 Site。独立 agent 必须实际试用前端并记录反馈。P1 自然语言业务 Agent 尚未启动，P0 优先。
