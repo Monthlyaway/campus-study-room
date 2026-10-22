@@ -1,0 +1,202 @@
+docs/ethics-and-risks.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-10
+docs/progress.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-16
+.editorconfig
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-15
+03_Development_Milestones.md
+  s_8ca5a53b33de4c::t_2f8bee0943f19b 3-4
+  s_8ca5a53b33de4c::t_707a760f961646 1-2
+  s_8ca5a53b33de4c::t_b0b90f62831ea9 5-7
+docs/adr/0002-delivery-and-gitlab.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-23
+01_PRD.md
+  s_8ca5a53b33de4c::t_2f8bee0943f19b 3-4
+  s_8ca5a53b33de4c::t_67853a5ec62c1d 1-2
+  s_8ca5a53b33de4c::t_cfb89206a2542a 5-7
+AGENTS.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-36
+.gitignore
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-18,21-24
+  s_8ca5a53b33de4c::t_88903d9b8fa797 19-20
+.gitlab/merge_request_templates/Default.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-18
+02_Technical_Design.md
+  s_8ca5a53b33de4c::t_2f8bee0943f19b 3-4
+  s_8ca5a53b33de4c::t_6fe63f66fa7047 1-2
+  s_8ca5a53b33de4c::t_7f7ed706753d50 5-7
+docs/team.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-11
+docs/adr/0001-module-and-shared-layer-ownership.md
+  s_8ca5a53b33de4c::t_07147a350d1ccd 1-9
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "1f0be73d0f87187a2ff21681d314687ddf53e008",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>",
+      "custom_attributes": {
+        "tlab.session_started_at": "2026-10-22T11:27:17Z",
+        "tlab.token_usage.output_tokens": "22589",
+        "tlab.token_usage.input_tokens": "139144",
+        "tlab.token_usage.cache_read_tokens": "3790720",
+        "tlab.token_usage.cache_creation_tokens": "0"
+      }
+    }
+  },
+  "changes": [
+    {
+      "new_path": ".editorconfig",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 15
+          }
+        ]
+      }
+    },
+    {
+      "new_path": ".gitignore",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 24
+          }
+        ]
+      }
+    },
+    {
+      "new_path": ".gitlab/merge_request_templates/Default.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 18
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "01_PRD.md",
+      "additions": {
+        "human": 551,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "02_Technical_Design.md",
+      "additions": {
+        "human": 632,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "03_Development_Milestones.md",
+      "additions": {
+        "human": 558,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "AGENTS.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 36
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/adr/0001-module-and-shared-layer-ownership.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 9
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/adr/0002-delivery-and-gitlab.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 23
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/ethics-and-risks.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 10
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/progress.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 16
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/team.md",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 11
+          }
+        ]
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 55
+      },
+      "deletions": {
+        "human": 70
+      }
+    }
+  ]
+}
