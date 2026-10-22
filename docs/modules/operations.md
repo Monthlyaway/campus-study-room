@@ -43,6 +43,8 @@ python3 scripts/studyroom.py status test
 
 旧版 `tests/integration/run_*` 入口统一先取得 local 环境锁，涉及迁移或 Maven/构建产物读取时再取得工作区锁，按相反顺序释放；纯 HTTP/故障阶段只取环境锁，`persistence_environment`、`prepare_fixture` 等可被 CI 复用的内部函数不重复加锁。
 
+原生启动同样按环境锁、工作区锁的顺序持锁，覆盖构建、迁移、种子、运行 JAR 复制及健康检查；独立原生 migrate/seed 也保护共享构建产物。既有 PID 必须对应该环境 `run/<service>.jar` 的完整 Java 命令，并通过健康检查及启动时间复核后才复用；PID 被无关进程占用时明确失败，不向它发送信号，也不宣称后端就绪。
+
 `release.env` 固定当前应用组合及离线运行镜像别名。后续 Compose 调用会读取它，避免重启时退回 development 镜像。发布历史与镜像不会自动清理；至少保留前三个已验证成功版本。
 
 ## 应用回退与数据库恢复

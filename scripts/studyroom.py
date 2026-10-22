@@ -158,10 +158,15 @@ def web_command(*args):
     return command
 
 
+def _build_backend_unlocked():
+    """Caller must hold the workspace lock until all target artifacts are consumed."""
+    run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+
+
 def build_backend():
     from integration_harness import workspace_lock
     with workspace_lock():
-        run([ROOT / "mvnw", "-B", "-ntp", "-DskipTests", "package"], env=java_env())
+        _build_backend_unlocked()
 
 
 def check(unit_only=False):
@@ -219,32 +224,69 @@ def native_stop(environment):
         raise RuntimeError("Backend did not stop gracefully; no process was force-killed")
 
 
+def native_process_identity(pid, runtime_jar):
+    """Read-only identity check; never send even a probe signal to a stale PID."""
+    if pid <= 1:
+        raise RuntimeError("Invalid native runtime PID")
+    result = run(["ps", "-ww", "-p", pid, "-o", "stat=", "-o", "lstart=", "-o", "command="],
+                 env={**os.environ, "LC_ALL": "C"}, capture=True, check=False)
+    if result.returncode == 1 and not result.stdout.strip():
+        return None
+    if result.returncode != 0:
+        raise RuntimeError("Could not inspect native runtime PID")
+    fields = result.stdout.strip().split(None, 6)
+    if len(fields) != 7:
+        raise RuntimeError("Could not parse native runtime identity")
+    if fields[0].startswith("Z"):
+        return None
+    executable, separator, argument = fields[6].partition(" -jar ")
+    # Native startup uses exactly [java, -jar, absolute_runtime_jar]. Comparing
+    # the complete argument also handles spaces without accepting path prefixes.
+    if not separator or Path(executable).name != "java" or argument != str(runtime_jar):
+        raise RuntimeError("PID file belongs to a different process; refusing to reuse it")
+    return tuple(fields[1:])  # Start time and command; recheck after readiness.
+
+
 def native_up(environment):
+    """Caller holds the environment lock; keep workspace ownership through startup."""
     if environment == "prod":
         raise RuntimeError("Native development mode is not a production deployment")
-    state, _ = config(environment)
-    compose(environment, "up", "-d", "--wait", "postgres", "mailpit", native=True)
-    build_backend()
-    migrate(environment, native=True)
-    migrate(environment, native=True, action="reference")
-    migrate(environment, native=True, action="demo")
-    for service in ("core", "repair"):
-        pidfile = state / f"{service}.pid"
-        if pidfile.exists():
-            try:
-                os.kill(int(pidfile.read_text()), 0)
+    from integration_harness import workspace_lock
+    with workspace_lock():
+        state, _ = config(environment)
+        running = {}
+        # Reject unrelated live PIDs before starting dependencies or migrating.
+        for service in ("core", "repair"):
+            pidfile = state / f"{service}.pid"
+            if pidfile.exists():
+                pid = int(pidfile.read_text())
+                identity = native_process_identity(pid, state / "run" / f"{service}.jar")
+                if identity:
+                    running[service] = (pid, identity)
+        compose(environment, "up", "-d", "--wait", "postgres", "mailpit", native=True)
+        _build_backend_unlocked()
+        migrate(environment, native=True)
+        migrate(environment, native=True, action="reference")
+        migrate(environment, native=True, action="demo")
+        for service in ("core", "repair"):
+            pidfile = state / f"{service}.pid"
+            runtime_jar = state / "run" / f"{service}.jar"
+            health = f"http://localhost:{8081 if service == 'core' else 8082}/actuator/health/readiness"
+            if service in running:
+                pid, identity = running[service]
+                wait_http(health)
+                if native_process_identity(pid, runtime_jar) != identity:
+                    raise RuntimeError("Native runtime identity changed during startup; retry after inspection")
                 continue
-            except ProcessLookupError:
-                pass
-        log = open(state / f"{service}.log", "a")
-        run_dir = state / "run"
-        run_dir.mkdir(exist_ok=True)
-        runtime_jar = run_dir / f"{service}.jar"
-        shutil.copy2(jar(service), runtime_jar)
-        process = subprocess.Popen(["java", "-jar", str(runtime_jar)], cwd=ROOT,
-                                   env=native_env(environment, service), stdout=log, stderr=log, start_new_session=True)
-        pidfile.write_text(str(process.pid))
-        wait_http(f"http://localhost:{8081 if service == 'core' else 8082}/actuator/health/readiness")
+            runtime_jar.parent.mkdir(exist_ok=True)
+            shutil.copy2(jar(service), runtime_jar)
+            with open(state / f"{service}.log", "a") as log:
+                process = subprocess.Popen(["java", "-jar", str(runtime_jar)], cwd=ROOT,
+                                           env=native_env(environment, service), stdout=log, stderr=log, start_new_session=True)
+            pidfile.write_text(str(process.pid))
+            wait_http(health)
+            if process.poll() is not None:
+                raise RuntimeError("Native runtime exited before becoming ready")
     print("Backend ready: core localhost:8081, repair localhost:8082")
     print("Run ./scripts/web dev for the frontend. Mail inbox: http://localhost:" + config(environment)[1]["MAIL_UI_PORT"])
 
@@ -758,10 +800,11 @@ def main():
                 native_up(environment)
             elif command == "install":
                 install(environment)
-            elif command == "migrate":
-                migrate(environment, native=True)
-            elif command == "seed":
-                migrate(environment, native=True, action=args[1] if len(args) > 1 else "reference")
+            elif command in ("migrate", "seed"):
+                from integration_harness import workspace_lock
+                with workspace_lock():
+                    action = "migrate" if command == "migrate" else (args[1] if len(args) > 1 else "reference")
+                    migrate(environment, native=True, action=action)
             else:
                 compose(environment, "stop")
     elif command == "status":
