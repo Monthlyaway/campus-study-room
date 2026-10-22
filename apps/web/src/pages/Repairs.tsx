@@ -75,7 +75,10 @@ export default function Repairs() {
   }, [id, r?.status, detail.reload, pollGeneration]);
   const roomName = (roomId: string) =>
     items<Room>(rooms.data).find((room) => room.id === roomId)?.name || "教室";
-  const create = () =>
+  const roomsPending = rooms.loading || (!rooms.data && !rooms.error);
+  const roomsReady = !roomsPending && !rooms.error && items(rooms.data).length > 0;
+  const create = () => {
+    if (!roomsReady) return;
     action.open({
       title: "上报设施故障",
       path: "/repairs",
@@ -108,6 +111,7 @@ export default function Repairs() {
       ],
       success: "报修已提交，我们会尽快安排处理",
     });
+  };
   const act = (name: string) => {
     if (!r) return;
     const spec: any = {
@@ -254,12 +258,35 @@ export default function Repairs() {
         description="让问题被看见，让每一处空间都保持好状态。"
         action={
           can(user, "repair:create") ? (
-            <Button type="primary" icon={<PlusOutlined />} onClick={create}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={create}
+              loading={roomsPending}
+              disabled={!roomsReady}
+              aria-label="上报故障"
+              aria-busy={roomsPending}
+            >
               上报故障
             </Button>
           ) : undefined
         }
       />
+      {can(user, "repair:create") && (
+        <>
+          <Failure error={rooms.error} onRetry={rooms.reload} />
+          {!roomsPending && !rooms.error && rooms.data && !items(rooms.data).length && (
+            <Alert
+              className="mb-20"
+              type="info"
+              showIcon
+              title="暂无可报修教室"
+              description="请联系教室管理员完善教室信息。"
+              action={<Button size="small" onClick={rooms.reload}>重新加载教室</Button>}
+            />
+          )}
+        </>
+      )}
       <Tabs
         activeKey={view}
         onChange={(v) => {

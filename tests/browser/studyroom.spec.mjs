@@ -261,8 +261,24 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await noHorizontalOverflow(reporter.page);
     await screenshot(reporter.page, info, 'mobile-repair-closed');
 
+    // A real slow room request must keep report creation unavailable until choices arrive.
+    // Otherwise opening the action early permanently snapshots an empty options list.
+    const delayedRooms = await reporter.context.newCDPSession(reporter.page);
+    await delayedRooms.send('Network.enable');
+    await delayedRooms.send('Network.emulateNetworkConditions', { offline: false, latency: 1800, downloadThroughput: -1, uploadThroughput: -1 });
+    const roomResponse = reporter.page.waitForResponse(response => new URL(response.url()).pathname === '/api/v1/rooms');
     await reporter.page.goto('/repairs');
-    await reporter.page.getByRole('button', { name: '上报故障' }).click();
+    const reportButton = reporter.page.getByRole('button', { name: '上报故障', exact: true });
+    await expect(reportButton).toBeDisabled();
+    await expect(reportButton).toHaveAttribute('aria-busy', 'true');
+    const loadedRooms = await roomResponse;
+    expect(loadedRooms.status()).toBe(200);
+    expect((await loadedRooms.json()).data.items.length).toBeGreaterThan(0);
+    await expect(reportButton).toBeEnabled();
+    await expect(reportButton).toHaveAttribute('aria-busy', 'false');
+    await delayedRooms.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+    await delayedRooms.detach();
+    await reportButton.click();
     await selectFirst(reporter.page, '故障教室');
     await modal(reporter.page).getByLabel('故障标题').fill(unique('cancelled repair'));
     await modal(reporter.page).getByLabel('问题描述').fill('独立测试取消终态的截止字段；提交后由本人撤销。');
