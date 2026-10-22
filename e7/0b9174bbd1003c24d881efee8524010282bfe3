@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "e70b9174bbd1003c24d881efee8524010282bfe3",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "tests/integration/core_restart_recovery.py",
+      "additions": {
+        "human": 357
+      }
+    },
+    {
+      "new_path": "tests/ops/test_core_restart_recovery.py",
+      "additions": {
+        "human": 172
+      }
+    }
+  ]
+}
