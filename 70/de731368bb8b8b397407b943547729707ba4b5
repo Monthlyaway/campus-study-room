@@ -1,0 +1,200 @@
+.dockerignore
+  s_8ca5a53b33de4c::t_e3d2742ef1a52d 1-13
+  s_8ca5a53b33de4c::t_bc369a14c7210f 14-16
+infra/compose/Dockerfile.web
+  s_8ca5a53b33de4c::t_677b64fb3cb0ff 13-14
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-12,15-16
+infra/compose/maintenance.html
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1
+infra/compose/init-db.sh
+  s_8ca5a53b33de4c::t_98bb7adde9e813 1-29
+docs/dependency-baseline.json
+  s_8ca5a53b33de4c::t_98bb7adde9e813 1-27
+infra/compose/Dockerfile.backend
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-18
+scripts/init-env
+  s_8ca5a53b33de4c::t_98bb7adde9e813 1-41
+infra/compose/compose.yml
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-28,30-66,68-107,109-145,147-158,160-172
+  s_8ca5a53b33de4c::t_88903d9b8fa797 29,67,108,146,159
+  s_8ca5a53b33de4c::t_ff53a0533ec6df 173-175
+infra/compose/proxy_params
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-9
+infra/compose/entrypoint.sh
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-16
+infra/compose/nginx.conf
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-33
+infra/compose/development.yml
+  s_8ca5a53b33de4c::t_f1a49b1e1ebe7f 1-3,5-9
+  s_8ca5a53b33de4c::t_88903d9b8fa797 4
+.node-version
+  s_8ca5a53b33de4c::t_98bb7adde9e813 1
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "70de731368bb8b8b397407b943547729707ba4b5",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": ".dockerignore",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 16
+          }
+        ]
+      }
+    },
+    {
+      "new_path": ".node-version",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/dependency-baseline.json",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 27
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/Dockerfile.backend",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 18
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/Dockerfile.web",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 16
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/compose.yml",
+      "additions": {
+        "human": 2,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 175
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/development.yml",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 9
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/entrypoint.sh",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 16
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/init-db.sh",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 29
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/maintenance.html",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/nginx.conf",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 33
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "infra/compose/postgres-entrypoint.sh",
+      "additions": {
+        "human": 7
+      }
+    },
+    {
+      "new_path": "infra/compose/proxy_params",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 9
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "scripts/init-env",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 41
+          }
+        ]
+      }
+    }
+  ]
+}
