@@ -1,0 +1,27 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "79ba674e387c868270ea837fdd7806124eda531b",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/release/v4-actual-rollback.json",
+      "additions": {
+        "human": 168
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/v4-compatibility.json",
+      "additions": {
+        "human": 105
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/v4-portable-import.json",
+      "additions": {
+        "human": 148
+      }
+    }
+  ]
+}
