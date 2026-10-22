@@ -344,6 +344,7 @@ export async function getApiV1RoomsIdResourceClaims(
         page: "1",
         // size has a default value: 20
         size: "20",
+
         ...queryParams,
       },
       ...(options || {}),

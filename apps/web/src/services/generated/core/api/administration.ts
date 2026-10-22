@@ -15,6 +15,7 @@ export async function getApiV1AuditEvents(
       page: "1",
       // size has a default value: 20
       size: "20",
+
       ...params,
     },
     ...(options || {}),

@@ -67,6 +67,11 @@ declare namespace CoreAPI {
   type getApiV1AuditEventsParams = {
     page?: number;
     size?: number;
+    action?: string;
+    objectId?: string;
+    roomId?: string;
+    from?: string;
+    to?: string;
   };
 
   type getApiV1AuthCsrfParams = {
@@ -163,6 +168,9 @@ declare namespace CoreAPI {
     id: string;
     page?: number;
     size?: number;
+    startAt?: string;
+    endAt?: string;
+    sourceType?: "M1" | "M2" | "M3";
   };
 
   type getApiV1RoomsIdSeatsParams = {

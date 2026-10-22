@@ -37,12 +37,19 @@ export default function Notifications() {
   const { user } = useSession();
   const [tab, setTab] = useState("mine");
   const [status, setStatus] = useState<string>();
+  const [sourceType, setSourceType] = useState<string>();
+  const [roomId, setRoomId] = useState<string>();
+  const rooms = useData<any>(
+    can(user, "notification:manage") ? "/rooms?size=100" : null
+  );
   const [page, setPage] = useState(1);
   const data = useData<any>(
     `${tab === "mine" ? "/notifications" : "/notification-deliveries"}?${query({
       page,
       size: 15,
-      status,
+      status: tab === "deliveries" ? status : undefined,
+      sourceType: tab === "deliveries" ? sourceType : undefined,
+      roomId: tab === "deliveries" ? roomId : undefined,
     })}`
   );
   const action = useAction(data.reload);
@@ -81,6 +88,38 @@ export default function Notifications() {
             description="重试继续使用原通知记录，不会创建重复业务。连续失败 8 次后仍每 5 分钟重试。"
           />
           <div className="list-toolbar">
+            <Select
+              aria-label="通知来源"
+              placeholder="全部业务来源"
+              allowClear
+              value={sourceType}
+              onChange={(v) => {
+                setSourceType(v);
+                setPage(1);
+              }}
+              options={[
+                { value: "M1", label: "个人预约" },
+                { value: "M2", label: "教室申请" },
+                { value: "M3", label: "设施报修" },
+              ]}
+            />
+            <Select
+              aria-label="通知教室"
+              placeholder="全部授权教室"
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              value={roomId}
+              onChange={(v) => {
+                setRoomId(v);
+                setPage(1);
+              }}
+              options={items(rooms.data).map((r) => ({
+                value: r.id,
+                label: r.name,
+              }))}
+            />
+
             <Select
               placeholder="全部送达状态"
               allowClear
@@ -125,6 +164,7 @@ export default function Notifications() {
                     n.content ||
                     n.payload?.message ||
                     n.payload?.title ||
+                    n.payloadJson?.message ||
                     n.payloadJson?.title ||
                     `请查看关联业务的最新状态。`}
                 </p>

@@ -293,12 +293,14 @@ export default function Reservations() {
                   },
                 ]}
               />
-              <Alert
-                className="mb-20"
-                type="info"
-                title="签到窗口：预约开始后 15 分钟内"
-                description="在教室查看当日编码，输入后完成签到。"
-              />
+              {detail.data.status === "RESERVED" && (
+                <Alert
+                  className="mb-20"
+                  type="info"
+                  title="签到窗口：预约开始后 15 分钟内"
+                  description="在教室查看当日编码，输入后完成签到。"
+                />
+              )}
               {controls(detail.data)}
             </>
           )}
