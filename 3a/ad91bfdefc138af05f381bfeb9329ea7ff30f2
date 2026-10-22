@@ -1,0 +1,219 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "3aad91bfdefc138af05f381bfeb9329ea7ff30f2",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/modules/shared-services.md",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "new_path": "modules/security-common/src/main/java/com/campus/studyroom/security/BusinessRequestTracker.java",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreJobStatus.java",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ReadQueries.java",
+      "additions": {
+        "human": 28
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/SharedPersistenceTest.java",
+      "additions": {
+        "human": 246
+      }
+    },
+    {
+      "new_path": "tests/integration/run_shared_persistence.py",
+      "additions": {
+        "human": 38
+      }
+    },
+    {
+      "old_path": "contracts/openapi/repairs.yaml",
+      "new_path": "contracts/openapi/repairs.yaml",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/modules/repair.md",
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CheckinCodes.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CheckinCodes.java",
+      "additions": {
+        "human": 22
+      },
+      "deletions": {
+        "human": 33
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreApplication.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreApplication.java",
+      "additions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/Events.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Events.java",
+      "additions": {
+        "human": 84
+      },
+      "deletions": {
+        "human": 41
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/Idempotency.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Idempotency.java",
+      "additions": {
+        "human": 24
+      },
+      "deletions": {
+        "human": 25
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/Jobs.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Jobs.java",
+      "additions": {
+        "human": 56
+      },
+      "deletions": {
+        "human": 38
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/Notifications.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Notifications.java",
+      "additions": {
+        "human": 133
+      },
+      "deletions": {
+        "human": 73
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/RateLimits.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RateLimits.java",
+      "additions": {
+        "human": 32
+      },
+      "deletions": {
+        "human": 33
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 10
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/TaskExecutor.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/TaskExecutor.java",
+      "additions": {
+        "human": 36
+      },
+      "deletions": {
+        "human": 26
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/resources/application.yml",
+      "new_path": "services/core-service/src/main/resources/application.yml",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairApplication.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairApplication.java",
+      "additions": {
+        "human": 13
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairJobStatus.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairJobStatus.java",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairSecurity.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairSecurity.java",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 3
+      }
+    }
+  ]
+}
