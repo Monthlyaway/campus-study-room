@@ -1,0 +1,85 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "0e6db77bc0d2b542f14bd8a75a8d712a038be21e",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/modules/administration.md",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminViews.java",
+      "additions": {
+        "human": 125
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdministrationLocks.java",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/AdminPersistenceTest.java",
+      "additions": {
+        "human": 371
+      }
+    },
+    {
+      "new_path": "tests/integration/admin_http.py",
+      "additions": {
+        "human": 56
+      }
+    },
+    {
+      "new_path": "tests/integration/run_admin_persistence.py",
+      "additions": {
+        "human": 30
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/AccessService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AccessService.java",
+      "additions": {
+        "human": 63
+      },
+      "deletions": {
+        "human": 71
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "additions": {
+        "human": 518
+      },
+      "deletions": {
+        "human": 355
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/RoomRepository.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RoomRepository.java",
+      "additions": {
+        "human": 24
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
