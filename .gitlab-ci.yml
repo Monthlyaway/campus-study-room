@@ -1,5 +1,10 @@
 workflow:
   rules:
+    # GitLab 17.8 protected runners require a branch/tag pipeline, including for open MRs.
+    - if: '$CI_PROJECT_ID == "11753" && $CI_COMMIT_REF_PROTECTED == "true" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web") && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "ycy/campus-platform" || $CI_COMMIT_BRANCH == "ycy/ci-container-check")'
+    # The complete protected branch pipeline supplies the latest-commit MR check.
+    - if: '$CI_PROJECT_ID == "11753" && $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" && ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "ycy/campus-platform" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "ycy/ci-container-check")'
+      when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
@@ -116,7 +121,7 @@ package:
 
 container-release:
   stage: release-test
-  tags: [amd64-build]
+  tags: [studyroom-release-arm64]
   image: $STUDYROOM_CI_REGISTRY/docker:28.5.2-cli@sha256:625d9431a9f54c5a2bc90f24f0e1c3d55b1349fd857dd85035f98c2c9acbdd4d
   needs: [backend, frontend, integration]
   services:

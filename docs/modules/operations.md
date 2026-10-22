@@ -87,7 +87,7 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 
 `container-release`在独立DinD服务中按完整commit构建core/repair/web，执行正式deploy入口、健康与内部路径检查，再用固定Playwright包点击真实同源页面。独立数据库集成测试通过后才允许进入容器部署；源码打包还必须等待真实浏览器验收通过。清单、运行版本、结构化日志与浏览器JUnit/截图留作90天制品，不上传秘密、会话、数据库或Docker TLS私钥。
 
-Docker CLI/daemon固定28.5.2及内容摘要，Compose2.40.3；client通过2376验证TLS，证书置于共享builds目录内、checkout之外的每job目录，避免checkout清除证书。使用已存在的`amd64-build` Runner，不修改共享Runner权限、不挂宿主Docker socket。如果其配置不支持隔离DinD，门禁会明确失败，不能改成放行。依据[GitLab DinD](https://docs.gitlab.com/ci/docker/docker_in_docker/)及[共享builds目录](https://docs.gitlab.com/ci/services/#shared-builds-directory)说明；实际运行结果在发布证据中记录。
+Docker CLI/daemon固定28.5.2及内容摘要，Compose2.40.3；client通过2376验证TLS，证书置于共享builds目录内、checkout之外的每job目录，避免checkout清除证书。原`amd64-build` Runner已由真实启动日志证明缺少标准DinD所需mount能力。配置现预置专用`studyroom-release-arm64`标签，等待本机独立Linux ARM64 VM的项目Runner获准接入；普通backend/frontend/integration仍为AMD64。不得修改共享Runner权限、挂宿主Docker socket或在专用Runner尚不可用时放行门禁。依据[GitLab DinD](https://docs.gitlab.com/ci/docker/docker_in_docker/)及[共享builds目录](https://docs.gitlab.com/ci/services/#shared-builds-directory)说明；实际运行结果在发布证据中记录。
 
 该job中的test环境只在任务寿命内存在；结束时正常停止应用且不执行删卷。GitLab未启用容器仓库，不能把此临时构建当成远程镜像已发布；本机留存与可迁移五镜像包由正式发布步骤提供。
 
@@ -96,3 +96,14 @@ Docker CLI/daemon固定28.5.2及内容摘要，Compose2.40.3；client通过2376�
 R3 pipeline 682987的backend/frontend/integration均通过，集成任务4478645完成全部九组数据库套件、HTTP/真实SMTP和响应丢失重放；container-release任务4478646与重试4478766却都在18秒内以runner system failure结束，未执行项目脚本。日志明确为Pod仍Pending时服务health check提前返回错误。
 
 [GitLab Runner v17.2.0源码](https://gitlab.com/gitlab-org/gitlab-runner/-/blob/v17.2.0/executors/kubernetes/kubernetes.go#L2814)显示legacy路径创建Pod后立即进入可选服务探针，状态监视将Pending作为错误，而探针执行协程仍在等待Running。配置删除仅用于该探针的`HEALTHCHECK_TCP_PORT`，保留正常Pod启动等待；项目脚本仍通过TLS验证的`docker info`最多等待90次，并严格校验Docker28.5.2/Compose2.40.3、三镜像部署与真实浏览器。没有关闭TLS、修改共享runner或降低业务门禁。修正效果必须由后续实际CI确认；此源码定位不宣称已运行容器发布成功。
+
+
+### GitLab 17.8 的可信分支与专用 ARM64 Runner
+
+服务端实际为 JiHu GitLab `17.8.7-jh`；该版本的 [受保护 Runner 不接受 MR pipeline](https://github.com/gitlabhq/gitlabhq/blob/v17.8.7/doc/ci/runners/configure_runners.md#L248)。方案保持项目 `11753` 的 Runner `locked=true`、`run_untagged=false`、`access_level=ref_protected`，只分配 `studyroom-release-arm64` 标签并发 1。标签不是授权边界，必须在 GitLab 服务端开启 Protected。独立 VM 已安装并校验官方 Linux ARM64 Runner `17.8.5`（revision `c9164c8c`），systemd 仍 disabled/inactive，无真实配置、令牌或 Runner 进程，尚未注册。服务端 patch 号不能直接当作 Runner 发行版本。
+
+`workflow` 为项目 11753、确切受保护分支 `main` / `ycy/campus-platform` / `ycy/ci-container-check` 的 push/web 事件优先创建完整 branch pipeline。仅在同项目、两端受保护、目标 main、来源为上述两条确切临时分支时抑制重复 MR pipeline。普通 MR 与 fork MR 保留原规则，仍必须通过含 container-release 的完整五任务链；无法取得受保护 Runner 就保持未通过，不能跳过容器门禁或设置 allow_failure。最终 tag 沿用原规则，并在创建前精确配置 tag 保护。实际 MR 页面必须关联最新提交的完整 branch pipeline，成功前不能合入或发布。
+
+维护者确认授权后，仅新增两条临时精确分支保护，允许可信维护者 push/merge、禁 force push，不放宽 main、不用 `ycy/*`。先记录原设置并检查宽泛规则的重叠权限；验收结束等待任务排空并暂停 Runner，再撤销此次两个临时条目，保留 main。接入前配置回归为 `python3 -m unittest discover -s tests/ops -p test_ci_workflow.py -v`；此测试不替代真实 GitLab 执行。
+
+本机已授权 VM 为原生 ARM64、4 CPU、6 GiB RAM、20 GiB 数据盘及 10 GiB 根盘。VM 只承担本项目验收，不共享 Mac HOME/源码/宿主 Docker socket、不改默认 Docker context；关 SSH agent 和普通端口自动转发。Runner 的 `/builds` 为 VM 内的动态 Docker volume，供 job 与 DinD service 共享；每 job TLS 目录处于 checkout 外，浏览器只绑定该 job 的 checkout。`privileged=true` 也赋予 build 容器来宾 root 能力，不能把 Runner 配置的 0600 权限宣称为对特权 job 的隔离。完整诊断、模板及审批边界见 [DinD 启动与接入方案](../evidence/gitlab-dind-startup.md)；VM 启动、Runner 注册与远端门禁结果须各自如实记录。
