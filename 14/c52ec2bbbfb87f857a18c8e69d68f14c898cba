@@ -1,0 +1,26 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "14c52ec2bbbfb87f857a18c8e69d68f14c898cba",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "scripts/private_artifacts.py",
+      "new_path": "scripts/private_artifacts.py",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/ops/test_private_artifacts.py",
+      "new_path": "tests/ops/test_private_artifacts.py",
+      "additions": {
+        "human": 13
+      }
+    }
+  ]
+}
