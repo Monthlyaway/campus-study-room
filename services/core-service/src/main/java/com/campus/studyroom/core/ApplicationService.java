@@ -241,6 +241,13 @@ public class ApplicationService {
     else if (comment.codePointCount(0, comment.length()) > 500)
       throw new ApiException(422, "INVALID_TEXT", "理由不得超过500字");
     short step = a.currentStep;
+    // Load both steps before changing managed state: a later JPQL read could auto-flush
+    // a partial transition and increment the aggregate version twice.
+    var completed = steps.findByApplicationIdAndStepNo(id, step).orElseThrow();
+    var next =
+        decision.equals("APPROVE") && step == 1
+            ? steps.findByApplicationIdAndStepNo(id, (short) 2).orElseThrow()
+            : null;
     if (decision.equals("APPROVE") && step == 2) {
       Room room = resource.lock(a.roomId);
       if (!room.enabled) throw new ApiException(422, "RESOURCE_DISABLED", "教室已停用");
@@ -257,17 +264,14 @@ public class ApplicationService {
     action.decision = decision;
     action.comment = comment;
     action.occurredAt = clock.instant();
-    actions.saveAndFlush(action);
-    var completed = steps.findByApplicationIdAndStepNo(id, step).orElseThrow();
+    actions.save(action);
     completed.status = decision.equals("APPROVE") ? "APPROVED" : "REJECTED";
     steps.save(completed);
     if (decision.equals("APPROVE") && step == 1) {
       a.currentStep = 2;
-      var next = steps.findByApplicationIdAndStepNo(id, (short) 2).orElseThrow();
       next.status = "PENDING";
       steps.save(next);
     }
-    steps.flush();
     a.updatedAt = clock.instant();
     applications.saveAndFlush(a);
     events.audit(user, "APPLICATION_" + decision, "M2", id, a.roomId, "PENDING", a.status);

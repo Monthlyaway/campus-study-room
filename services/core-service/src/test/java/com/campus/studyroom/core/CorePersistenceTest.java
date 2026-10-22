@@ -541,4 +541,360 @@ class CorePersistenceTest {
         404, assertThrows(ApiException.class, () -> bookings.create(foreign, body)).status);
     assertEquals(0, db.count("select count(*) from core.reservation where room_id=?1", restricted));
   }
+
+  @Autowired jakarta.persistence.EntityManagerFactory entityManagerFactory;
+  @Autowired ApplicationRepository applicationRepository;
+  @Autowired ApprovalActionRepository approvalActionRepository;
+
+  UUID applicationAt(Instant at) {
+    return Store.id(
+        ((Map<?, ?>)
+                applications.create(
+                    seeded("user:applicant"),
+                    Map.of(
+                        "roomId",
+                        room,
+                        "startAt",
+                        at.toString(),
+                        "endAt",
+                        at.plusSeconds(3600).toString(),
+                        "purposeTitle",
+                        "事务边界验收",
+                        "purposeDescription",
+                        "真实数据库审批与维护组合验收")))
+            .get("id"));
+  }
+
+  Object approve(UUID application, String actor, long version) {
+    return applications.decision(
+        seeded("user:" + actor),
+        application,
+        Map.of("expectedVersion", version, "decision", "APPROVE"));
+  }
+
+  List<Object> race(Callable<?> first, Callable<?> second) throws Exception {
+    var barrier = new CyclicBarrier(2);
+    try (var pool = Executors.newFixedThreadPool(2)) {
+      List<Future<Object>> futures = new ArrayList<>();
+      for (Callable<?> action : List.of(first, second))
+        futures.add(
+            pool.submit(
+                () -> {
+                  barrier.await(10, TimeUnit.SECONDS);
+                  try {
+                    return action.call();
+                  } catch (ApiException expected) {
+                    return expected;
+                  }
+                }));
+      List<Object> outcomes = new ArrayList<>();
+      for (var future : futures) outcomes.add(future.get(20, TimeUnit.SECONDS));
+      return outcomes;
+    }
+  }
+
+  @Test
+  void reservationAndFinalApprovalCompeteAtTheSameRoomBarrier() throws Exception {
+    UUID application = applicationAt(start);
+    approve(application, "dept-approver", 0);
+    var outcomes = race(this::create, () -> approve(application, "space-approver", 1));
+    assertEquals(1, outcomes.stream().filter(ApiException.class::isInstance).count());
+    var conflict =
+        (ApiException)
+            outcomes.stream().filter(ApiException.class::isInstance).findFirst().orElseThrow();
+    assertEquals(409, conflict.status);
+    assertEquals("RESERVATION_CONFLICT", conflict.code);
+    assertEquals(
+        1,
+        db.count(
+            "select count(*) from core.resource_claim where room_id=?1 and released_at is null",
+            room));
+    var a = applicationRepository.findById(application).orElseThrow();
+    if (outcomes.getFirst() instanceof ApiException) {
+      assertEquals("APPROVED", a.status);
+      assertEquals(2, a.version);
+      assertEquals(
+          2,
+          db.count(
+              "select count(*) from core.approval_action where application_id=?1", application));
+      assertEquals(0, db.count("select count(*) from core.reservation where room_id=?1", room));
+      assertEquals(
+          1,
+          db.count(
+              "select count(*) from core.notification where source_id=?1 and event_type='APPROVED'",
+              application));
+    } else {
+      assertEquals("PENDING", a.status);
+      assertEquals(1, a.version);
+      assertEquals(2, a.currentStep);
+      assertEquals(
+          1,
+          db.count(
+              "select count(*) from core.approval_action where application_id=?1", application));
+      assertEquals(
+          "PENDING",
+          db.need(
+                  "select status from core.approval_step where application_id=?1 and step_no=2",
+                  application)
+              .get("status"));
+      assertTrue(claimRepository.findBySourceTypeAndSourceId("M2", application).isEmpty());
+      assertEquals(
+          0, db.count("select count(*) from core.notification where source_id=?1", application));
+      assertEquals(
+          0,
+          db.count(
+              "select count(*) from core.audit_event where object_id=?1 and"
+                  + " action='RESOURCE_CLAIMED'",
+              application));
+    }
+  }
+
+  @Test
+  void failureAfterClaimInsertRollsBackApplicationClaimAuditAndNotification() {
+    UUID application = applicationAt(start);
+    approve(application, "dept-approver", 0);
+    // A committed fixture row forces a real PostgreSQL uniqueness failure after the claim insert.
+    // Its actor differs from the final approver so the service does not reject it in canReview.
+    var duplicate = new ApprovalActionEntity();
+    duplicate.id = UUID.randomUUID();
+    duplicate.applicationId = application;
+    duplicate.stepNo = 2;
+    duplicate.actorId = roomAdmin();
+    duplicate.decision = "APPROVE";
+    duplicate.comment = "test-only constraint fault fixture";
+    duplicate.occurredAt = time.instant();
+    approvalActionRepository.saveAndFlush(duplicate);
+    var before = db.need("select * from core.room_application where id=?1", application);
+    var beforeSteps =
+        db.list(
+            "select * from core.approval_step where application_id=?1 order by step_no",
+            application);
+    var beforeActions =
+        db.list(
+            "select * from core.approval_action where application_id=?1 order by step_no",
+            application);
+    var beforeAudit =
+        db.list("select * from core.audit_event where object_id=?1 order by id", application);
+    var beforeNotifications =
+        db.list("select * from core.notification where source_id=?1 order by id", application);
+    var registry =
+        entityManagerFactory
+            .unwrap(org.hibernate.engine.spi.SessionFactoryImplementor.class)
+            .getEventListenerRegistry();
+    var originals = new ArrayList<org.hibernate.event.spi.PostInsertEventListener>();
+    registry
+        .getEventListenerGroup(org.hibernate.event.spi.EventType.POST_INSERT)
+        .listeners()
+        .forEach(originals::add);
+    var inserted = new java.util.concurrent.atomic.AtomicBoolean();
+    org.hibernate.event.spi.PostInsertEventListener observer =
+        event -> {
+          if (event.getEntity() instanceof ClaimEntity claim
+              && "M2".equals(claim.sourceType)
+              && application.equals(claim.sourceId)) inserted.set(true);
+        };
+    registry.appendListeners(org.hibernate.event.spi.EventType.POST_INSERT, observer);
+    try {
+      var error =
+          assertThrows(
+              org.springframework.dao.DataIntegrityViolationException.class,
+              () -> approve(application, "space-approver", 1));
+      assertTrue(
+          error
+              .getMostSpecificCause()
+              .getMessage()
+              .contains("approval_action_application_id_step_no_key"));
+      assertTrue(
+          inserted.get(),
+          "The target claim INSERT must succeed before the later constraint failure; an early check"
+              + " is not rollback evidence");
+      assertEquals(before, db.need("select * from core.room_application where id=?1", application));
+      assertEquals(
+          beforeSteps,
+          db.list(
+              "select * from core.approval_step where application_id=?1 order by step_no",
+              application));
+      assertEquals(
+          beforeActions,
+          db.list(
+              "select * from core.approval_action where application_id=?1 order by step_no",
+              application));
+      assertTrue(claimRepository.findBySourceTypeAndSourceId("M2", application).isEmpty());
+      assertEquals(
+          beforeAudit,
+          db.list("select * from core.audit_event where object_id=?1 order by id", application));
+      assertEquals(
+          beforeNotifications,
+          db.list("select * from core.notification where source_id=?1 order by id", application));
+    } finally {
+      registry.setListeners(
+          org.hibernate.event.spi.EventType.POST_INSERT,
+          originals.toArray(org.hibernate.event.spi.PostInsertEventListener[]::new));
+      approvalActionRepository.deleteById(duplicate.id);
+    }
+  }
+
+  @Test
+  void simultaneousDecisionsCommitOnlyOneStepAction() throws Exception {
+    UUID application = applicationAt(start);
+    time.set(start.minusSeconds(1));
+    var outcomes =
+        race(
+            () -> approve(application, "dept-approver", 0),
+            () -> approve(application, "dept-approver", 0));
+    assertEquals(1, outcomes.stream().filter(ApiException.class::isInstance).count());
+    var conflict =
+        (ApiException)
+            outcomes.stream().filter(ApiException.class::isInstance).findFirst().orElseThrow();
+    assertEquals("VERSION_CONFLICT", conflict.code);
+    var a = applicationRepository.findById(application).orElseThrow();
+    assertEquals("PENDING", a.status);
+    assertEquals(1, a.version);
+    assertEquals(2, a.currentStep);
+    assertEquals(
+        1,
+        db.count("select count(*) from core.approval_action where application_id=?1", application));
+    assertEquals(
+        List.of("APPROVED", "PENDING"),
+        db
+            .list(
+                "select status from core.approval_step where application_id=?1 order by step_no",
+                application)
+            .stream()
+            .map(x -> x.get("status"))
+            .toList());
+    assertEquals(
+        1,
+        db.count(
+            "select count(*) from core.audit_event where object_id=?1 and"
+                + " action='APPLICATION_APPROVE'",
+            application));
+    assertTrue(claimRepository.findBySourceTypeAndSourceId("M2", application).isEmpty());
+  }
+
+  @Test
+  void expiryAndFinalApprovalCannotLeaveExpiredApplicationClaimed() throws Exception {
+    UUID earlier = applicationAt(start.plusSeconds(86400));
+    UUID racing = applicationAt(start.plusSeconds(90000));
+    approve(earlier, "dept-approver", 0);
+    approve(racing, "dept-approver", 0);
+    Instant expiry = applicationRepository.findById(racing).orElseThrow().expiresAt;
+    time.set(expiry.minusSeconds(1));
+    approve(earlier, "space-approver", 1);
+    time.set(expiry);
+    var outcomes =
+        race(
+            () -> approve(racing, "space-approver", 1),
+            () -> {
+              applications.task(Map.of("sourceId", racing, "taskType", "M2_EXPIRE"));
+              return "EXPIRE_PROCESSED";
+            });
+    assertInstanceOf(ApiException.class, outcomes.getFirst());
+    var rejected = (ApiException) outcomes.getFirst();
+    assertTrue(Set.of("VERSION_CONFLICT", "APPLICATION_EXPIRED").contains(rejected.code));
+    var a = applicationRepository.findById(racing).orElseThrow();
+    assertEquals("EXPIRED", a.status);
+    assertEquals(2, a.version);
+    assertEquals(
+        1, db.count("select count(*) from core.approval_action where application_id=?1", racing));
+    assertTrue(claimRepository.findBySourceTypeAndSourceId("M2", racing).isEmpty());
+    assertEquals(
+        0,
+        db.count(
+            "select count(*) from core.notification where source_id=?1 and event_type='APPROVED'",
+            racing));
+    applications.task(Map.of("sourceId", earlier, "taskType", "M2_EXPIRE"));
+    assertEquals("APPROVED", applicationRepository.findById(earlier).orElseThrow().status);
+    assertEquals(2, applicationRepository.findById(earlier).orElseThrow().version);
+    var earlierClaim = claimRepository.findBySourceTypeAndSourceId("M2", earlier).orElseThrow();
+    assertNull(earlierClaim.releasedAt);
+    assertEquals(2, earlierClaim.sourceVersion);
+  }
+
+  @Test
+  void maintenanceCascadesFiveStatesWithoutChangingHistoryOrRevivingOrders() {
+    Instant base = time.instant();
+    start = base.plusSeconds(3600);
+    UUID historical = Store.id(create().get("id"));
+    start = base.plusSeconds(10800);
+    UUID current = Store.id(create().get("id"));
+    start = base.plusSeconds(18000);
+    UUID future = Store.id(create().get("id"));
+    UUID approved = applicationAt(base.plusSeconds(25200));
+    approve(approved, "dept-approver", 0);
+    approve(approved, "space-approver", 1);
+    UUID pending = applicationAt(base.plusSeconds(32400));
+    time.set(base.plusSeconds(3600));
+    bookings.checkin(
+        user, historical, Map.of("expectedVersion", 0, "roomCode", codes.get(room).get("code")));
+    time.set(base.plusSeconds(7200));
+    bookings.task(Map.of("sourceId", historical, "taskType", "M1_COMPLETE"));
+    var historyBefore = db.need("select * from core.reservation where id=?1", historical);
+    var pendingBefore = db.need("select * from core.room_application where id=?1", pending);
+    time.set(base.plusSeconds(10800));
+    bookings.checkin(
+        user, current, Map.of("expectedVersion", 0, "roomCode", codes.get(room).get("code")));
+    time.set(base.plusSeconds(11100));
+    UUID repair = UUID.randomUUID();
+    resources.command(command(repair, "BLOCK"));
+    var active = reservationRepository.findById(current).orElseThrow();
+    assertEquals("INTERRUPTED", active.status);
+    assertEquals(time.instant(), active.endedAt);
+    assertEquals("MAINTENANCE", active.cancelReason);
+    assertEquals("CANCELLED", reservationRepository.findById(future).orElseThrow().status);
+    assertEquals("MAINTENANCE", reservationRepository.findById(future).orElseThrow().cancelReason);
+    assertEquals("CANCELLED", applicationRepository.findById(approved).orElseThrow().status);
+    assertEquals(
+        "MAINTENANCE", applicationRepository.findById(approved).orElseThrow().cancelReason);
+    assertEquals(historyBefore, db.need("select * from core.reservation where id=?1", historical));
+    assertEquals(
+        pendingBefore, db.need("select * from core.room_application where id=?1", pending));
+    for (UUID id : List.of(current, future))
+      assertNotNull(claimRepository.findBySourceTypeAndSourceId("M1", id).orElseThrow().releasedAt);
+    assertNotNull(
+        claimRepository.findBySourceTypeAndSourceId("M2", approved).orElseThrow().releasedAt);
+    assertTrue(claimRepository.findBySourceTypeAndSourceId("M2", pending).isEmpty());
+    assertEquals(0, db.count("select count(*) from core.violation where user_id=?1", user));
+    assertEquals(
+        3,
+        db.count(
+            "select count(*) from core.notification where room_id=?1 and event_type='MAINTENANCE'",
+            room));
+    for (UUID id : List.of(current, future, approved))
+      assertEquals(
+          1,
+          db.count(
+              "select count(*) from core.notification where source_id=?1 and"
+                  + " event_type='MAINTENANCE'",
+              id));
+    assertEquals(
+        3,
+        db.count(
+            "select count(*) from core.audit_event where room_id=?1 and action='MAINTENANCE_CANCEL'"
+                + " and actor_type='SERVICE'",
+            room));
+    assertEquals(
+        1,
+        db.count(
+            "select count(*) from core.resource_claim where room_id=?1 and released_at is null and"
+                + " source_type='M3'",
+            room));
+    var reservationsAfter =
+        db.list("select * from core.reservation where room_id=?1 order by id", room);
+    var applicationsAfter =
+        db.list("select * from core.room_application where room_id=?1 order by id", room);
+    resources.command(command(repair, "RELEASE"));
+    assertEquals(
+        reservationsAfter,
+        db.list("select * from core.reservation where room_id=?1 order by id", room));
+    assertEquals(
+        applicationsAfter,
+        db.list("select * from core.room_application where room_id=?1 order by id", room));
+    assertEquals(
+        0,
+        db.count(
+            "select count(*) from core.resource_claim where room_id=?1 and released_at is null",
+            room));
+    assertFalse(resources.conflict(room, seat, start, start.plusSeconds(3600)));
+  }
 }
