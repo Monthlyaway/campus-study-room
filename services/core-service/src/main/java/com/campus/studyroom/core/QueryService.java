@@ -14,13 +14,21 @@ public class QueryService {
   final ResourceService resource;
   final BookingService bookings;
   final Clock clock;
+  final AvailabilityReadRepository availability;
 
-  public QueryService(Store d, AccessService a, ResourceService r, BookingService b, Clock c) {
+  public QueryService(
+      Store d,
+      AccessService a,
+      ResourceService r,
+      BookingService b,
+      Clock c,
+      AvailabilityReadRepository availability) {
     db = d;
     access = a;
     resource = r;
     bookings = b;
     clock = c;
+    this.availability = availability;
   }
 
   public Object availability(UUID u, Map<String, String> q, boolean rooms, int page, int size) {
@@ -31,90 +39,16 @@ public class QueryService {
         end,
         clock.instant(),
         bookings.max(rooms ? "M2_MAX_DURATION_HOURS" : "M1_MAX_DURATION_HOURS"));
-    if (!rooms
-        && db.count(
-                "select count(*) from core.reservation where user_id=?1 and status"
-                    + " in('RESERVED','CHECKED_IN') and start_at<?2 and end_at>?3",
-                u,
-                end,
-                start)
-            > 0) return Pages.of(List.of(), page, size);
-    String sql =
-        rooms
-            ? "select r.*,r.name room_name,b.name building_name,c.name campus_name from core.room r"
-                  + " join core.building b on b.id=r.building_id join core.campus c on"
-                  + " c.id=b.campus_id join core.app_user u on u.id=?1 where r.enabled and"
-                  + " b.enabled and c.enabled and (r.department_id is null or"
-                  + " r.department_id=u.department_id) and not exists(select 1 from"
-                  + " core.resource_claim rc where rc.room_id=r.id and rc.released_at is null and"
-                  + " rc.start_at<?2 and (rc.end_at is null or rc.end_at>?3))"
-            : "select s.id,s.id seat_id,s.room_id,s.code,s.has_power,r.name room_name,r.code"
-                  + " room_code,b.name building_name,c.name campus_name,r.building_id,b.campus_id"
-                  + " from core.seat s join core.room r on r.id=s.room_id join core.building b on"
-                  + " b.id=r.building_id join core.campus c on c.id=b.campus_id join core.app_user"
-                  + " u on u.id=?1 where s.enabled and r.enabled and b.enabled and c.enabled and"
-                  + " (r.department_id is null or r.department_id=u.department_id) and not"
-                  + " exists(select 1 from core.resource_claim rc where rc.room_id=r.id and"
-                  + " (rc.seat_id is null or rc.seat_id=s.id) and rc.released_at is null and"
-                  + " rc.start_at<?2 and (rc.end_at is null or rc.end_at>?3))";
-    var all = db.list(sql, u, end, start);
-    List<Map<String, Object>> result = new ArrayList<>();
-    for (var s : all) {
-      UUID room = Store.id(s.get(rooms ? "id" : "roomId"));
-      if (q.containsKey("roomId") && !q.get("roomId").equals(room.toString())
-          || q.containsKey("buildingId") && !q.get("buildingId").equals(s.get("buildingId"))
-          || q.containsKey("campusId") && !q.get("campusId").equals(s.get("campusId"))
-          || !rooms && "true".equals(q.get("hasPower")) && !Boolean.TRUE.equals(s.get("hasPower")))
-        continue;
-      try {
-        resource.opening(room, start, end);
-      } catch (ApiException e) {
-        continue;
-      }
-      s.put("available", true);
-      result.add(s);
-    }
-    return Pages.of(result, page, size);
+    return availability.available(u, start, end, rooms, q, page, size);
   }
 
   public Object roomAvailability(UUID u, UUID room, Map<String, String> q) {
+    access.require(u, "seat:search");
     if (!access.admissible(u, room)) throw ApiException.notFound();
     Instant start = DomainPolicy.time(q.get("startAt")), end = DomainPolicy.time(q.get("endAt"));
     DomainPolicy.interval(start, end, clock.instant(), bookings.max("M1_MAX_DURATION_HOURS"));
-    var r = db.need("select * from core.room where id=?1", room);
-    boolean opening = true;
-    try {
-      resource.opening(room, start, end);
-    } catch (ApiException e) {
-      opening = false;
-    }
-    boolean userBusy =
-        db.count(
-                "select count(*) from core.reservation where user_id=?1 and status"
-                    + " in('RESERVED','CHECKED_IN') and start_at<?2 and end_at>?3",
-                u,
-                end,
-                start)
-            > 0;
-    var seats =
-        db.list(
-            "select id,id seat_id,room_id,code,has_power,enabled,version from core.seat where"
-                + " room_id=?1 order by code",
-            room);
-    for (var s : seats) {
-      String reason =
-          !Boolean.TRUE.equals(r.get("enabled")) || !Boolean.TRUE.equals(s.get("enabled"))
-              ? "DISABLED"
-              : !opening
-                  ? "OUTSIDE_OPENING_HOURS"
-                  : userBusy
-                      ? "USER_CONFLICT"
-                      : resource.conflict(room, Store.id(s.get("id")), start, end)
-                          ? "OCCUPIED"
-                          : null;
-      s.put("available", reason == null);
-      s.put("unavailableReason", reason);
-    }
+    var seats = availability.grid(u, room, start, end);
+    for (var seat : seats) seat.put("available", seat.get("unavailableReason") == null);
     return Map.of("roomId", room, "seats", seats, "startAt", start, "endAt", end);
   }
 
@@ -165,5 +99,56 @@ public class QueryService {
     long num = Store.number(out, "checkinNumerator"), den = Store.number(out, "checkinDenominator");
     out.put("checkinRate", den == 0 ? null : (double) num / den);
     return out;
+  }
+
+  public Object audit(UUID user, Map<String, String> query, int page, int size) {
+    access.require(user, "audit:read");
+    String sql =
+        "select e.* from core.audit_event e left join core.room r on r.id=e.room_id where "
+            + ReadQueries.scope("audit:read", "?1", "e.room_id", "r.department_id");
+    List<Object> parameters = new ArrayList<>(List.of(user));
+    for (String key : List.of("objectId", "roomId", "action", "from", "to")) {
+      String value = query.get(key);
+      if (value == null || value.isBlank()) continue;
+      String predicate =
+          switch (key) {
+            case "objectId" -> "e.object_id=";
+            case "roomId" -> "e.room_id=";
+            case "action" -> "e.action=";
+            case "from" -> "e.created_at>=";
+            default -> "e.created_at<";
+          };
+      parameters.add(
+          switch (key) {
+            case "objectId", "roomId" -> Store.id(value);
+            case "from", "to" -> DomainPolicy.time(value);
+            default -> value;
+          });
+      sql += " and " + predicate + "?" + parameters.size();
+    }
+    return db.page(sql + " order by e.created_at desc,e.id", page, size, parameters.toArray());
+  }
+
+  public Object claims(UUID user, UUID room, Map<String, String> query, int page, int size) {
+    if (!access.roomScope(user, "room:manage", room) && !access.roomScope(user, "audit:read", room))
+      throw ApiException.forbidden();
+    String sql = "select * from core.resource_claim where room_id=?1";
+    List<Object> parameters = new ArrayList<>(List.of(room));
+    if (query.containsKey("startAt") && !query.get("startAt").isBlank()) {
+      parameters.add(DomainPolicy.time(query.get("startAt")));
+      sql += " and (end_at is null or end_at>?" + parameters.size() + ")";
+    }
+    if (query.containsKey("endAt") && !query.get("endAt").isBlank()) {
+      parameters.add(DomainPolicy.time(query.get("endAt")));
+      sql += " and start_at<?" + parameters.size();
+    }
+    if (query.containsKey("sourceType") && !query.get("sourceType").isBlank()) {
+      String source = query.get("sourceType");
+      if (!Set.of("M1", "M2", "M3").contains(source))
+        throw new ApiException(400, "INVALID_SOURCE_TYPE", "占用来源不正确");
+      parameters.add(source);
+      sql += " and source_type=?" + parameters.size();
+    }
+    return db.page(sql + " order by start_at desc,id", page, size, parameters.toArray());
   }
 }

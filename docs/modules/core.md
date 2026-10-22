@@ -18,7 +18,7 @@
 | `Events` / `Notifications` / `Jobs` | 同事务审计和通知、持久任务、SMTP 重试 |
 | `Store` / `RoomRepository` | JPA 原生 DTO 投影与 `PESSIMISTIC_WRITE` 行锁 |
 
-数据库读写使用 JPA EntityManager；房间和用户 guard 为映射实体。业务查询投影成 DTO，禁止将 ORM Entity 直接作为响应。所有资源变化经过 `ResourceService`。
+M1/M2/资源写入使用 Spring Data JPA 聚合实体和仓储；Reservation/Application 采用 @Version。读取房间编号采用标量投影，获取教室锁后才加载业务实体，避免一级缓存保留等待前的旧状态。可用性通过专用只读仓储在 PostgreSQL 中完成准入、完整时段开放、占用排除、过滤与分页；不逐座查询。业务查询投影成 DTO，禁止将 ORM Entity 直接作为响应。所有资源变化经过 `ResourceService`。
 
 ## 安全和会话
 
@@ -33,6 +33,8 @@ Cookie 为 `STUDYROOMSESSION`，HttpOnly、SameSite=Lax；生产必须启用 Sec
 业务时区固定 Asia/Shanghai，API 时间必须有偏移量。时间区间左闭右开；开始必须严格晚于当前时间，结束在14天内，整点小时且在完整开放区间内。
 
 M1 创建顺序：用户 `booking_guard` 行锁 → 教室行锁 → 同用户跨教室重叠检查 → 资源占用检查 → 创建预约、占用、审计和期限任务。其他资源操作先教室锁。M2 提交不预占；第二级批准与占用写入同一事务。冲突失败不会留下批准步骤或占用。
+
+创建M1/M2时先对配置总版本行取得共享读锁，再读取最长时长，确保订单中的配置版本与数值来自同一次配置。管理员修改配置采用排他锁；多个预约仍可同时读取配置。已有订单保留创建时的配置快照，后续调参不追溯修改历史订单。
 
 M3 BLOCK 创建本来源的整室封禁，取消未来 RESERVED、打断 CHECKED_IN、取消 APPROVED 整室申请；不创建违约，不改变 PENDING 申请。RELEASE 只释放该工单来源，不能恢复停用资源、复活历史订单或解除其他工单。
 
@@ -53,6 +55,8 @@ M3 BLOCK 创建本来源的整室封禁，取消未来 RESERVED、打断 CHECKED
 ```sh
 ./mvnw -pl services/core-service -am test
 python3 tests/integration/core_http.py
+python3 tests/integration/run_core_persistence.py
+python3 tests/integration/core_mutation.py
 ```
 
 HTTP 验收要求真实服务和 PostgreSQL，使用隔离演示库，创建独立测试教室与账号，不依赖预置业务订单。测试包含20用户竞争一个座位、同用户跨教室竞争、幂等重放、本人隐私、最终审批冲突回滚及账号禁用后旧会话失效。验收结果见 `docs/evidence/core/acceptance.md`。
@@ -63,4 +67,4 @@ HTTP 验收要求真实服务和 PostgreSQL，使用隔离演示库，创建独�
 
 ### 持续重构状态
 
-当前第一轮行为验收实现以 JPA 原生SQL完成业务CRUD，尚未达到技术方案要求的完整聚合实体/仓储分层。后续提交必须将预约、申请、资源、账号管理和任务基础设施的写入迁移到 Spring Data JPA Entity/Repository，并保持真实并发验收通过；此项是发版前的未完成项，不以接口功能通过替代。可用性查询的数据库分页与开放规则批量判断也列为当前性能整改项。
+第一轮原生SQL行为实现已作为历史提交保留。后续预约、申请、资源写入已迁移为 Spring Data JPA 聚合仓储，并通过5个HTTP及10个隔离PG用例；3项故意破坏约束的反证均被测试检测。可用性、审计与资源占用查询已使用数据库分页和条件过滤。账号管理说明见 `administration.md`，共享任务与通知已由对应负责人迁移实体仓储；完整 typed API schema 与总体容量验收仍需最终门禁确认。

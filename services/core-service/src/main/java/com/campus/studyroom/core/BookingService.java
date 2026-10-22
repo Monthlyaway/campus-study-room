@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.*;
+import com.campus.studyroom.core.persistence.*;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,35 @@ public class BookingService {
   final Events events;
   final Clock clock;
   final CheckinCodes codes;
+  final ReservationRepository reservations;
+  final ViolationRepository violations;
+  final SeatRepository seats;
+  final SystemConfigRepository configs;
+  final ConfigRevisionRepository configRevisions;
 
   public BookingService(
-      Store d, AccessService a, ResourceService r, Events e, Clock c, CheckinCodes x) {
+      Store d,
+      AccessService a,
+      ResourceService r,
+      Events e,
+      Clock c,
+      CheckinCodes x,
+      ReservationRepository reservations,
+      ViolationRepository violations,
+      SeatRepository seats,
+      SystemConfigRepository configs,
+      ConfigRevisionRepository configRevisions) {
     db = d;
     access = a;
     resource = r;
     events = e;
     clock = c;
     codes = x;
+    this.reservations = reservations;
+    this.violations = violations;
+    this.seats = seats;
+    this.configs = configs;
+    this.configRevisions = configRevisions;
   }
 
   static final String DETAIL =
@@ -31,60 +52,57 @@ public class BookingService {
           + " rm.id=r.room_id ";
 
   int max(String key) {
-    return ((Number)
-            db.need("select value_json from core.system_config where key=?1", key).get("valueJson"))
-        .intValue();
+    return ((Number) configs.findById(key).orElseThrow().value).intValue();
   }
 
-  long configVersion() {
-    return db.count("select version from core.config_revision where id=1");
+  record ConfigSnapshot(long version, int maxDurationHours) {}
+
+  ConfigSnapshot snapshot(String key) {
+    var revision = configRevisions.readLock().orElseThrow();
+    return new ConfigSnapshot(revision.version, max(key));
   }
 
   @Transactional
   public Object create(UUID user, Map<String, Object> b) {
     access.require(user, "reservation:create");
     UUID seat = Store.id(b.get("seatId"));
-    var s = db.need("select * from core.seat where id=?1", seat);
-    UUID room = Store.id(s.get("roomId"));
+    UUID room = seats.roomId(seat).orElseThrow(ApiException::notFound);
     resource.guard(user);
     Room r = resource.lock(room);
+    var s = seats.findById(seat).orElseThrow(ApiException::notFound);
     if (!access.admissible(user, room)) throw ApiException.notFound();
-    if (!r.enabled || !Boolean.TRUE.equals(s.get("enabled")))
-      throw new ApiException(422, "RESOURCE_DISABLED", "教室或座位已停用");
-    Instant start = DomainPolicy.time(b.get("startAt")), end = DomainPolicy.time(b.get("endAt"));
-    int max = max("M1_MAX_DURATION_HOURS");
-    DomainPolicy.interval(start, end, clock.instant(), max);
+    if (!r.enabled || !s.enabled) throw new ApiException(422, "RESOURCE_DISABLED", "教室或座位已停用");
+    Instant start = DomainPolicy.time(b.get("startAt")),
+        end = DomainPolicy.time(b.get("endAt")),
+        now = clock.instant();
+    var config = snapshot("M1_MAX_DURATION_HOURS");
+    int max = config.maxDurationHours();
+    DomainPolicy.interval(start, end, now, max);
     resource.opening(room, start, end);
-    if (db.count(
-            "select count(*) from core.reservation where user_id=?1 and status"
-                + " in('RESERVED','CHECKED_IN') and start_at<?2 and end_at>?3",
-            user,
-            end,
-            start)
-        > 0) throw ApiException.conflict("USER_RESERVATION_CONFLICT", "您已有同一时段的预约");
+    if (reservations.existsByUserIdAndStatusInAndStartAtLessThanAndEndAtGreaterThan(
+        user, List.of("RESERVED", "CHECKED_IN"), end, start))
+      throw ApiException.conflict("USER_RESERVATION_CONFLICT", "您已有同一时段的预约");
     resource.ensureAvailable(room, seat, start, end);
-    UUID id = UUID.randomUUID();
-    db.update(
-        "insert into"
-            + " core.reservation(id,user_id,room_id,seat_id,start_at,end_at,status,config_version,max_duration_hours)"
-            + " values(?1,?2,?3,?4,?5,?6,'RESERVED',?7,?8)",
-        id,
-        user,
-        room,
-        seat,
-        start,
-        end,
-        configVersion(),
-        max);
+    ReservationEntity booking = new ReservationEntity();
+    booking.id = UUID.randomUUID();
+    booking.userId = user;
+    booking.roomId = room;
+    booking.seatId = seat;
+    booking.startAt = start;
+    booking.endAt = end;
+    booking.status = "RESERVED";
+    booking.configVersion = config.version();
+    booking.maxDurationHours = max;
+    booking.createdAt = booking.updatedAt = now;
+    reservations.saveAndFlush(booking);
+    UUID id = booking.id;
     resource.claim(room, seat, start, end, "M1", id, 0, user);
     events.audit(user, "RESERVATION_CREATED", "M1", id, room, null, "RESERVED");
     events.task(
         "M1_PRE_START",
         "M1",
         id,
-        start.minusSeconds(900).isBefore(clock.instant())
-            ? clock.instant()
-            : start.minusSeconds(900));
+        start.minusSeconds(900).isBefore(now) ? now : start.minusSeconds(900));
     events.task("M1_LATE", "M1", id, start.plusSeconds(600));
     events.task("M1_NO_SHOW", "M1", id, start.plusSeconds(900));
     events.task("M1_COMPLETE", "M1", id, end);
@@ -93,8 +111,7 @@ public class BookingService {
 
   @Transactional(readOnly = true)
   public Map<String, Object> detail(UUID user, UUID id) {
-    var r = db.need(DETAIL + "where r.id=?1", id);
-    return present(user, r);
+    return present(user, db.need(DETAIL + "where r.id=?1", id));
   }
 
   Map<String, Object> present(UUID user, Map<String, Object> r) {
@@ -125,101 +142,92 @@ public class BookingService {
         result.items().stream().map(r -> present(u, r)).toList(), page, size, result.total());
   }
 
+  ReservationEntity locked(UUID id) {
+    UUID room = reservations.roomId(id).orElseThrow(ApiException::notFound);
+    resource.lock(room);
+    return reservations.lock(id).orElseThrow(ApiException::notFound);
+  }
+
   @Transactional
   public Object cancel(UUID user, UUID id, Map<String, Object> b) {
-    var old = db.need("select room_id from core.reservation where id=?1", id);
-    UUID room = Store.id(old.get("roomId"));
-    resource.lock(room);
-    var r = db.need("select * from core.reservation where id=?1 for update", id);
-    if (!user.equals(Store.id(r.get("userId")))) throw ApiException.notFound();
-    DomainPolicy.version(r, b.get("expectedVersion"));
-    DomainPolicy.requireState(r, "RESERVED");
-    if (!clock.instant().isBefore(DomainPolicy.time(r.get("startAt"))))
+    var r = locked(id);
+    if (!user.equals(r.userId)) throw ApiException.notFound();
+    DomainPolicy.version(r.version, b.get("expectedVersion"));
+    DomainPolicy.requireState(r.status, "RESERVED");
+    if (!clock.instant().isBefore(r.startAt))
       throw new ApiException(422, "CANCELLATION_CLOSED", "预约开始后不能取消");
-    db.update(
-        "update core.reservation set"
-            + " status='CANCELLED',cancel_reason='USER_CANCEL',ended_at=?1,updated_at=?1,version=version+1"
-            + " where id=?2",
-        clock.instant(),
-        id);
-    resource.release("M1", id, user, room);
-    events.audit(user, "RESERVATION_CANCELLED", "M1", id, room, "RESERVED", "CANCELLED");
+    r.status = "CANCELLED";
+    r.cancelReason = "USER_CANCEL";
+    r.endedAt = r.updatedAt = clock.instant();
+    reservations.saveAndFlush(r);
+    resource.release("M1", id, user, r.roomId);
+    events.audit(user, "RESERVATION_CANCELLED", "M1", id, r.roomId, "RESERVED", "CANCELLED");
     return detail(user, id);
   }
 
   @Transactional
   public Object checkin(UUID user, UUID id, Map<String, Object> b) {
-    var old = db.need("select room_id from core.reservation where id=?1", id);
-    UUID room = Store.id(old.get("roomId"));
-    resource.lock(room);
-    var r = db.need("select * from core.reservation where id=?1 for update", id);
-    if (!user.equals(Store.id(r.get("userId")))) throw ApiException.notFound();
-    DomainPolicy.version(r, b.get("expectedVersion"));
-    DomainPolicy.requireState(r, "RESERVED");
-    DomainPolicy.checkIn(DomainPolicy.time(r.get("startAt")), clock.instant());
-    if (!codes.matches(room, Objects.toString(b.get("roomCode"), "")))
+    var r = locked(id);
+    if (!user.equals(r.userId)) throw ApiException.notFound();
+    DomainPolicy.version(r.version, b.get("expectedVersion"));
+    DomainPolicy.requireState(r.status, "RESERVED");
+    DomainPolicy.checkIn(r.startAt, clock.instant());
+    if (!codes.matches(r.roomId, Objects.toString(b.get("roomCode"), "")))
       throw new ApiException(422, "INVALID_ROOM_CODE", "签到码不正确或已过期");
-    db.update(
-        "update core.reservation set"
-            + " status='CHECKED_IN',checked_in_at=?1,updated_at=?1,version=version+1 where id=?2",
-        clock.instant(),
-        id);
-    events.audit(user, "RESERVATION_CHECKED_IN", "M1", id, room, "RESERVED", "CHECKED_IN");
+    r.status = "CHECKED_IN";
+    r.checkedInAt = r.updatedAt = clock.instant();
+    reservations.saveAndFlush(r);
+    events.audit(user, "RESERVATION_CHECKED_IN", "M1", id, r.roomId, "RESERVED", "CHECKED_IN");
     return detail(user, id);
   }
 
   @Transactional
   public void task(Map<String, Object> t) {
     UUID id = Store.id(t.get("sourceId"));
-    var r = db.one("select * from core.reservation where id=?1", id);
-    if (r == null) return;
-    UUID room = Store.id(r.get("roomId"));
-    resource.lock(room);
-    r = db.need("select * from core.reservation where id=?1 for update", id);
-    Instant start = DomainPolicy.time(r.get("startAt"));
-    UUID user = Store.id(r.get("userId"));
-    String type = t.get("taskType").toString();
-    String state = r.get("status").toString();
+    if (!reservations.existsById(id)) return;
+    var r = locked(id);
     Instant now = clock.instant();
-    if (state.equals("RESERVED") && !now.isBefore(start.plusSeconds(900))) {
-      db.update(
-          "update core.reservation set status='NO_SHOW',ended_at=?1,updated_at=?1,version=version+1"
-              + " where id=?2",
-          now,
-          id);
-      resource.release("M1", id, user, room);
-      db.update(
-          "insert into core.violation(id,reservation_id,user_id,reason,occurred_at)"
-              + " values(?1,?2,?3,'NO_SHOW',?4) on conflict(reservation_id) do nothing",
-          UUID.randomUUID(),
-          id,
-          user,
-          now);
+    String type = t.get("taskType").toString();
+    if (r.status.equals("RESERVED") && !now.isBefore(r.startAt.plusSeconds(900))) {
+      r.status = "NO_SHOW";
+      r.endedAt = r.updatedAt = now;
+      reservations.saveAndFlush(r);
+      resource.release("M1", id, r.userId, r.roomId);
+      if (!violations.existsByReservationId(id)) {
+        var v = new ViolationEntity();
+        v.id = UUID.randomUUID();
+        v.reservationId = id;
+        v.userId = r.userId;
+        v.reason = "NO_SHOW";
+        v.occurredAt = now;
+        violations.saveAndFlush(v);
+      }
       events.notify(
-          user,
-          room,
+          r.userId,
+          r.roomId,
           "NO_SHOW",
           "M1",
           id,
           "0",
           Map.of("message", "未按时签到，预约已取消", "reservationId", id));
-      events.audit(user, "RESERVATION_NO_SHOW", "M1", id, room, "RESERVED", "NO_SHOW");
+      events.systemAudit(
+          r.userId, "RESERVATION_NO_SHOW", "M1", id, r.roomId, "RESERVED", "NO_SHOW");
     } else if (type.equals("M1_COMPLETE")
-        && state.equals("CHECKED_IN")
-        && !now.isBefore(DomainPolicy.time(r.get("endAt")))) {
-      db.update(
-          "update core.reservation set"
-              + " status='COMPLETED',ended_at=end_at,updated_at=?1,version=version+1 where id=?2",
-          now,
-          id);
-      resource.release("M1", id, user, room);
-      events.audit(user, "RESERVATION_COMPLETED", "M1", id, room, state, "COMPLETED");
-    } else if (state.equals("RESERVED")
-        && (type.equals("M1_PRE_START") && now.isBefore(start)
-            || type.equals("M1_LATE") && now.isBefore(start.plusSeconds(900))))
+        && r.status.equals("CHECKED_IN")
+        && !now.isBefore(r.endAt)) {
+      r.status = "COMPLETED";
+      r.endedAt = r.endAt;
+      r.updatedAt = now;
+      reservations.saveAndFlush(r);
+      resource.release("M1", id, r.userId, r.roomId);
+      events.systemAudit(
+          r.userId, "RESERVATION_COMPLETED", "M1", id, r.roomId, "CHECKED_IN", "COMPLETED");
+    } else if (r.status.equals("RESERVED")
+        && (type.equals("M1_PRE_START") && now.isBefore(r.startAt)
+            || type.equals("M1_LATE") && now.isBefore(r.startAt.plusSeconds(900))))
       events.notify(
-          user,
-          room,
+          r.userId,
+          r.roomId,
           type,
           "M1",
           id,
@@ -230,6 +238,6 @@ public class BookingService {
               "reservationId",
               id,
               "startAt",
-              start.toString()));
+              r.startAt.toString()));
   }
 }

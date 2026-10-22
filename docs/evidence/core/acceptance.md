@@ -23,4 +23,41 @@
 3. 在代理对象外访问注入EntityManager字段为空。改为Repository方法封装访问，真实预约与主数据操作验证通过。
 4. HTTP验收之后增加requestId贯通、来源房间校验、数据库分页与统计聚合；这些变更会在最终整套回归再次执行，未将尚未运行的回归记为已通过。
 
-原始控制台输出保存在任务执行记录；持续集成通过`tests/integration/core_http.py`重放。测试没有故意破坏后的反证证据，不能用当前绿灯代替该门禁。
+原始控制台输出保存在任务执行记录；持续集成通过`tests/integration/core_http.py`重放。关键约束的故意破坏反证见下文，其他门禁仍按实际执行情况记录。
+
+## JPA 聚合与查询整改后的回归
+
+2026-10-22，命名迁移到 `campus-study-room` 后：
+
+- `python3 tests/integration/core_http.py`：5/5通过，11.207秒；此次运行使用新 Reservation/Application/Claim Entity 与 Spring Data JPA 仓储。
+- `python3 tests/integration/run_core_persistence.py`：隔离数据库 `studyroom_core_integration`，8/8通过，测试本体7.173秒；使用真实 PostgreSQL 18.6 与测试注入 Clock，未开放调试时间HTTP接口。
+- 同日完成账号/配置仓储接入、配置一致快照、审计筛选修复后重跑：10/10通过，测试本体9.743秒。新增配置用例第一次因误用不具备 `config:manage` 的 operator 账号被正确拒绝，调整为具有该权限的 admin 后通过，未扩大权限或删除断言。
+
+新增持久层用例：
+
+| 用例 | 结果 |
+| --- | --- |
+| checkinBoundaryAndPersistedNoShowAreExclusive | +14:59可签到并完成；+15:00拒绝，重复到期处理仅1条违约 |
+| maintenanceBeforeNoShowDoesNotPenalizeStudent | 维修先提交则取消，之后超时不记违约，释放不复活 |
+| committedNoShowRemainsHistoricalDuringMaintenance | 已提交NO_SHOW及违约不会因维修被抹去 |
+| sourceTombstoneAndMultipleMaintenanceClaimsAreIndependent | 命令重放相同JSON；双工单只释放指定来源；RELEASE先到阻止旧BLOCK复活 |
+| concurrentDeadlineScannersOnlyCommitOneViolation | 8线程屏障并发处理同预约，1条违约、1条NO_SHOW通知 |
+| availabilityAndStatisticsUseDatabaseProjection | 完整时段开放/过滤/分页正确；预约后余位0，聚合1座位小时 |
+| sameSeatConflictCannotCommitSecondClaim | 两用户同座位第二次409，仅1条有效来源占用 |
+| foreignDepartmentCannotCreateReservation | 直接调用服务创建跨院系预约404，数据库没有新增订单 |
+| configurationChangeOnlyAffectsNewOrders | 已有订单保留原配置版本/时长；改为2小时后新3小时订单被拒，新1小时订单记新版本 |
+| auditAndClaimFiltersApplyBeforeDatabasePagination | objectId UUID、动作/房间、来源与左闭右开时间过滤的total与列表一致；普通学生查询审计403 |
+
+固定时钟只存在测试配置中。测试账号、房间使用新UUID隔离；生产服务没有调时间或绕过鉴权接口。
+
+## 关键约束反证
+
+2026-10-22，执行 `python3 tests/integration/core_mutation.py`。Runner 把后端源代码复制到系统临时目录，只修改副本；真实工作区、正在运行的服务和共享 Maven target 均不修改。使用独立数据库 `studyroom_core_mutation`，先执行未修改的3个用例，再分别破坏一条约束，最后恢复副本并再次执行3个用例。
+
+| 故意引入的错误 | 检测结果 |
+| --- | --- |
+| 删除创建预约时的座位资源冲突判断 | `sameSeatConflictCannotCommitSecondClaim` 失败：应抛出冲突但第二个预约成功 |
+| 删除创建预约时的院系准入判断 | `foreignDepartmentCannotCreateReservation` 失败：应返回404但越权预约成功 |
+| 释放来源时错误地释放同教室所有未释放claim | `sourceTombstoneAndMultipleMaintenanceClaimsAreIndependent` 失败：另一个工单的封禁丢失 |
+
+3项变异均被业务断言检测，没有把编译错误或启动错误当作检测成功；恢复后3/3通过。完整日志与结构化断言保存在受忽略的 `output/core-mutations/`，脚本可重新生成。该证据覆盖这3条具体保护规则，不代替全部状态与性能验收。

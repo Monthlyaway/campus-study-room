@@ -282,9 +282,10 @@ public class CoreController {
   @GetMapping("/users")
   Object users(
       Authentication a,
+      @RequestParam(defaultValue = "") String q,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ok(admin.users(user(a), page, size));
+    return ok(admin.users(user(a), q, page, size));
   }
 
   @PostMapping("/users")
@@ -401,17 +402,19 @@ public class CoreController {
   @GetMapping("/notifications")
   Object notifications(
       Authentication a,
+      @RequestParam Map<String, String> q,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ok(notifications.list(user(a), false, page, size));
+    return ok(notifications.list(user(a), false, q, page, size));
   }
 
   @GetMapping("/notification-deliveries")
   Object deliveries(
       Authentication a,
+      @RequestParam Map<String, String> q,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ok(notifications.list(user(a), true, page, size));
+    return ok(notifications.list(user(a), true, q, page, size));
   }
 
   @PostMapping("/notifications/{id}/read")
@@ -452,20 +455,7 @@ public class CoreController {
       @RequestParam Map<String, String> q,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    access.require(user(a), "audit:read");
-    var rows =
-        db.list("select * from core.audit_event order by created_at desc").stream()
-            .filter(
-                x ->
-                    access.scope(
-                        user(a),
-                        "audit:read",
-                        x.get("roomId") == null ? null : Store.id(x.get("roomId")),
-                        null))
-            .filter(x -> !q.containsKey("objectId") || q.get("objectId").equals(x.get("objectId")))
-            .filter(x -> !q.containsKey("action") || q.get("action").equals(x.get("action")))
-            .toList();
-    return ok(Pages.of(rows, page, size));
+    return ok(queries.audit(user(a), q, page, size));
   }
 
   @GetMapping("/rooms/{id}/resource-claims")
@@ -475,13 +465,6 @@ public class CoreController {
       @RequestParam Map<String, String> q,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    if (!access.roomScope(user(a), "room:manage", id)
-        && !access.roomScope(user(a), "audit:read", id)) throw ApiException.forbidden();
-    return ok(
-        Pages.of(
-            db.list(
-                "select * from core.resource_claim where room_id=?1 order by start_at desc", id),
-            page,
-            size));
+    return ok(queries.claims(user(a), id, q, page, size));
   }
 }

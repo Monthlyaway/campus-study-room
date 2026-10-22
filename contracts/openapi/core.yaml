@@ -225,7 +225,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Envelope"
+                  "$ref": "#/components/schemas/CurrentUserEnvelope"
                 }
               }
             }
@@ -254,28 +254,7 @@
           "503": {
             "description": "Dependency unavailable"
           }
-        },
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "minimum": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "minimum": 1,
-              "maximum": 100
-            }
-          }
-        ]
+        }
       }
     },
     "/api/v1/version": {
@@ -1740,6 +1719,34 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "startAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "sourceType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "M1",
+                "M2",
+                "M3"
+              ]
+            }
           }
         ]
       }
@@ -2873,6 +2880,14 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Case-insensitive username or displayName contains search; wildcard characters are treated literally.",
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       },
@@ -3164,7 +3179,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionCommand"
+                "$ref": "#/components/schemas/RoleBindingCommand"
               }
             }
           }
@@ -3836,6 +3851,45 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ]
       }
@@ -4403,6 +4457,181 @@
           "requestId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "RoleScope": {
+        "type": "object",
+        "required": [
+          "scopeType"
+        ],
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "SELF",
+              "DEPARTMENT",
+              "ROOM",
+              "ALL",
+              "SHARED"
+            ]
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "description": "SELF/ALL/SHARED carry neither ID. DEPARTMENT requires only departmentId; ROOM requires only roomId. SELF grants no management resource scope; SHARED covers rooms with no department."
+      },
+      "BookingLimits": {
+        "type": "object",
+        "required": [
+          "reservationMaxHours",
+          "applicationMaxHours"
+        ],
+        "properties": {
+          "reservationMaxHours": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "applicationMaxHours": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      },
+      "CurrentUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "userId",
+          "username",
+          "displayName",
+          "enabled",
+          "permissions",
+          "roles",
+          "scopes",
+          "bookingLimits"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "schoolNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "authVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleScope"
+            }
+          },
+          "bookingLimits": {
+            "$ref": "#/components/schemas/BookingLimits"
+          }
+        }
+      },
+      "CurrentUserEnvelope": {
+        "type": "object",
+        "required": [
+          "data",
+          "requestId"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CurrentUser"
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "RoleBindingCommand": {
+        "type": "object",
+        "required": [
+          "expectedVersion",
+          "bindings"
+        ],
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "roleId",
+                "scopes"
+              ],
+              "properties": {
+                "roleId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "scopes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleScope"
+                  }
+                }
+              }
+            }
           }
         }
       }
