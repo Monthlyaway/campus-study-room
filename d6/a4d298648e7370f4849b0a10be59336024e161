@@ -1,0 +1,15 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "d6a4d298648e7370f4849b0a10be59336024e161",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/DeliberateCiGateFailureTest.java",
+      "additions": {
+        "human": 13
+      }
+    }
+  ]
+}
