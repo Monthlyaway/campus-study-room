@@ -1,0 +1,71 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "09c9c4d70715787f7e070a823f8cafb376d5f26a",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "tests/browser/README.md",
+      "additions": {
+        "human": 40
+      }
+    },
+    {
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 35
+      }
+    },
+    {
+      "new_path": "tests/browser/global-setup.mjs",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "tests/browser/helpers.mjs",
+      "additions": {
+        "human": 149
+      }
+    },
+    {
+      "new_path": "tests/browser/package.json",
+      "additions": {
+        "human": 14
+      }
+    },
+    {
+      "new_path": "tests/browser/playwright.config.mjs",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "tests/browser/studyroom.spec.mjs",
+      "additions": {
+        "human": 221
+      }
+    },
+    {
+      "old_path": "apps/web/src/pages/Repairs.tsx",
+      "new_path": "apps/web/src/pages/Repairs.tsx",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 7
+      }
+    }
+  ]
+}
