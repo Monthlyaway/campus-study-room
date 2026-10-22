@@ -1,0 +1,101 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "7d5738a79cda3f8a275f2c1f72f856df26e549ab",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "db/migration/repair/V20261022160000__assigned_worker_name_snapshot.sql",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-assignment-name.json",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-assignment-name.md",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "tests/integration/repair_assignment_name_http.py",
+      "additions": {
+        "human": 48
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/repairs/api/typings.d.ts",
+      "new_path": "apps/web/src/services/generated/repairs/api/typings.d.ts",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "contracts/openapi/repairs.yaml",
+      "new_path": "contracts/openapi/repairs.yaml",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/modules/repair.md",
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/CoreClient.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/CoreClient.java",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairDtos.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairDtos.java",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairOrder.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairOrder.java",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
