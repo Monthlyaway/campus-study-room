@@ -1,0 +1,236 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "6c9c47359404d9083ae67dad003ea7feb92d4544",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "db/migration/core/V20261022143000__reservation_history_index.sql",
+      "additions": {
+        "human": 5
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance.md",
+      "additions": {
+        "human": 65
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-actual-container-limits.json",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-artifacts.json",
+      "additions": {
+        "human": 58
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-environment.json",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-internal-auth-before.json",
+      "additions": {
+        "human": 263
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-recovery.json",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T123019Z-result.json",
+      "additions": {
+        "human": 269
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-actual-container-limits.json",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-artifacts.json",
+      "additions": {
+        "human": 54
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-environment.json",
+      "additions": {
+        "human": 35
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-page-query-counts.json",
+      "additions": {
+        "human": 294
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-query-plans.json",
+      "additions": {
+        "human": 2237
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-recovery.json",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T125715Z-result.json",
+      "additions": {
+        "human": 269
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/internal-auth-after.json",
+      "additions": {
+        "human": 565
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/InternalServiceAuthenticationProvider.java",
+      "additions": {
+        "human": 54
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/InternalServiceAuthenticationProviderTest.java",
+      "additions": {
+        "human": 59
+      }
+    },
+    {
+      "new_path": "tests/performance/README.md",
+      "additions": {
+        "human": 46
+      }
+    },
+    {
+      "new_path": "tests/performance/auth_probe.py",
+      "additions": {
+        "human": 30
+      }
+    },
+    {
+      "new_path": "tests/performance/environment.py",
+      "additions": {
+        "human": 91
+      }
+    },
+    {
+      "new_path": "tests/performance/inspect_queries.py",
+      "additions": {
+        "human": 50
+      }
+    },
+    {
+      "new_path": "tests/performance/prepare.py",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "tests/performance/refresh.py",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "tests/performance/run.py",
+      "additions": {
+        "human": 199
+      }
+    },
+    {
+      "new_path": "tests/performance/seed.sql",
+      "additions": {
+        "human": 48
+      }
+    },
+    {
+      "old_path": "docs/modules/administration.md",
+      "new_path": "docs/modules/administration.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "additions": {
+        "human": 47
+      },
+      "deletions": {
+        "human": 14
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/PermissionRepository.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/PermissionRepository.java",
+      "additions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleRepository.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleRepository.java",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SeatRepository.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SeatRepository.java",
+      "additions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "services/core-service/src/test/java/com/campus/studyroom/core/AdminPersistenceTest.java",
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/AdminPersistenceTest.java",
+      "additions": {
+        "human": 119
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
