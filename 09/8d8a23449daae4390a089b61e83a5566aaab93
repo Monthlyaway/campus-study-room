@@ -1,0 +1,41 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "098d8a23449daae4390a089b61e83a5566aaab93",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/gitlab-dind-startup.md",
+      "additions": {
+        "human": 142
+      }
+    },
+    {
+      "new_path": "tests/ops/test_ci_workflow.py",
+      "additions": {
+        "human": 237
+      }
+    },
+    {
+      "old_path": ".gitlab-ci.yml",
+      "new_path": ".gitlab-ci.yml",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 12
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
