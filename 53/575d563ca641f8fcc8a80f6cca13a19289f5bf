@@ -1,0 +1,170 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "53575d563ca641f8fcc8a80f6cca13a19289f5bf",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/frontend-sync.md",
+      "additions": {
+        "human": 45
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix.md",
+      "additions": {
+        "human": 52
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/audit-correlation.json",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/authorization-outage.json",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/block-pending.json",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/block-recovered.json",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/initial-fixture-failure.json",
+      "additions": {
+        "human": 13
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/late-block.json",
+      "additions": {
+        "human": 64
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/log-scan.json",
+      "additions": {
+        "human": 39
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/proxy-events.json",
+      "additions": {
+        "human": 129
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/release-pending.json",
+      "additions": {
+        "human": 30
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/release-recovered.json",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/result.json",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/runtime.json",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/ui-attention-runtime.json",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/ui-fixed-runtime.json",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-fault-matrix/ui-polling.json",
+      "additions": {
+        "human": 46
+      }
+    },
+    {
+      "new_path": "tests/integration/fault_matrix_web.py",
+      "additions": {
+        "human": 59
+      }
+    },
+    {
+      "new_path": "tests/integration/run_fault_matrix.py",
+      "additions": {
+        "human": 377
+      }
+    },
+    {
+      "old_path": "apps/web/src/pages/Repairs.tsx",
+      "new_path": "apps/web/src/pages/Repairs.tsx",
+      "additions": {
+        "human": 13
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/repair.md",
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/fault_proxy.py",
+      "new_path": "tests/integration/fault_proxy.py",
+      "additions": {
+        "human": 23
+      },
+      "deletions": {
+        "human": 4
+      }
+    }
+  ]
+}
