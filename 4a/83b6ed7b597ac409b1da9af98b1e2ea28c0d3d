@@ -1,0 +1,52 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "4a83b6ed7b597ac409b1da9af98b1e2ea28c0d3d",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "tests/ops/test_performance_identity.py",
+      "additions": {
+        "human": 163
+      }
+    },
+    {
+      "old_path": "tests/integration/core_restart_recovery.py",
+      "new_path": "tests/integration/core_restart_recovery.py",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/ops/test_core_restart_recovery.py",
+      "new_path": "tests/ops/test_core_restart_recovery.py",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "old_path": "tests/performance/environment.py",
+      "new_path": "tests/performance/environment.py",
+      "additions": {
+        "human": 30
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/performance/run.py",
+      "new_path": "tests/performance/run.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
