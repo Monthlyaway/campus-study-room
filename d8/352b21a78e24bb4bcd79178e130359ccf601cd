@@ -1,0 +1,38 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "d8352b21a78e24bb4bcd79178e130359ccf601cd",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/restart-recovery.json",
+      "additions": {
+        "human": 317
+      }
+    },
+    {
+      "new_path": "docs/evidence/core/restart-recovery.md",
+      "additions": {
+        "human": 44
+      }
+    },
+    {
+      "old_path": "tests/integration/core_restart_recovery.py",
+      "new_path": "tests/integration/core_restart_recovery.py",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/ops/test_core_restart_recovery.py",
+      "new_path": "tests/ops/test_core_restart_recovery.py",
+      "additions": {
+        "human": 8
+      }
+    }
+  ]
+}
