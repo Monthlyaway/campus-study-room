@@ -2,6 +2,8 @@
 
 前端位于 `apps/web/`，产品名为「栖学 · 校园自习室」。采用 React 19、Umi 4、TypeScript 5、Ant Design 6；安装版本以 `apps/web/package.json` 和 `pnpm-lock.yaml` 为准。静态产物由统一 Nginx 入口提供，不依赖外网字体或图片，不发布为 Sites。
 
+当前本机发布入口为 `http://localhost:19282`，R4 `r-20261022T170200-3012051`、完整提交 `3012051f06c601e6c22a03e50d9d307a3054d1d9`；Mailpit为 `http://localhost:19227`。这是正式离线导入后的独立验收实例，默认源码安装18080和开发8000入口分别管理。R4浏览器、导入、回退、完整性能及core/repair真实恢复均已通过；GitLab共享runner #5186因挂载权限不足未启动DinD，需要支持DinD的隔离环境。完整CI仍待解决，未合main/tag，整体交付未完成。
+
 ## 本地开发
 
 使用 Node 24.22.1 和 pnpm 10.34.7：
@@ -103,3 +105,9 @@ R2 `3350d5b4716185eb23379df6d177789a2751d46d` 的真实回归通过了稳定按�
 上报按钮现在等待可用教室列表，加载中显示忙碌且不能打开；查询失败在页面提供重试，成功空列表说明没有可报修教室。创建动作也校验就绪条件，避免捕获空选项。M3回归加入实际网络延迟，检查“未返回时disabled/busy→真实200后enabled→选择教室创建→取消”，没有增加固定等待来掩盖问题。发布镜像结果继续按精确版本记录。
 
 R3发布版 `3c7a93cae56e68d2a96adb1e022f4fffc8112c5e` 的完整6流程实际通过（119.255秒，无跳过/重试），涵盖两项界面修复、再次预约、拒绝理由、维修姓名与终态文案、手机加载/错误恢复。真实报告隐私反证及运行秘密扫描均通过。精确运行身份、旧候选失败记录、独立代理反馈，以及14b创建→R2午夜真实签到→维修中断零违约的版本边界见[发布版前端验收](../evidence/frontend-release.md)。
+
+## R4 离线发行版实际复验
+
+R4 `3012051f06c601e6c22a03e50d9d307a3054d1d9` 纳入CI与验收工具修正，业务页面代码和R3相同。正式离线导入19282后独立执行完整六流程，**6/6通过，100.806秒，0 skipped / unexpected / flaky，无重试**；启动时实际核对Web/core/repair三个版本接口一致。桌面1440×1000、手机375×812操作和截图保留，真实409、再次预约、拒绝必填理由、维修姓名/同步/终态，以及1800ms实际网络延迟下的报修入口均通过，没有新增阻塞反馈。
+
+真实Chromium失败报告隐私反证1/1通过；报告与HTML内嵌ZIP扫描7份运行秘密零命中。独立证据 `output/browser-release-v4/` 不覆盖旧R3记录，详见[R4前端验收](../evidence/frontend-release-v4.md)。[离线导入](../evidence/release/v4-portable-import.json)、[兼容演练](../evidence/release/v4-compatibility.json)与[正式回退](../evidence/release/v4-actual-rollback.json)各自记录数据与运行身份；R4[性能](../evidence/performance.md)及[core恢复](../evidence/core/restart-recovery-v4.json)也已独立通过，浏览器结果不替代这些不同层次的验收。
