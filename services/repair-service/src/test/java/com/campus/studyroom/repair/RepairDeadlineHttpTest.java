@@ -287,58 +287,58 @@ class RepairDeadlineHttpTest {
     // A value which PostgreSQL would otherwise round into the following second.
     clock.now = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).plusNanos(999_999_789);
     try {
-    var submitted = create("24小时未派单升级");
-    var assigned = create("48小时未完工升级");
-    var acceptance = create("48小时未验收升级");
-    action("dispatch", assigned, "assign", Map.of("assignedTo", workerId()));
-    action("dispatch", acceptance, "assign", Map.of("assignedTo", workerId()));
-    action("worker_a", acceptance, "start", Map.of());
-    assertEquals(RepairStatus.BLOCK_PENDING, service.find(acceptance.id).status);
-    var block = service.outbox.findByOrderIdOrderByCreatedAtAsc(acceptance.id).stream()
-        .filter(c -> c.commandType.equals("BLOCK")).findFirst().orElseThrow();
-    assertEquals(service.find(acceptance.id).updatedAt.toString(),
-        service.json.read(block.payloadJson).get("occurredAt"), "Command payload and database must share the same event instant");
-    cancelDuringSyncIsForbidden(acceptance, RepairStatus.BLOCK_PENDING);
-    deliver(acceptance);
-    assertEquals(RepairStatus.IN_REPAIR, service.find(acceptance.id).status);
-    action("worker_a", acceptance, "complete", Map.of("workNote", "维修完成等待验收"));
-    exactDeadline(submitted, "ASSIGN_OVERDUE", RepairStatus.SUBMITTED);
-    exactDeadline(assigned, "WORK_OVERDUE", RepairStatus.ASSIGNED);
-    exactDeadline(acceptance, "ACCEPT_OVERDUE", RepairStatus.AWAITING_ACCEPTANCE);
-    availabilityAfterTimeout(true);
-    assertEquals(1, service.find(acceptance.id).resourceVersion);
-    assertEquals(
-        1,
-        service.outbox.findByOrderIdOrderByCreatedAtAsc(acceptance.id).stream()
-            .filter(c -> !c.commandType.equals("NOTIFY"))
-            .count(),
-        "Timeout must not create RELEASE");
-    var result =
-        Map.of(
-            "ASSIGN_OVERDUE",
-            submitted.id,
-            "WORK_OVERDUE",
-            assigned.id,
-            "ACCEPT_OVERDUE",
-            acceptance.id);
-    Files.writeString(input.resolveSibling("deadline-results.json"), service.json.write(result));
-    // Cleanup uses only valid business actions; no direct resource deletion.
-    clock.now = clock.now.plusNanos(789);
-    action("reporter", submitted, "cancel", Map.of());
-    action("dispatch", assigned, "cancel", Map.of("reason", "期限验收完成，未开始维修"));
-    action(
-        "property", acceptance, "acceptance", Map.of("decision", "ACCEPT", "comment", "独立管理员验收通过"));
-    assertEquals(RepairStatus.RELEASE_PENDING, service.find(acceptance.id).status);
-    cancelDuringSyncIsForbidden(acceptance, RepairStatus.RELEASE_PENDING);
-    deliver(submitted);
-    deliver(assigned);
-    deliver(acceptance);
-    deliver(acceptance);
-    assertEquals(RepairStatus.CLOSED, service.find(acceptance.id).status);
-    assertEquals(clock.now.truncatedTo(java.time.temporal.ChronoUnit.MICROS),
-        service.find(acceptance.id).closedAt, "The worker must persist the same microsecond event time");
-    action("reporter", acceptance, "rating", Map.of("score", 5, "comment", "纳秒时钟终态评分"));
-    availabilityAfterTimeout(false);
+      var submitted = create("24小时未派单升级");
+      var assigned = create("48小时未完工升级");
+      var acceptance = create("48小时未验收升级");
+      action("dispatch", assigned, "assign", Map.of("assignedTo", workerId()));
+      action("dispatch", acceptance, "assign", Map.of("assignedTo", workerId()));
+      action("worker_a", acceptance, "start", Map.of());
+      assertEquals(RepairStatus.BLOCK_PENDING, service.find(acceptance.id).status);
+      var block = service.outbox.findByOrderIdOrderByCreatedAtAsc(acceptance.id).stream()
+          .filter(c -> c.commandType.equals("BLOCK")).findFirst().orElseThrow();
+      assertEquals(service.find(acceptance.id).updatedAt.toString(),
+          service.json.read(block.payloadJson).get("occurredAt"), "Command payload and database must share the same event instant");
+      cancelDuringSyncIsForbidden(acceptance, RepairStatus.BLOCK_PENDING);
+      deliver(acceptance);
+      assertEquals(RepairStatus.IN_REPAIR, service.find(acceptance.id).status);
+      action("worker_a", acceptance, "complete", Map.of("workNote", "维修完成等待验收"));
+      exactDeadline(submitted, "ASSIGN_OVERDUE", RepairStatus.SUBMITTED);
+      exactDeadline(assigned, "WORK_OVERDUE", RepairStatus.ASSIGNED);
+      exactDeadline(acceptance, "ACCEPT_OVERDUE", RepairStatus.AWAITING_ACCEPTANCE);
+      availabilityAfterTimeout(true);
+      assertEquals(1, service.find(acceptance.id).resourceVersion);
+      assertEquals(
+          1,
+          service.outbox.findByOrderIdOrderByCreatedAtAsc(acceptance.id).stream()
+              .filter(c -> !c.commandType.equals("NOTIFY"))
+              .count(),
+          "Timeout must not create RELEASE");
+      var result =
+          Map.of(
+              "ASSIGN_OVERDUE",
+              submitted.id,
+              "WORK_OVERDUE",
+              assigned.id,
+              "ACCEPT_OVERDUE",
+              acceptance.id);
+      Files.writeString(input.resolveSibling("deadline-results.json"), service.json.write(result));
+      // Cleanup uses only valid business actions; no direct resource deletion.
+      clock.now = clock.now.plusNanos(789);
+      action("reporter", submitted, "cancel", Map.of());
+      action("dispatch", assigned, "cancel", Map.of("reason", "期限验收完成，未开始维修"));
+      action(
+          "property", acceptance, "acceptance", Map.of("decision", "ACCEPT", "comment", "独立管理员验收通过"));
+      assertEquals(RepairStatus.RELEASE_PENDING, service.find(acceptance.id).status);
+      cancelDuringSyncIsForbidden(acceptance, RepairStatus.RELEASE_PENDING);
+      deliver(submitted);
+      deliver(assigned);
+      deliver(acceptance);
+      deliver(acceptance);
+      assertEquals(RepairStatus.CLOSED, service.find(acceptance.id).status);
+      assertEquals(clock.now.truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+          service.find(acceptance.id).closedAt, "The worker must persist the same microsecond event time");
+      action("reporter", acceptance, "rating", Map.of("score", 5, "comment", "纳秒时钟终态评分"));
+      availabilityAfterTimeout(false);
     } finally {
       clock.now = original;
     }
