@@ -1,0 +1,29 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 30
+      },
+      "deletions": {
+        "human": 31
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 27
+      },
+      "deletions": {
+        "human": 24
+      }
+    }
+  ]
+}
