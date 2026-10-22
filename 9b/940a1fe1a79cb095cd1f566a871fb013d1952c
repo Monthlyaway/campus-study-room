@@ -1,0 +1,26 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "9b940a1fe1a79cb095cd1f566a871fb013d1952c",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": ".gitlab-ci.yml",
+      "new_path": ".gitlab-ci.yml",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 2
+      }
+    }
+  ]
+}
