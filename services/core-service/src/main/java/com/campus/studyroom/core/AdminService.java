@@ -156,14 +156,13 @@ public class AdminService {
                   p),
               AdminViews::master);
       case "rooms" ->
-          page(
+          roomPage(
               rooms.visible(
                   u,
                   accounts.findById(u).orElseThrow(ApiException::notFound).departmentId,
                   optionalId(q.get("buildingId")),
                   VISIBLE_PERMISSIONS,
-                  p),
-              this::roomView);
+                  p));
       case "seats" -> {
         UUID room = Store.id(q.get("roomId"));
         if (!visibleRoom(u, room)) throw ApiException.notFound();
@@ -176,6 +175,34 @@ public class AdminService {
   boolean visibleRoom(UUID u, UUID room) {
     return access.admissible(u, room)
         || VISIBLE_PERMISSIONS.stream().anyMatch(p -> access.roomScope(u, p, room));
+  }
+
+  PageData<Map<String, Object>> roomPage(Page<Room> page) {
+    if (page.isEmpty())
+      return new PageData<>(
+          List.of(), page.getNumber() + 1, page.getSize(), page.getTotalElements());
+    Map<UUID, BuildingEntity> buildingById = new HashMap<>();
+    buildings
+        .findAllById(page.map(r -> r.buildingId).toSet())
+        .forEach(b -> buildingById.put(b.id, b));
+    Map<UUID, CampusEntity> campusById = new HashMap<>();
+    campuses
+        .findAllById(buildingById.values().stream().map(b -> b.campusId).distinct().toList())
+        .forEach(c -> campusById.put(c.id, c));
+    Map<UUID, Long> seatCounts = new HashMap<>();
+    seats
+        .enabledCounts(page.map(r -> r.id).toList())
+        .forEach(c -> seatCounts.put(c.getRoomId(), c.getSeatCount()));
+    return page(
+        page,
+        r -> {
+          var result = AdminViews.master(r);
+          var building = buildingById.get(r.buildingId);
+          result.put("buildingName", building.name);
+          result.put("campusName", campusById.get(building.campusId).name);
+          result.put("seatCount", seatCounts.getOrDefault(r.id, 0L));
+          return result;
+        });
   }
 
   Map<String, Object> roomView(Room room) {
@@ -544,17 +571,23 @@ public class AdminService {
   @Transactional(readOnly = true)
   public Object roles(UUID u) {
     access.require(u, "role:manage");
-    return Pages.of(
-        roles.findByEnabledTrueOrderByCode().stream()
-            .map(
-                r -> {
-                  var m = AdminViews.role(r);
-                  m.put("permissionCodes", permissions.codesForRole(r.id));
-                  return m;
-                })
-            .toList(),
-        1,
-        100);
+    var found = roles.findByEnabledTrue(PageRequest.of(0, 100, Sort.by("code")));
+    Map<UUID, List<String>> codesByRole = new HashMap<>();
+    if (!found.isEmpty())
+      permissions
+          .codesForRoles(found.map(r -> r.id).toList())
+          .forEach(
+              row ->
+                  codesByRole
+                      .computeIfAbsent(row.getRoleId(), ignored -> new ArrayList<>())
+                      .add(row.getCode()));
+    return page(
+        found,
+        r -> {
+          var m = AdminViews.role(r);
+          m.put("permissionCodes", codesByRole.getOrDefault(r.id, List.of()));
+          return m;
+        });
   }
 
   @Transactional

@@ -12,7 +12,7 @@ public interface RoleRepository
   @Query("select r from RoleEntity r where r.id=:id")
   Optional<RoleEntity> lock(@Param("id") UUID id);
 
-  List<RoleEntity> findByEnabledTrueOrderByCode();
+  Page<RoleEntity> findByEnabledTrue(Pageable pageable);
 
   Optional<RoleEntity> findByCode(String code);
 }

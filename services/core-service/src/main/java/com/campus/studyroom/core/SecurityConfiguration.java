@@ -70,21 +70,13 @@ public class SecurityConfiguration {
   @Order(1)
   SecurityFilterChain internal(
       HttpSecurity http,
-      PasswordEncoder encoder,
       @Value("${studyroom.internal-user}") String username,
       @Value("${studyroom.internal-password}") String password)
       throws Exception {
-    if (password.isBlank()) throw new IllegalStateException("INTERNAL_PASSWORD must be configured");
-    var users =
-        new org.springframework.security.provisioning.InMemoryUserDetailsManager(
-            User.withUsername(username)
-                .password(encoder.encode(password))
-                .authorities("SERVICE")
-                .build());
-    var provider = new DaoAuthenticationProvider(users);
-    provider.setPasswordEncoder(encoder);
+    var manager =
+        new ProviderManager(new InternalServiceAuthenticationProvider(username, password));
     return http.securityMatcher("/internal/**")
-        .authenticationProvider(provider)
+        .authenticationManager(manager)
         .authorizeHttpRequests(a -> a.anyRequest().hasAuthority("SERVICE"))
         .httpBasic(c -> {})
         .csrf(c -> c.disable())

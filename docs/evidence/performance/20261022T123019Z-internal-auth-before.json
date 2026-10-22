@@ -1,0 +1,263 @@
+{
+  "public": {
+    "concurrency": 20,
+    "requests": [
+      {
+        "status": 200,
+        "seconds": 0.0607
+      },
+      {
+        "status": 200,
+        "seconds": 0.004144
+      },
+      {
+        "status": 200,
+        "seconds": 0.024355
+      },
+      {
+        "status": 200,
+        "seconds": 0.053708
+      },
+      {
+        "status": 200,
+        "seconds": 0.075321
+      },
+      {
+        "status": 200,
+        "seconds": 0.021915
+      },
+      {
+        "status": 200,
+        "seconds": 0.119452
+      },
+      {
+        "status": 200,
+        "seconds": 0.046979
+      },
+      {
+        "status": 200,
+        "seconds": 0.00367
+      },
+      {
+        "status": 200,
+        "seconds": 0.020265
+      },
+      {
+        "status": 200,
+        "seconds": 0.002034
+      },
+      {
+        "status": 200,
+        "seconds": 0.011932
+      },
+      {
+        "status": 200,
+        "seconds": 0.047982
+      },
+      {
+        "status": 200,
+        "seconds": 0.040001
+      },
+      {
+        "status": 200,
+        "seconds": 0.036802
+      },
+      {
+        "status": 200,
+        "seconds": 0.016636
+      },
+      {
+        "status": 200,
+        "seconds": 0.001191
+      },
+      {
+        "status": 200,
+        "seconds": 0.037316
+      },
+      {
+        "status": 200,
+        "seconds": 0.066339
+      },
+      {
+        "status": 200,
+        "seconds": 0.005308
+      }
+    ],
+    "p50Ms": 24.355,
+    "p95Ms": 75.321
+  },
+  "valid": {
+    "concurrency": 20,
+    "requests": [
+      {
+        "status": 200,
+        "seconds": 1.54835
+      },
+      {
+        "status": 200,
+        "seconds": 1.538211
+      },
+      {
+        "status": 200,
+        "seconds": 1.395535
+      },
+      {
+        "status": 200,
+        "seconds": 1.465151
+      },
+      {
+        "status": 200,
+        "seconds": 1.491124
+      },
+      {
+        "status": 200,
+        "seconds": 1.318078
+      },
+      {
+        "status": 200,
+        "seconds": 1.455562
+      },
+      {
+        "status": 200,
+        "seconds": 1.39916
+      },
+      {
+        "status": 200,
+        "seconds": 1.470403
+      },
+      {
+        "status": 200,
+        "seconds": 1.378866
+      },
+      {
+        "status": 200,
+        "seconds": 1.287682
+      },
+      {
+        "status": 200,
+        "seconds": 1.471213
+      },
+      {
+        "status": 200,
+        "seconds": 1.459097
+      },
+      {
+        "status": 200,
+        "seconds": 1.383188
+      },
+      {
+        "status": 200,
+        "seconds": 1.465565
+      },
+      {
+        "status": 200,
+        "seconds": 1.377635
+      },
+      {
+        "status": 200,
+        "seconds": 1.445276
+      },
+      {
+        "status": 200,
+        "seconds": 1.438017
+      },
+      {
+        "status": 200,
+        "seconds": 1.470763
+      },
+      {
+        "status": 200,
+        "seconds": 1.348446
+      }
+    ],
+    "p50Ms": 1445.276,
+    "p95Ms": 1538.211
+  },
+  "invalid": {
+    "concurrency": 20,
+    "requests": [
+      {
+        "status": 401,
+        "seconds": 2.243734
+      },
+      {
+        "status": 401,
+        "seconds": 2.689686
+      },
+      {
+        "status": 401,
+        "seconds": 2.335893
+      },
+      {
+        "status": 401,
+        "seconds": 2.678488
+      },
+      {
+        "status": 401,
+        "seconds": 2.299732
+      },
+      {
+        "status": 401,
+        "seconds": 2.718011
+      },
+      {
+        "status": 401,
+        "seconds": 2.586126
+      },
+      {
+        "status": 401,
+        "seconds": 1.065095
+      },
+      {
+        "status": 401,
+        "seconds": 2.702724
+      },
+      {
+        "status": 401,
+        "seconds": 2.614283
+      },
+      {
+        "status": 401,
+        "seconds": 2.582089
+      },
+      {
+        "status": 401,
+        "seconds": 2.684659
+      },
+      {
+        "status": 401,
+        "seconds": 2.401584
+      },
+      {
+        "status": 401,
+        "seconds": 2.552394
+      },
+      {
+        "status": 401,
+        "seconds": 2.669952
+      },
+      {
+        "status": 401,
+        "seconds": 2.576161
+      },
+      {
+        "status": 401,
+        "seconds": 2.418773
+      },
+      {
+        "status": 401,
+        "seconds": 2.650506
+      },
+      {
+        "status": 401,
+        "seconds": 2.555139
+      },
+      {
+        "status": 401,
+        "seconds": 2.631371
+      }
+    ],
+    "p50Ms": 2582.089,
+    "p95Ms": 2702.7239999999997
+  }
+}

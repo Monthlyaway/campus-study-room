@@ -14,7 +14,10 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties =
+        "spring.jpa.properties.hibernate.session_factory.statement_inspector=com.campus.studyroom.core.AdminPersistenceTest$QueryCounter")
 @EnabledIfEnvironmentVariable(named = "STUDYROOM_ADMIN_DB_TESTS", matches = "true")
 class AdminPersistenceTest {
   @Autowired AdminService admin;
@@ -27,6 +30,121 @@ class AdminPersistenceTest {
   @Autowired CampusRepository campuses;
   @Autowired BuildingRepository buildings;
   @Autowired Clock clock;
+
+  public static class QueryCounter implements org.hibernate.resource.jdbc.spi.StatementInspector {
+    static final ThreadLocal<List<String>> statements = new ThreadLocal<>();
+
+    public String inspect(String sql) {
+      var current = statements.get();
+      if (current != null) current.add(sql);
+      return sql;
+    }
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void roomPageUsesBoundedQueriesAndBatchedSeatCounts() {
+    var campus =
+        map(
+            admin.createMaster(
+                actor(),
+                "campuses",
+                Map.of(
+                    "code", "C" + UUID.randomUUID().toString().substring(0, 15), "name", "批量校区")));
+    var building =
+        map(
+            admin.createMaster(
+                actor(),
+                "buildings",
+                Map.of(
+                    "campusId",
+                    campus.get("id"),
+                    "code",
+                    "B" + UUID.randomUUID().toString().substring(0, 15),
+                    "name",
+                    "批量教学楼")));
+    String roomCodePrefix = "Q" + UUID.randomUUID().toString().substring(0, 8);
+    for (int n = 0; n < 21; n++) {
+      var room =
+          map(
+              admin.createMaster(
+                  roomAdmin(),
+                  "rooms",
+                  Map.of(
+                      "buildingId",
+                      building.get("id"),
+                      "code",
+                      roomCodePrefix + String.format("%02d", n),
+                      "name",
+                      "批量教室" + n)));
+      if (n % 2 == 0)
+        admin.createMaster(
+            roomAdmin(), "seats", Map.of("roomId", room.get("id"), "code", "01", "hasPower", true));
+    }
+    Map<String, String> filter = Map.of("buildingId", building.get("id").toString());
+    try {
+      QueryCounter.statements.set(new ArrayList<>());
+      var first = (PageData<Map<String, Object>>) admin.masters(actor(), "rooms", filter, 1, 1);
+      int one = QueryCounter.statements.get().size();
+      QueryCounter.statements.set(new ArrayList<>());
+      var page = (PageData<Map<String, Object>>) admin.masters(actor(), "rooms", filter, 1, 20);
+      int twenty = QueryCounter.statements.get().size();
+      assertEquals(21, first.total());
+      assertEquals(21, page.total());
+      assertEquals(20, page.items().size());
+      assertTrue(
+          twenty <= one + 1,
+          "SQL count grew with rows: "
+              + one
+              + " -> "
+              + twenty
+              + " "
+              + QueryCounter.statements.get());
+      assertEquals(
+          1,
+          QueryCounter.statements.get().stream()
+              .filter(q -> q.contains("count(") && q.contains("core.seat"))
+              .count());
+      for (int n = 0; n < 20; n++) {
+        var room = page.items().get(n);
+        assertEquals("批量教学楼", room.get("buildingName"));
+        assertEquals("批量校区", room.get("campusName"));
+        assertEquals(n % 2 == 0 ? 1L : 0L, ((Number) room.get("seatCount")).longValue());
+      }
+    } finally {
+      QueryCounter.statements.remove();
+    }
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void roleListBatchesPermissionQueries() {
+    int baseline;
+    try {
+      QueryCounter.statements.set(new ArrayList<>());
+      admin.roles(actor());
+      baseline = QueryCounter.statements.get().size();
+    } finally {
+      QueryCounter.statements.remove();
+    }
+    for (int n = 0; n < 20; n++)
+      admin.createRole(actor(), Map.of("code", "BATCH_" + UUID.randomUUID(), "name", "批量角色"));
+    try {
+      QueryCounter.statements.set(new ArrayList<>());
+      var result = (PageData<Map<String, Object>>) admin.roles(actor());
+      assertTrue(
+          QueryCounter.statements.get().size() <= baseline + 1,
+          "Role queries grew with rows: " + baseline + " -> " + QueryCounter.statements.get());
+      assertTrue(result.total() >= 20);
+      assertTrue(
+          result.items().stream().allMatch(r -> r.get("permissionCodes") instanceof List<?>));
+      assertTrue(
+          QueryCounter.statements.get().stream()
+              .anyMatch(q -> q.contains("role_permission") && q.contains(" in ")));
+    } finally {
+      QueryCounter.statements.remove();
+    }
+  }
 
   static UUID seeded(String name) {
     return UUID.nameUUIDFromBytes(("studyroom:" + name).getBytes(StandardCharsets.UTF_8));

@@ -31,3 +31,7 @@ STUDYROOM_TEST_PASSWORD='<由本机 secret 注入>' python3 tests/integration/ad
 runner 使用独立 `studyroom_admin_integration` PostgreSQL 数据库，执行迁移与种子后验证，不向演示业务库写测试账号。2026-10-22 实际执行 `AdminPersistenceTest` 7/7 通过，无跳过，5.702 秒；覆盖 SELF 持久化/会话失效、同绑定范围隔离与公共教室创建、搜索分页总数、配置批量原子性与过期版本、最后管理员和系统角色保护、开放时间父版本，以及创建子资源与停用父资源的并发互斥。普通 Maven 的条件跳过不能替代该实际数据库验证。
 
 统一迁移并重启后的真实 HTTP 回归 2/2 通过，4.550 秒。实际断言共享 cookie 为 `STUDYROOMSESSION`；SELF 绑定保存成功，旧会话立即返回 401；新会话可访问维修后，管理员停用账号，使 core 和 repair 均返回 401。还验证了搜索大小写/总数、密码散列不返回、非法范围 422 不留下绑定、过期版本 409。真实密码不写入版本库。
+
+## 性能回归
+
+教室分页按本页 ID 批量读取教学楼、校区和启用座位数量，避免逐行触发统计查询；空页无需额外读取关联数据。`AdminPersistenceTest.roomPageUsesBoundedQueriesAndBatchedSeatCounts` 用 21 间真实教室检查 size 1/20 的 SQL 数量保持有界，校验有/无座位的统计及建筑/校区名称。角色列表也按数据库页批量读取权限码，不逐角色查权限。加入两项后真实 PostgreSQL 管理回归为 9/9 通过，性能环境前后 SQL 和完整负载证据见 [性能验收](../evidence/performance.md)。

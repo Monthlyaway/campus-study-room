@@ -1,0 +1,294 @@
+{
+  "room-list-1": {
+    "totalStatements": 13,
+    "statements": [
+      {
+        "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 1.417499,
+        "shared_blks_hit": 18,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+        "calls": 1,
+        "rows": 2,
+        "total_exec_time": 0.186875,
+        "shared_blks_hit": 8,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select se1_0.room_id,count(se1_0.id) from core.seat se1_0 where se1_0.room_id in ($1) and se1_0.enabled=$2 group by se1_0.room_id",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.09125,
+        "shared_blks_hit": 3,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+        "calls": 2,
+        "rows": 2,
+        "total_exec_time": 0.059166,
+        "shared_blks_hit": 6,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where ($1 is null or r1_0.building_id=$2) and (r1_0.department_id is null or r1_0.department_id=$3 or exists(select rse1_0.id from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$4 and re1_0.enabled=$5 and pe1_0.code in ($6 /*, ... */) and (rse1_0.scope_type=$7 or (rse1_0.scope_type=$8 and rse1_0.room_id=r1_0.id) or (rse1_0.scope_type=$9 and rse1_0.department_id=r1_0.department_id) or (rse1_0.scope_type=$10 and r1_0.department_id is null)))) order by r1_0.code fetch first $11 rows only",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.041334,
+        "shared_blks_hit": 2,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select be1_0.id,be1_0.campus_id,be1_0.code,be1_0.enabled,be1_0.name,be1_0.version from core.building be1_0 where be1_0.id in ($1)",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.039292,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ce1_0.id,ce1_0.code,ce1_0.enabled,ce1_0.name,ce1_0.version from core.campus ce1_0 where ce1_0.id in ($1)",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.032584,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN READ ONLY",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.028332999999999997,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select count(*) from core.room r1_0 where ($1 is null or r1_0.building_id=$2) and (r1_0.department_id is null or r1_0.department_id=$3 or exists(select rse1_0.id from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$4 and re1_0.enabled=$5 and pe1_0.code in ($6 /*, ... */) and (rse1_0.scope_type=$7 or (rse1_0.scope_type=$8 and rse1_0.room_id=r1_0.id) or (rse1_0.scope_type=$9 and rse1_0.department_id=r1_0.department_id) or (rse1_0.scope_type=$10 and r1_0.department_id is null))))",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.027292,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.005667,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      }
+    ]
+  },
+  "room-list-20": {
+    "totalStatements": 13,
+    "statements": [
+      {
+        "query": "select se1_0.room_id,count(se1_0.id) from core.seat se1_0 where se1_0.room_id in ($1 /*, ... */) and se1_0.enabled=$2 group by se1_0.room_id",
+        "calls": 1,
+        "rows": 20,
+        "total_exec_time": 0.36579100000000003,
+        "shared_blks_hit": 10,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.158375,
+        "shared_blks_hit": 18,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+        "calls": 1,
+        "rows": 2,
+        "total_exec_time": 0.060125,
+        "shared_blks_hit": 8,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+        "calls": 2,
+        "rows": 2,
+        "total_exec_time": 0.048042,
+        "shared_blks_hit": 6,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where ($1 is null or r1_0.building_id=$2) and (r1_0.department_id is null or r1_0.department_id=$3 or exists(select rse1_0.id from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$4 and re1_0.enabled=$5 and pe1_0.code in ($6 /*, ... */) and (rse1_0.scope_type=$7 or (rse1_0.scope_type=$8 and rse1_0.room_id=r1_0.id) or (rse1_0.scope_type=$9 and rse1_0.department_id=r1_0.department_id) or (rse1_0.scope_type=$10 and r1_0.department_id is null)))) order by r1_0.code fetch first $11 rows only",
+        "calls": 1,
+        "rows": 20,
+        "total_exec_time": 0.038083,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN READ ONLY",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.031625,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ce1_0.id,ce1_0.code,ce1_0.enabled,ce1_0.name,ce1_0.version from core.campus ce1_0 where ce1_0.id in ($1)",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.02425,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select count(*) from core.room r1_0 where ($1 is null or r1_0.building_id=$2) and (r1_0.department_id is null or r1_0.department_id=$3 or exists(select rse1_0.id from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$4 and re1_0.enabled=$5 and pe1_0.code in ($6 /*, ... */) and (rse1_0.scope_type=$7 or (rse1_0.scope_type=$8 and rse1_0.room_id=r1_0.id) or (rse1_0.scope_type=$9 and rse1_0.department_id=r1_0.department_id) or (rse1_0.scope_type=$10 and r1_0.department_id is null))))",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.015917,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select be1_0.id,be1_0.campus_id,be1_0.code,be1_0.enabled,be1_0.name,be1_0.version from core.building be1_0 where be1_0.id in ($1)",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.015000000000000001,
+        "shared_blks_hit": 1,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.0024990000000000004,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      }
+    ]
+  },
+  "reservation-list-1": {
+    "totalStatements": 9,
+    "statements": [
+      {
+        "query": "select count(*) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id) page_count",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 5.0440830000000005,
+        "shared_blks_hit": 384,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+        "calls": 1,
+        "rows": 2,
+        "total_exec_time": 0.190917,
+        "shared_blks_hit": 8,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.1155,
+        "shared_blks_hit": 18,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select cast(row_to_json(q) as text) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id limit $2 offset $3) q",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.080208,
+        "shared_blks_hit": 9,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.02875,
+        "shared_blks_hit": 3,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN READ ONLY",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.025292,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.006375,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      }
+    ]
+  },
+  "reservation-list-20": {
+    "totalStatements": 11,
+    "statements": [
+      {
+        "query": "select count(*) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id) page_count",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 1.777374,
+        "shared_blks_hit": 384,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+        "calls": 2,
+        "rows": 4,
+        "total_exec_time": 0.353917,
+        "shared_blks_hit": 16,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select cast(row_to_json(q) as text) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id limit $2 offset $3) q",
+        "calls": 1,
+        "rows": 20,
+        "total_exec_time": 0.293666,
+        "shared_blks_hit": 87,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.235208,
+        "shared_blks_hit": 18,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+        "calls": 1,
+        "rows": 1,
+        "total_exec_time": 0.048083,
+        "shared_blks_hit": 3,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN READ ONLY",
+        "calls": 2,
+        "rows": 0,
+        "total_exec_time": 0.023875,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      },
+      {
+        "query": "BEGIN",
+        "calls": 3,
+        "rows": 0,
+        "total_exec_time": 0.007333000000000001,
+        "shared_blks_hit": 0,
+        "shared_blks_read": 0
+      }
+    ]
+  }
+}
