@@ -60,15 +60,7 @@ public final class DomainPolicy {
   }
 
   static long expectedVersion(Object value) {
-    if (value instanceof Number n) {
-      try {
-        long version = new java.math.BigDecimal(n.toString()).longValueExact();
-        if (version >= 0) return version;
-      } catch (ArithmeticException | NumberFormatException ignored) {
-        // Never truncate fractions or overflow into a valid aggregate version.
-      }
-    }
-    throw new ApiException(400, "INVALID_VERSION", "版本号必须为非负整数");
+    return com.campus.studyroom.api.command.JsonCommand.versionNumber(value);
   }
 
   public static void requireState(Map<String, Object> m, String... allowed) {

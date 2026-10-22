@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.*;
+import com.campus.studyroom.api.command.*;
 import com.campus.studyroom.core.persistence.*;
 import java.time.*;
 import java.util.*;
@@ -46,14 +47,17 @@ public class ApplicationService {
 
   @Transactional
   public Object create(UUID user, Map<String, Object> b) {
+    return create(user, new ApplicationCreateRequest(b));
+  }
+
+  @Transactional
+  public Object create(UUID user, ApplicationCreateRequest b) {
     access.require(user, "room_application:create");
-    UUID room = Store.id(b.get("roomId"));
+    UUID room = b.roomId();
     Room r = resource.lock(room);
     if (!access.admissible(user, room)) throw ApiException.notFound();
     if (!r.enabled) throw new ApiException(422, "RESOURCE_DISABLED", "教室已停用");
-    Instant start = DomainPolicy.time(b.get("startAt")),
-        end = DomainPolicy.time(b.get("endAt")),
-        now = clock.instant();
+    Instant start = b.startAt().toInstant(), end = b.endAt().toInstant(), now = clock.instant();
     var config = bookings.snapshot("M2_MAX_DURATION_HOURS");
     int max = config.maxDurationHours();
     DomainPolicy.interval(start, end, now, max);
@@ -66,8 +70,8 @@ public class ApplicationService {
     a.roomId = room;
     a.startAt = start;
     a.endAt = end;
-    a.purposeTitle = DomainPolicy.text(b.get("purposeTitle"), 100);
-    a.purposeDescription = DomainPolicy.text(b.get("purposeDescription"), 2000);
+    a.purposeTitle = DomainPolicy.text(b.purposeTitle(), 100);
+    a.purposeDescription = DomainPolicy.text(b.purposeDescription(), 2000);
     a.status = "PENDING";
     a.currentStep = 1;
     a.expiresAt = start.isBefore(now.plusSeconds(86400)) ? start : now.plusSeconds(86400);
@@ -226,17 +230,22 @@ public class ApplicationService {
 
   @Transactional
   public Object decision(UUID user, UUID id, Map<String, Object> b) {
+    return decision(user, id, new ApplicationDecisionRequest(b));
+  }
+
+  @Transactional
+  public Object decision(UUID user, UUID id, ApplicationDecisionRequest b) {
     var a = locked(id);
     if (!readable(user, a)) throw ApiException.notFound();
-    DomainPolicy.version(a.version, b.get("expectedVersion"));
+    DomainPolicy.version(a.version, b.expectedVersion());
     DomainPolicy.requireState(a.status, "PENDING");
     if (!clock.instant().isBefore(a.expiresAt))
       throw new ApiException(422, "APPLICATION_EXPIRED", "申请已到审批截止时间");
     if (!canReview(user, a)) throw ApiException.forbidden();
-    String decision = Objects.toString(b.get("decision"));
+    String decision = Objects.toString(b.decision());
     if (!Set.of("APPROVE", "REJECT").contains(decision))
       throw new ApiException(422, "INVALID_DECISION", "审批结果不合法");
-    String comment = Objects.toString(b.get("comment"), "").trim();
+    String comment = Objects.toString(b.comment(), "").trim();
     if (decision.equals("REJECT")) comment = DomainPolicy.text(comment, 500);
     else if (comment.codePointCount(0, comment.length()) > 500)
       throw new ApiException(422, "INVALID_TEXT", "理由不得超过500字");
@@ -293,16 +302,21 @@ public class ApplicationService {
 
   @Transactional
   public Object cancel(UUID user, UUID id, Map<String, Object> b) {
+    return cancel(user, id, new ApplicationCancelRequest(b));
+  }
+
+  @Transactional
+  public Object cancel(UUID user, UUID id, ApplicationCancelRequest b) {
     var a = locked(id);
     if (!readable(user, a)) throw ApiException.notFound();
-    DomainPolicy.version(a.version, b.get("expectedVersion"));
+    DomainPolicy.version(a.version, b.expectedVersion());
     DomainPolicy.requireState(a.status, "PENDING", "APPROVED");
     boolean owner = user.equals(a.applicantId);
     String reason = "USER_CANCEL";
     if (!owner || a.status.equals("APPROVED") && !clock.instant().isBefore(a.startAt)) {
       if (!access.roomScope(user, "room_application:cancel_scope", a.roomId)
           || !a.status.equals("APPROVED")) throw ApiException.forbidden();
-      reason = DomainPolicy.text(b.get("reason"), 500);
+      reason = DomainPolicy.text(b.reason(), 500);
     }
     String before = a.status;
     a.status = "CANCELLED";

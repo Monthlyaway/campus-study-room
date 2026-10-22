@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.*;
+import com.campus.studyroom.api.command.*;
 import java.util.*;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,8 +110,9 @@ public class CoreController {
   Object createBooking(
       Authentication a,
       @RequestHeader(value = "Idempotency-Key", required = false) String key,
-      @RequestBody Map<String, Object> b) {
-    return write(a, "POST", "/reservations", key, b, 201, () -> booking.create(user(a), b));
+      @RequestBody ReservationCreateRequest b) {
+    return write(
+        a, "POST", "/reservations", key, b.originalBody(), 201, () -> booking.create(user(a), b));
   }
 
   @PostMapping("/reservations/{id}/{action:cancel|check-in}")
@@ -119,14 +121,14 @@ public class CoreController {
       @PathVariable UUID id,
       @PathVariable String action,
       @RequestHeader(value = "Idempotency-Key", required = false) String key,
-      @RequestBody Map<String, Object> b) {
+      @RequestBody ReservationActionRequest b) {
     if (action.equals("check-in")) limits.checkIn(user(a));
     return write(
         a,
         "POST",
         "/reservations/" + id + "/" + action,
         key,
-        b,
+        b.originalBody(),
         200,
         () ->
             action.equals("cancel")
@@ -172,29 +174,47 @@ public class CoreController {
   Object createApplication(
       Authentication a,
       @RequestHeader(value = "Idempotency-Key", required = false) String key,
-      @RequestBody Map<String, Object> b) {
-    return write(
-        a, "POST", "/room-applications", key, b, 201, () -> applications.create(user(a), b));
-  }
-
-  @PostMapping("/room-applications/{id}/{action:decisions|cancel}")
-  Object applicationAction(
-      Authentication a,
-      @PathVariable UUID id,
-      @PathVariable String action,
-      @RequestHeader(value = "Idempotency-Key", required = false) String key,
-      @RequestBody Map<String, Object> b) {
+      @RequestBody ApplicationCreateRequest b) {
     return write(
         a,
         "POST",
-        "/room-applications/" + id + "/" + action,
+        "/room-applications",
         key,
-        b,
+        b.originalBody(),
+        201,
+        () -> applications.create(user(a), b));
+  }
+
+  @PostMapping("/room-applications/{id}/decisions")
+  Object applicationDecision(
+      Authentication a,
+      @PathVariable UUID id,
+      @RequestHeader(value = "Idempotency-Key", required = false) String key,
+      @RequestBody ApplicationDecisionRequest body) {
+    return write(
+        a,
+        "POST",
+        "/room-applications/" + id + "/decisions",
+        key,
+        body.originalBody(),
         200,
-        () ->
-            action.equals("cancel")
-                ? applications.cancel(user(a), id, b)
-                : applications.decision(user(a), id, b));
+        () -> applications.decision(user(a), id, body));
+  }
+
+  @PostMapping("/room-applications/{id}/cancel")
+  Object applicationCancel(
+      Authentication a,
+      @PathVariable UUID id,
+      @RequestHeader(value = "Idempotency-Key", required = false) String key,
+      @RequestBody ApplicationCancelRequest body) {
+    return write(
+        a,
+        "POST",
+        "/room-applications/" + id + "/cancel",
+        key,
+        body.originalBody(),
+        200,
+        () -> applications.cancel(user(a), id, body));
   }
 
   @GetMapping("/{kind:departments|campuses|buildings|rooms}")

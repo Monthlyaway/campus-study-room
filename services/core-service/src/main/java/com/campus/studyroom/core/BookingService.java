@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.*;
+import com.campus.studyroom.api.command.*;
 import com.campus.studyroom.core.persistence.*;
 import java.time.*;
 import java.util.*;
@@ -64,17 +65,20 @@ public class BookingService {
 
   @Transactional
   public Object create(UUID user, Map<String, Object> b) {
+    return create(user, new ReservationCreateRequest(b));
+  }
+
+  @Transactional
+  public Object create(UUID user, ReservationCreateRequest b) {
     access.require(user, "reservation:create");
-    UUID seat = Store.id(b.get("seatId"));
+    UUID seat = b.seatId();
     UUID room = seats.roomId(seat).orElseThrow(ApiException::notFound);
     resource.guard(user);
     Room r = resource.lock(room);
     var s = seats.findById(seat).orElseThrow(ApiException::notFound);
     if (!access.admissible(user, room)) throw ApiException.notFound();
     if (!r.enabled || !s.enabled) throw new ApiException(422, "RESOURCE_DISABLED", "教室或座位已停用");
-    Instant start = DomainPolicy.time(b.get("startAt")),
-        end = DomainPolicy.time(b.get("endAt")),
-        now = clock.instant();
+    Instant start = b.startAt().toInstant(), end = b.endAt().toInstant(), now = clock.instant();
     var config = snapshot("M1_MAX_DURATION_HOURS");
     int max = config.maxDurationHours();
     DomainPolicy.interval(start, end, now, max);
@@ -164,9 +168,14 @@ public class BookingService {
 
   @Transactional
   public Object cancel(UUID user, UUID id, Map<String, Object> b) {
+    return cancel(user, id, new ReservationActionRequest(b));
+  }
+
+  @Transactional
+  public Object cancel(UUID user, UUID id, ReservationActionRequest b) {
     var r = locked(id);
     if (!user.equals(r.userId)) throw ApiException.notFound();
-    DomainPolicy.version(r.version, b.get("expectedVersion"));
+    DomainPolicy.version(r.version, b.expectedVersion());
     DomainPolicy.requireState(r.status, "RESERVED");
     if (!clock.instant().isBefore(r.startAt))
       throw new ApiException(422, "CANCELLATION_CLOSED", "预约开始后不能取消");
@@ -181,12 +190,17 @@ public class BookingService {
 
   @Transactional
   public Object checkin(UUID user, UUID id, Map<String, Object> b) {
+    return checkin(user, id, new ReservationActionRequest(b));
+  }
+
+  @Transactional
+  public Object checkin(UUID user, UUID id, ReservationActionRequest b) {
     var r = locked(id);
     if (!user.equals(r.userId)) throw ApiException.notFound();
-    DomainPolicy.version(r.version, b.get("expectedVersion"));
+    DomainPolicy.version(r.version, b.expectedVersion());
     DomainPolicy.requireState(r.status, "RESERVED");
     DomainPolicy.checkIn(r.startAt, clock.instant());
-    if (!codes.matches(r.roomId, Objects.toString(b.get("roomCode"), "")))
+    if (!codes.matches(r.roomId, Objects.toString(b.roomCode(), "")))
       throw new ApiException(422, "INVALID_ROOM_CODE", "签到码不正确或已过期");
     r.status = "CHECKED_IN";
     r.checkedInAt = r.updatedAt = clock.instant();
