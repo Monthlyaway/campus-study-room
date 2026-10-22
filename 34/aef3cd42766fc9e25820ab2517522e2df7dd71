@@ -1,0 +1,233 @@
+mvnw.cmd
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1-206
+modules/security-common/pom.xml
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1
+db/migration/core/V20261022000100__core_schema.sql
+  s_8ca5a53b33de4c::t_9cfdd94759f08a 1-37
+services/core-service/pom.xml
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1
+services/repair-service/pom.xml
+  s_8ca5a53b33de4c::t_51db15518ed522 1-2
+.mvn/wrapper/maven-wrapper.properties
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1-3
+  s_8ca5a53b33de4c::t_2640b58d502378 4-5
+pom.xml
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1-8
+db/migration/session/V20261022000000__spring_session.sql
+  s_8ca5a53b33de4c::t_9cfdd94759f08a 1-13
+services/core-service/src/main/resources/application.yml
+  s_8ca5a53b33de4c::t_9cbf9881840f6c 1,3-63
+  s_8ca5a53b33de4c::t_b4a62753c5777b 2
+mvnw
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1-338
+modules/api-contracts/pom.xml
+  s_8ca5a53b33de4c::t_5f790da40d8c00 1
+db/migration/repair/V20261022120000__repair_domain.sql
+  s_8ca5a53b33de4c::t_4978b58882f6cb 1-62
+services/repair-service/src/main/resources/application.yml
+  s_8ca5a53b33de4c::t_50eb96c7632626 8-10
+  s_8ca5a53b33de4c::t_c868f262807450 1-7,11-44,46-48
+  s_8ca5a53b33de4c::t_0a36645b5d7444 45
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "34aef3cd42766fc9e25820ab2517522e2df7dd71",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>",
+      "custom_attributes": {
+        "tlab.token_usage.input_tokens": "147954",
+        "tlab.token_usage.cache_creation_tokens": "0",
+        "tlab.token_usage.cache_read_tokens": "5030400",
+        "tlab.token_usage.output_tokens": "25970",
+        "tlab.session_started_at": "2026-10-22T11:37:41Z"
+      }
+    }
+  },
+  "changes": [
+    {
+      "new_path": ".mvn/wrapper/maven-wrapper.properties",
+      "additions": {
+        "human": 3,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 2
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "db/migration/core/V20261022000100__core_schema.sql",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 37
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "db/migration/repair/V20261022120000__repair_domain.sql",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 62
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "db/migration/session/V20261022000000__spring_session.sql",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 13
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/pom.xml",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/ApiException.java",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/ApiResponse.java",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/PageData.java",
+      "additions": {
+        "human": 5
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/RequestIds.java",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "modules/security-common/pom.xml",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "modules/security-common/src/main/java/com/campus/studyroom/security/SessionPrincipal.java",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "new_path": "mvnw",
+      "additions": {
+        "human": 3,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 335
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "mvnw.cmd",
+      "additions": {
+        "human": 206
+      }
+    },
+    {
+      "new_path": "pom.xml",
+      "additions": {
+        "human": 1,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "services/core-service/pom.xml",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreApplication.java",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/resources/application.yml",
+      "additions": {
+        "human": 4,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 59
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "services/repair-service/pom.xml",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairApplication.java",
+      "additions": {
+        "human": 14
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/resources/application.yml",
+      "additions": {
+        "human": 3,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 45
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "tools/migration-runner/pom.xml",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "tools/migration-runner/src/main/java/com/campus/studyroom/migration/MigrationRunner.java",
+      "additions": {
+        "human": 301
+      }
+    }
+  ]
+}
