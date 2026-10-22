@@ -1,0 +1,148 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "8b8a3d345263f0529a569aab4fa18b8605fca176",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "tests/integration/runner_locks.py",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "tests/ops/test_runner_locks.py",
+      "additions": {
+        "human": 156
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/integration/run_admin_persistence.py",
+      "new_path": "tests/integration/run_admin_persistence.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_core_acceptance.py",
+      "new_path": "tests/integration/run_core_acceptance.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_core_contract.py",
+      "new_path": "tests/integration/run_core_contract.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_core_inputs.py",
+      "new_path": "tests/integration/run_core_inputs.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_core_persistence.py",
+      "new_path": "tests/integration/run_core_persistence.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_fault_matrix.py",
+      "new_path": "tests/integration/run_fault_matrix.py",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_repair_acceptance.py",
+      "new_path": "tests/integration/run_repair_acceptance.py",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_repair_deadlines.py",
+      "new_path": "tests/integration/run_repair_deadlines.py",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_repair_faults.py",
+      "new_path": "tests/integration/run_repair_faults.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_repair_persistence.py",
+      "new_path": "tests/integration/run_repair_persistence.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_shared_persistence.py",
+      "new_path": "tests/integration/run_shared_persistence.py",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/integration/run_smtp_acceptance.py",
+      "new_path": "tests/integration/run_smtp_acceptance.py",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
