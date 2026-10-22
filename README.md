@@ -22,6 +22,8 @@ cd campus-study-room
 - 随机生成的演示密码：`.local/local/secrets/demo_password`（只存在本机，权限 0600）
 - 演示账号：`student`、`student2`、`applicant`、`dept-approver`、`space-approver`、`dispatcher`、`repairer`、`property-admin`、`room-admin`、`operator`、`admin`
 
+需要自动备份时使用 `./install.sh local --schedule-backups`，或在已有环境运行 `./scripts/schedule-backup install local`。调度器每天生成校验过的备份，成功后保留最近七天；macOS 使用 launchd，Linux 使用 systemd，详情见[发布运维](docs/modules/release-operations.md)。
+
 演示账号仅允许 local/dev/test。生产不导入演示数据；正式服务器、域名和 SMTP 接入按用户选择留待后续。数据库和服务内部接口不发布到公网。
 
 ## 原生开发
@@ -32,8 +34,11 @@ cd campus-study-room
 ./scripts/dev-up local     # PG/邮件、构建、迁移、种子、两个 Java 进程
 ./scripts/web install --frozen-lockfile
 ./scripts/web dev          # Umi 开发服务器，代理两个 API 服务
-./scripts/check            # 后端验证、类型检查、前端构建、Compose 校验
+./scripts/check            # 编译/类型/单元 + 隔离真实 PG、HTTP、SMTP、后端契约检查
+./scripts/check --unit-only # 日常快检；明确跳过真实集成与后端契约，不能作为完整验收
 ```
+
+默认检查需要可用的 Docker、Java、Node 和已安装的前端依赖；依赖不可用或测试被跳过时失败退出，不自动降级。它创建独占 PostgreSQL/Mailpit 容器与数据卷、随机凭据及本机空闲端口，运行两个临时后端和九组真实数据库套件（含公开/内部契约）、跨服务 HTTP、邮件与响应丢失补偿测试。检查不会重启现有 local/dev/test/prod 服务。整个检查持有工作区构建锁，集成环境锁覆盖依赖创建、迁移、测试和清理；结束只移除本轮容器/网络并停止本轮进程，保留命名数据卷。项目/卷名、0600 凭据与运行 JAR 留在私有 `.local/check/<运行编号>/` 供复查，不自动删除数据卷。日志和逐套件计数保留在 `output/check/<运行编号>/`，CI 调用同一集成函数与测试清单。性能、浏览器和发布演练仍有各自验收入口，不由该命令代替。
 
 开发用数据库端口为本机 `15432`，SMTP 为 `11025`；正常容器安装不发布数据库端口。原生进程日志在 `.local/local/`；构建输出与正在运行的 JAR 分开存放。更新代码后使用 `python3 scripts/studyroom.py native-restart local`，该命令等待旧进程正常退出后再构建、迁移和启动。所有时间按 Asia/Shanghai 展示。
 
@@ -54,7 +59,7 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 
 ## GitLab、提交与发布
 
-[项目仓库](https://code.agibot.com/yangchunyu/campus-study-room)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
+[项目仓库](https://code.agibot.com/yangchunyu/campus-study-room)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。合入 main 使用 Fast-forward merge，必要时先 rebase 并重新验证；默认不 squash，保留提交记录且不生成 merge commit。GitLab 要求 pipeline 成功，skipped 不视为成功。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
 
 ```sh
 ./scripts/build-release r-YYYYMMDDTHHMMSS-commit

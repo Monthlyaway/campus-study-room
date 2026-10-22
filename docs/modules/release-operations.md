@@ -43,7 +43,7 @@ COMPATIBILITY_SANDBOX=true
 COMPOSE_PROJECT_NAME=studyroom-compat-rehearsal
 ```
 
-使用独立状态目录、端口与数据库卷；不得将上述标记加入日常环境。准备两个已提交、固定镜像组合的版本：A 为基线，B 仅新增一个业务允许的可空 TEXT 列（当前探针要求 `core.reservation.<列名>`），同时保持 Compose、运行依赖与既有迁移不变。可使用独立演练分支承载该扩展，不修改已经部署过的迁移。先构建 A/B 镜像，再捕获会话，以免构建耗时超过 30 分钟的会话闲置期。
+使用独立状态目录、端口与数据库卷；不得将上述标记加入日常环境。准备两个已提交、固定镜像组合的版本：A 为基线，B 仅新增一个业务允许的可空 TEXT 列（当前探针显式允许 `core.reservation.operator_note` 或 `repair.repair_order.assigned_to_name`），同时保持 Compose、运行依赖与既有迁移不变。可使用独立演练分支承载该扩展，不修改已经部署过的迁移。先构建 A/B 镜像，再捕获会话，以免构建耗时超过 30 分钟的会话闲置期。
 
 在隔离项目部署 A 后，用 B 源码中的工具捕获真实业务与 V1 登录会话：
 
@@ -82,4 +82,28 @@ python3 tests/integration/release_compatibility.py verify test \
 
 兼容工具的实际运行及 A/B 发布清单、数据库 fingerprint、三镜像 ID、原会话与数据断言结果由发布验收记录补充。没有实际生成证明之前，不能将应用回退兼容性标记完成。
 
-V2 增量迁移 `V20261022150000__reservation_operator_note.sql` 为预约增加可空运维备注列，不改变状态或裁决，旧版写入无需提供新字段。兼容工具在A创建预约、两人两级通过的整室申请与报修，分别保留学生和申请人的原会话，验证B读到原记录、A在新schema仍能读写三类业务。该列的非空哨兵只在明确隔离演练库注入；真实结果尚待本轮执行归档。
+V2 增量迁移 `V20261022150000__reservation_operator_note.sql` 为预约增加可空运维备注列，不改变状态或裁决，旧版写入无需提供新字段。兼容工具在A创建预约、两人两级通过的整室申请与报修，分别保留学生和申请人的原会话，验证B读到原记录、A在新schema仍能读写三类业务。该列的非空哨兵只在明确隔离演练库注入；[A/B完整演练](../evidence/release/README.md)已归档。维修姓名列的兼容探针使用报修ID，后续版本必须生成对应新证明，不能复用A/B证明。
+
+## 每日备份与七天保留
+
+长期运行的本机或服务器环境可在安装时使用 `./install.sh test --schedule-backups`。已安装、离线导入或自定义状态目录的环境使用：
+
+```sh
+./scripts/schedule-backup install test --state-dir /absolute/path/to/deployment-state
+./scripts/schedule-backup status test --state-dir /absolute/path/to/deployment-state
+./scripts/schedule-backup run test --state-dir /absolute/path/to/deployment-state
+```
+
+macOS安装当前用户的LaunchAgent；Linux以root执行时安装systemd系统timer，普通用户安装user timer。服务器建议以具备目标Docker访问权限的运维用户配置系统timer；普通user timer取决于用户会话/linger，工具不会修改linger或授予Docker权限。macOS退出登录、宿主关机或Docker停止时不会完成备份；恢复后检查并补做当日备份。未成功备份不更新当日标记，下次小时检查重试。
+
+调度每小时检查一次，仅当当天dump、元数据与标记的SHA一致、完整解码验证记录有效且没有符号链接时才跳过；丢失或损坏则补备份。每个UTC日期最多自动完成一次有效备份；`run --force`可立即追加。备份和发布共用环境锁。成功生成`pg_dump -Fc`并通过`pg_restore --list`和`pg_restore --file=/dev/null`全量解码后才从`.partial`改为正式`.dump`，元数据与dump均0600。元数据包括SHA-256、开始/完成时间、实际PG/Flyway清单、当时运行release manifest及恢复点说明，不含秘密。发布前仍单独备份，不被“当天已备份”跳过。
+
+仅在一次新备份成功后，清理本环境备份目录里超过七天、命名/元数据/校验全部匹配的dump与json对。未知文件、校验不符、符号链接、失败partial和恢复报告保留供排查。不要把该策略误认为异机容灾；备份应另行加密同步到部署方指定存储。
+
+取消调度用相同参数执行 `./scripts/schedule-backup remove test --state-dir ...`，只卸载该环境的任务定义，保留数据、备份和日志。日志在状态目录的`backup-scheduler.log`。仓库移动后重新执行install以刷新绝对路径。
+
+2026-10-22已在独立便携安装环境实际生成备份，核对完整解码、SHA、版本与迁移清单，并安装launchd；首次系统触发退出码0，正确识别当日已成功备份。内存截断64字节的负例证明TOC检查返回0但全量解码失败，原备份不变。丢失/损坏/链接等回归通过；七天保留通过临时文件反证测试，尚未经历真实七天；Linux systemd定义已校验，未在独立Linux宿主实际加载。见[备份调度证据](../evidence/release/scheduled-backup.json)。
+
+## GitLab 合并历史
+
+用户于2026-10-22指定 Fast-forward merge，默认不 squash。项目已实际保存该设置：需要时先rebase特性分支到最新main，再由同一提交的成功流水线允许合并；不创建额外merge commit，保留逻辑提交。Squash策略为Allow（默认不勾选），不是Encourage或Require。Pipelines must succeed已勾选，Skipped pipelines are considered successful未勾选。禁止通过修改门禁或直接推送main绕开失败测试。

@@ -30,6 +30,7 @@ Asia/Shanghai、带偏移时间、左闭右开区间、整点小时、14 天结�
 4. 状态/API/schema/配置改动同步更新 README、模块 docs、OpenAPI 与需求追踪表。
 5. 提交前检查 diff、生成物、secret 扫描和测试结果；只暂存本任务文件。Conventional Commits，正文含任务/需求编号。不冒充其他模型或真实人员署名。
 6. GitLab CI 检查全仓，迁移、部署和验收共享环境锁。生产配置不得包含演示账号或默认密码。镜像组合固定，回退不降级数据库。
+7. 用户指定合入 main 使用 Fast-forward merge，保持线性历史，不生成 merge commit；必要时先将特性分支 rebase 到最新 main 并重新验证。默认不 squash，保留每个逻辑 commit。GitLab 必须要求 pipeline 成功；skipped 不视为成功。不要改写 main 的已有历史。
 
 ## 事实与报告
 

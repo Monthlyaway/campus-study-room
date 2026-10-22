@@ -24,7 +24,7 @@
 | REQ-D-04 / T10-03 | [主数据][admin]、[房间锁与来源][resource] | 父停用/子创建并发；[矩阵][matrix]占用座位停用保护/历史保留/整室中新座位不可约；[输入矩阵][typed]停用房间使最终审批拒绝、维修解除仍停用且不可预约，PENDING保持 | 关键资源停用/新增/审批组合已验证；最终部署与页面回归另验 |
 | REQ-D-05 / T10-03 | [配置管理][admin]、[订单配置快照][booking] | [矩阵][matrix]旧4小时订单逐字段不变；改为2小时后3小时拒绝/2小时成功；0/13/小数及非管理员拒绝；新审计旧4/新2、操作者与时间严格核对 | TC-D-05已验证；发现并修复配置审计before_json缺失，未放宽断言 |
 | REQ-D-06 / T10-05、T20-04 | [通知][notifications]、[任务与事件][events] | Shared PG去重/租约；[真实SMTP矩阵][repair-matrix]421连续8失败、299秒不发/300秒第9次、管理员原记录重试后Mailpit第10次收信，readAt保持且预约不回滚；M1三种提醒实际收到；他人已读404 | 本地真实SMTP失败恢复已验证；进程重启后发送仍归工程验收，正式邮箱按ADR延期 |
-| REQ-D-07 / T10-05、T50-01 | [审计事件][events]、[审计查询][queries] | Shared PG审计UPDATE/DELETE权限拒绝及JOB类型；Core PG objectId/动作/房间筛选、学生403；[矩阵][matrix]配置旧/新值、操作者与时间，重复取消/签到仅1条审计 | 部分验证：维修BLOCK/RELEASE按同工单关联两侧requestId、拒绝审批/越权审计与完整部署日志秘密扫描仍待补；本轮三份日志密码/探针扫描无命中仅限本轮 |
+| REQ-D-07 / T10-05、T50-01 | [审计事件][events]、[审计查询][queries] | Shared PG审计UPDATE/DELETE权限拒绝及JOB类型；Core PG objectId/动作/房间筛选、学生403；[矩阵][matrix]配置旧/新值、操作者与时间，重复取消/签到仅1条审计 | [故障矩阵](evidence/repair-fault-matrix.md)已核对BLOCK/RELEASE两侧审计、outbox和日志的同一requestId，五份日志对34个实际秘密及编码变体无命中；最终发行日志扫描仍单独记录 |
 
 ## M1 自习座位预约
 
@@ -54,9 +54,9 @@
 | --- | --- | --- | --- |
 | REQ-M3-01 / T40-01、T40-06 | [维修服务][repair] | [真实HTTP矩阵][repair-matrix]空白/超长输入拒绝、100 emoji/2000字边界通过、跨院系403、他人/范围外详情404且列表不泄漏；原有幂等/手机/同室双来源链路 | TC-M3-01关键输入与范围组合已验证；最终发布环境回归另验 |
 | REQ-M3-02 / T40-02、T40-06 | [派单与权限][repair] | [真实HTTP矩阵][repair-matrix]非维修角色/停用人员422、范围外404；重派历史保留且firstAssignedAt/workDueAt相同，旧维修人404、新维修人开始成功；已开始不能转派；各维修人收到对应一次ASSIGNED | TC-M3-02完整关键组合已验证；最终发布环境回归另验 |
-| REQ-M3-03 / T40-03 | [outbox与worker][repair]、[core封禁][resource] | 真实HTTP BLOCK_PENDING→IN_REPAIR；透明代理丢失已提交响应后原命令重试成功 | 部分验证：单独补core完全断网→页面显示同步中→恢复自动收敛；生产入口拒绝内部封禁请求验证 |
+| REQ-M3-03 / T40-03 | [outbox与worker][repair]、[core封禁][resource] | 真实HTTP BLOCK_PENDING→IN_REPAIR；透明代理丢失已提交响应后原命令重试成功 | [故障矩阵](evidence/repair-fault-matrix.md)已验证写回网络阻断、8次失败后attention/300秒退避、恢复后自动IN_REPAIR及375px状态刷新；整个core停机时开始动作因无法校验权限返回503、工单不变。两种故障按真实行为区分；公开内部路径404已验 |
 | REQ-M3-04 / T40-04 | [完工][repair] | [真实HTTP矩阵][repair-matrix]他维修人404/非执行物业403、空白/2001字422、2000字通过，失败版本/历史不变；仅报修人收到AWAITING_ACCEPTANCE，claim持续有效 | TC-M3-04关键组合已验证；最终发布环境回归另验 |
-| REQ-M3-05 / T40-04、T40-05 | [验收/来源释放][repair]、[资源][resource] | [真实HTTP矩阵][repair-matrix]报修人兼维修人兼物业仍403自验，另一合格物业通过后CLOSED；空白/超长驳回理由422，驳回仍封禁；原有双来源/来源mutation通过 | 独立验收与驳回已验证；释放失败后的重试/状态矩阵仍待专项 |
+| REQ-M3-05 / T40-04、T40-05 | [验收/来源释放][repair]、[资源][resource] | [真实HTTP矩阵][repair-matrix]报修人兼维修人兼物业仍403自验，另一合格物业通过后CLOSED；空白/超长驳回理由422，驳回仍封禁；原有双来源/来源mutation通过 | 独立验收、驳回及释放失败后的自动重试已验证；[故障矩阵](evidence/repair-fault-matrix.md)实际RELEASE_PENDING→网络恢复→CLOSED，封禁解除且旧BLOCK不复活；最终发行组合另验 |
 | REQ-M3-06 / T40-06 | [评价][repair] | [真实HTTP矩阵][repair-matrix]0/6/1.5/4.0/布尔/字符串/超长说明拒绝，IN_REPAIR/待验收不能评分；同键重放原评价、不同键409；非报修人403且原评分/状态不变 | 评分类型、状态、归属与幂等已验证；最终发布环境回归另验 |
 | REQ-M3-07 / T40-02、T40-04 | [期限任务][repair] | 原有PG轮次/8线程/返修；[三deadline真实core HTTP][repair-matrix]前1ns不触发、当刻重复3次仅1命令，同命令重复HTTP仍去重；3事件×9角色收件计数正确；验收超时公开M1仍不可约，独立验收后恢复；[性能环境](evidence/performance.md)重启20任务12.09秒处理 | 三期限、通知对象与超时仍封禁已验证；最终发布镜像恢复另验 |
 | REQ-M3-08 / T40-01 | [取消][repair] | [真实HTTP矩阵][repair-matrix]本人SUBMITTED取消、ASSIGNED本人拒绝/调度有原因成功；IN_REPAIR/待验收取消失败且claim不变；测试Clock+真实core HTTP验证两同步状态也拒绝；取消后派单/开始拒绝 | TC-M3-08关键状态组合已验证；最终发布环境回归另验 |
@@ -67,7 +67,7 @@
 | --- | --- | --- | --- |
 | REQ-X-01 / T10-04、T40-05、T40-07 | [来源实体/资源][resource] | Core PG双来源与墓碑；repair真实HTTP双工单先后解除；来源限定mutation被检测 | 主路径已验证，待按管理查询核对全部来源历史、释放时间/requestId，并补释放后仍有M1/M2来源的组合 |
 | REQ-X-02 / T10-04、T30-02、T30-05 | [统一房间锁][resource]、[审批事务][application] | 同座20线程；[M1/M2最终审批双线程屏障只1成功，以及POST_INSERT确认claim落库后PG约束失败的整笔回滚](evidence/core/atomic-workflows.md) | TC-X-02两项专项通过；最终部署组合仍须完整集成回归，不据此关闭工程门禁 |
-| REQ-X-03 / T10-05、T40-03、T40-05 | [outbox][repair]、[永久去重/墓碑][resource] | repair故障代理保留相同commandId/requestId/payload两次HTTP；Core PG先RELEASE后旧BLOCK不复活 | 已验证提交后丢响应与墓碑；补双侧审计关联、重启与租约过期/网络不可达组合；正式发布下恢复另验 |
+| REQ-X-03 / T10-05、T40-03、T40-05 | [outbox][repair]、[永久去重/墓碑][resource] | repair故障代理保留相同commandId/requestId/payload两次HTTP；Core PG先RELEASE后旧BLOCK不复活 | [故障矩阵](evidence/repair-fault-matrix.md)补齐网络不可达/退避恢复、双侧审计与原命令重放；已释放来源对新command的旧版本返回STALE_IGNORED。真实重启与最终发行恢复另验 |
 | REQ-X-04 / T10-04、T40-03、T40-07 | [维修级联][resource] | repair HTTP未来预约取消且不复活；Core PG维修/NO_SHOW两种先后均无错误追责；[同室五态、3条正确通知/审计、零违约、释放不复活](evidence/core/atomic-workflows.md) | TC-X-04数据库级联专项通过；对应SMTP实际接收仍与通知/工程验收联合验证 |
 
 ## 工程交付
@@ -76,9 +76,9 @@
 | --- | --- | --- | --- |
 | REQ-ENG-01 / T00-01、T60-01 | [协作规则](../AGENTS.md)、[分工](team.md)、本表 | 分模块连续commit与agent实测记录；原规格与ADR已入库 | 部分验证：逐REQ补最终commit/MR/tag/manifest闭环；独立agent审核不冒充人工签字；原人工提交流程按用户授权调整 |
 | REQ-ENG-02 / T00-02、T50-02 | [HTTP测试][core-http]、[PG测试][core-test]、[反证][mutation]、浏览器证据 | 真实PG与两个进程HTTP、3项变异均业务断言失败且恢复通过，独立桌面/手机 | 反证子门禁通过；完整M1签到/完成、M2拒绝/过期和多角色全部UI E2E仍未覆盖，不能据此关闭G5 |
-| REQ-ENG-03 / T00-04、T50-04 | [迁移程序][migration]、[版本SQL](../db/migration) | 空库迁移/reference/demo、重复seed；新增SELF纠正迁移在原库后应用，未改原迁移 | 部分验证：补旧版业务数据→新schema升级→旧版镜像仍读写的完整演练及数量报告 |
+| REQ-ENG-03 / T00-04、T50-04 | [迁移程序][migration]、[版本SQL](../db/migration) | 空库迁移/reference/demo、重复seed；新增SELF纠正迁移在原库后应用，未改原迁移 | [A/B演练](evidence/release/README.md)已完成旧业务→新增可空列→旧镜像原会话读写、schema保留、隔离恢复完整行摘要；包含assigned_to_name的新发行组合继续验收 |
 | REQ-ENG-04 / T00-03、T00-04、T50-05 | [环境与发布脚本][ops]、[GitLab CI][ci] | local与隔离PG套件使用不同数据库；独立test Compose安装由根代理执行 | 待执行test/prod（或等效隔离验收环境）不串数据证据；同环境运维跨进程排队及另一环境并行已实测；集成测试入口锁仍需统一 |
-| REQ-ENG-05 / T00-05、T50-05 | [GitLab CI][ci]、[全仓检查](../scripts/check) | 本机全仓check通过；有构建/生成漂移/PG/HTTP任务配置 | **未闭环：GitLab真实提交触发、故意失败阻断部署与合并、修复后整套test自动升级及E2E。** 配置文件存在不等于pipeline已运行 |
+| REQ-ENG-05 / T00-05、T50-05 | [GitLab CI][ci]、[全仓检查](../scripts/check) | [默认完整check](evidence/core/default-check.md)实际exit0，18 HTTP/65 PG/27收件人及响应丢失重放；CI调用相同函数与清单 | **未闭环：** GitLab实际pipeline 682662通过原四阶段；682703/682861在维修HTTP失败，container-release/package被阻断。现已设置Fast-forward、默认不squash、pipeline成功合并门禁；新增统一集成检查和容器发布/E2E尚待真实runner通过，失败MR合并门禁仍待页面证据 |
 | REQ-ENG-06 / T00-06、T50-04～06 | [发布/回退][ops]、[版本API][controller] | 不可变组合校验与错误manifest的ops单测；本地版本接口实现 | [A/B演练](evidence/release/README.md)已执行新可空列后旧组合回退，原会话/三业务/schema保留；启动失败自动恢复亦通过。第三版留存、最终tag及完整GitLab门禁待闭环；正式生产审批按ADR延期 |
 | REQ-ENG-07 / T00-03、T60-02 | [安装入口](../install.sh)、[部署脚本][ops] | 根代理已完成本机独立test Compose首次安装；前端生产入口独立复核 | [离线独立安装](evidence/release/portable-install.json)五镜像ID匹配、新源码/秘密/卷；[独立浏览器](../tests/browser/REVIEW.md)完整M1/M2/M3等6项通过。最终版本仍需回归；另一服务器/AMD64未实测 |
 | REQ-ENG-08 / T00-01、T50-01 | [安全][security]、[伦理记录](ethics-and-risks.md) | HTTP CSRF/越权拒绝、Cookie HttpOnly/SameSite配置，维修公平处理PG；非真实学生测试数据 | 部分验证：全运行日志/提交秘密扫描、签到码泄露接口矩阵、统计无个人违约排名与四类伦理记录的具体commit关联；正式HTTPS按ADR延期 |
@@ -92,14 +92,14 @@
 | PRD§12 性能 | 已有20请求资源正确性测试 | 共享四CPU/总8GiB容器限额、20并发、60秒预热+5分钟80:20：复测读p95 153.50ms/写252.93ms/5xx=0；宿主共享条件与镜像ID已记录，正式release复验待执行 |
 | PRD§12 定时与恢复 | Clock测试+数据库任务/租约持久化；M3响应丢失重试30秒左右收敛 | 真实停启跨期限、恢复≤60秒开始补偿、健康延迟≤60秒；各类型误提醒/重复业务核对 |
 | PRD§12 容器持久化 | 命名volume与共享JDBC Session实现 | [保留卷重建](evidence/release/backup-and-recreate.json)确认三容器ID均改变、两原会话可用、三类订单及两侧审计完整行摘要不变；隔离备份恢复同样逐表匹配 |
-| 技术方案§1/§2.3/§6 契约 | 日常写入已JPA；[56公开+5内部具名schema与真实HTTP](evidence/core/contracts.md)；[关键M1/M2 typed命令及原hash重放][typed] | Auth/管理/内部请求及Java响应投影仍有Map；继续分模块类型化和全部端点契约矩阵，不能把生成成功等同全部契约验证 |
+| 技术方案§1/§2.3/§6 契约 | 日常写入已JPA；[56公开+5内部具名schema与真实HTTP](evidence/core/contracts.md)；[关键M1/M2 typed命令及原hash重放][typed] | 保留已有Java Map投影不单独作为业务缺陷；关键输入已类型化，OpenAPI具名schema与实际HTTP检查约束边界。新增接口或变更时同步契约，最终完整check纳入真实后端契约套件 |
 | milestone G0～G6 | 多项实际实现/测试已完成，原milestone初始状态保留为规格 | 只有本表所有相应证据闭环后更新工作进度门禁，不能回填不存在的人工验收或历史pipeline |
 
 ## 下一轮优先验收清单
 
-1. 日期、再次预约、签到码/限流、取消时点、M2自批/同人两级与复杂统计已补真实DB/API矩阵；M1/M2时间输入与关键管理范围也已补真实HTTP；继续认证/管理/内部DTO及其余错误输入和页面组合，勿重复把已通过子场景列为缺口。
+1. 日期、再次预约、签到码/限流、取消时点、M2自批/同人两级与复杂统计已补真实DB/API矩阵；M1/M2时间输入与关键管理范围也已补真实HTTP；补必备页面未实际操作的业务闭环，勿将Map投影或已通过子场景反复列为缺口。
 2. 三类提醒实际邮件及SMTP失败恢复已通过；继续M1/M3真实进程停启、迟到任务补偿与最终发布镜像60秒指标。
-3. 维修主要负面HTTP矩阵已补齐；继续释放失败、跨服务审计关联与完整来源保留组合；最终发布环境再跑关键业务链。
+3. 维修主要负面HTTP矩阵已补齐；释放失败及跨服务审计关联已由故障矩阵补齐；最终发布环境再跑关键业务链。
 4. 完成新test容器三条业务链、保留卷重建、备份恢复与V2→V1兼容回退，生成可核验release manifest。
 5. 实际运行GitLab pipeline正反门禁与整套自动部署，归档提交/MR/流水线/版本链接。
 6. 已有两轮指定规模/5分钟性能证据，继续最终发布镜像复验；补精确DTO/OpenAPI、全秘密扫描、接口/页面矩阵、文档复现后再决定阶段门禁状态。
