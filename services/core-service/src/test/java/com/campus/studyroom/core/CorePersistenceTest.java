@@ -449,6 +449,63 @@ class CorePersistenceTest {
 
   @Test
   @SuppressWarnings("unchecked")
+  void reservationHistoryUsesHalfOpenDateBoundsBeforePagination() {
+    Instant from = Instant.parse("2030-01-02T16:00:00Z");
+    Instant to = from.plusSeconds(86400);
+    List<UUID> ids = new ArrayList<>();
+    for (long hours : List.of(-1L, 0L, 23L, 24L)) {
+      start = from.plusSeconds(hours * 3600);
+      ids.add(Store.id(create().get("id")));
+    }
+    bookings.cancel(user, ids.get(1), Map.of("expectedVersion", 0));
+    UUID otherSeat =
+        Store.id(
+            ((Map<String, Object>)
+                    admin.createMaster(
+                        roomAdmin(),
+                        "seats",
+                        Map.of("roomId", room, "code", "02", "hasPower", true)))
+                .get("id"));
+    UUID other = anotherStudent("CS");
+    bookings.create(
+        other,
+        Map.of(
+            "seatId",
+            otherSeat,
+            "startAt",
+            from.toString(),
+            "endAt",
+            from.plusSeconds(3600).toString()));
+    String localFrom = "2030-01-03T00:00:00+08:00", localTo = "2030-01-04T00:00:00+08:00";
+    var first = bookings.list(user, null, localFrom, localTo, 1, 1);
+    var second = bookings.list(user, null, from.toString(), to.toString(), 2, 1);
+    assertEquals(2, first.total());
+    assertEquals(2, second.total());
+    assertEquals(ids.get(2), Store.id(first.items().getFirst().get("id")));
+    assertEquals(ids.get(1), Store.id(second.items().getFirst().get("id")));
+    assertEquals(0, bookings.list(user, null, localFrom, localTo, 3, 1).items().size());
+    var cancelled = bookings.list(user, "CANCELLED", localFrom, localTo, 1, 20);
+    assertEquals(1, cancelled.total());
+    assertEquals(ids.get(1), Store.id(cancelled.items().getFirst().get("id")));
+    assertEquals(3, bookings.list(user, null, localFrom, null, 1, 20).total());
+    assertEquals(3, bookings.list(user, null, null, localTo, 1, 20).total());
+    assertEquals(4, bookings.list(user, null, "", " ", 1, 20).total());
+    for (String invalid : List.of("2030-01-03T00:00:00", "not-a-date"))
+      assertEquals(
+          "INVALID_TIME",
+          assertThrows(ApiException.class, () -> bookings.list(user, null, invalid, localTo, 1, 20))
+              .code);
+    for (String invalidEnd : List.of(localFrom, "2030-01-02T00:00:00+08:00"))
+      assertEquals(
+          "INVALID_DATE_RANGE",
+          assertThrows(
+                  ApiException.class, () -> bookings.list(user, null, localFrom, invalidEnd, 1, 20))
+              .code);
+    assertEquals(4, db.count("select count(*) from core.reservation where user_id=?1", user));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
   void foreignDepartmentCannotCreateReservation() {
     UUID foreign = anotherStudent("ART");
     var r =

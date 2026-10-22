@@ -132,6 +132,18 @@ declare namespace CoreAPI {
   type getApiV1ReservationsParams = {
     page?: number;
     size?: number;
+    /** Filter the current user’s reservations by state. */
+    status?:
+      | "RESERVED"
+      | "CHECKED_IN"
+      | "CANCELLED"
+      | "NO_SHOW"
+      | "COMPLETED"
+      | "INTERRUPTED";
+    /** Inclusive lower bound on reservation startAt. Must include a UTC offset. Omit for no lower bound. */
+    startFrom?: string;
+    /** Exclusive upper bound on reservation startAt. Must include a UTC offset and be later than startFrom when both exist. For an inclusive calendar end date in Asia/Shanghai, send the following day at 00:00:00+08:00. */
+    startTo?: string;
   };
 
   type getApiV1RolesParams = {

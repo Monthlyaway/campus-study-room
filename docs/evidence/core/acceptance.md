@@ -61,3 +61,15 @@
 | 释放来源时错误地释放同教室所有未释放claim | `sourceTombstoneAndMultipleMaintenanceClaimsAreIndependent` 失败：另一个工单的封禁丢失 |
 
 3项变异均被业务断言检测，没有把编译错误或启动错误当作检测成功；恢复后3/3通过。完整日志与结构化断言保存在受忽略的 `output/core-mutations/`，脚本可重新生成。该证据覆盖这3条具体保护规则，不代替全部状态与性能验收。
+
+## 预约历史日期筛选（REQ-M1-06）
+
+2026-10-22，修复后执行 `python3 tests/integration/run_core_persistence.py`：11/11通过，Maven总耗时14.668秒。新增 `reservationHistoryUsesHalfOpenDateBoundsBeforePagination`，真实创建边界前一小时、边界当刻、当天23点、次日00点四个预约，再加入其他用户订单，验证：
+
+- `[startFrom,startTo)` 只包含中间两条，分页total始终2；第3页为空。
+- +08:00与等价UTC边界结果一致；单侧范围、空值、日期与取消状态组合正确。
+- 查询只返回本人；无偏移/无效时间以及反向/相等边界返回400，不修改订单。
+
+前端结束日发送次日00:00+08:00，OpenAPI与生成客户端同步。生成、TypeScript检查以及6个前端API测试通过。真实服务重启后执行 `python3 tests/integration/core_http.py`：6/6通过，12.912秒。新用例通过公开API重复验证两种偏移表示、跨日边界、status组合、页码/total、400错误与读取无副作用；原20用户抢座与同人跨房间竞争同时回归通过。
+
+另由实现者通过375×812真实浏览器复验：选择10月25日时只显示该日1条，改为10月26日时0条；请求上界确为所选结束日次日零点。过程及截图说明见[独立浏览器记录](browser-review.md)。

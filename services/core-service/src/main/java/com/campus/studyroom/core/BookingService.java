@@ -130,14 +130,28 @@ public class BookingService {
   }
 
   @Transactional(readOnly = true)
-  public Object list(UUID u, String status, int page, int size) {
+  public PageData<Map<String, Object>> list(
+      UUID u, String status, String startFrom, String startTo, int page, int size) {
+    Instant from = startFrom == null || startFrom.isBlank() ? null : DomainPolicy.time(startFrom);
+    Instant to = startTo == null || startTo.isBlank() ? null : DomainPolicy.time(startTo);
+    if (from != null && to != null && !to.isAfter(from))
+      throw new ApiException(400, "INVALID_DATE_RANGE", "结束时间必须晚于开始时间");
     String where = "where r.user_id=?1";
     List<Object> p = new ArrayList<>(List.of(u));
     if (status != null && !status.isBlank()) {
       p.add(status);
       where += " and r.status=?2";
     }
-    var result = db.page(DETAIL + where + " order by r.start_at desc", page, size, p.toArray());
+    if (from != null) {
+      p.add(from);
+      where += " and r.start_at>=?" + p.size();
+    }
+    if (to != null) {
+      p.add(to);
+      where += " and r.start_at<?" + p.size();
+    }
+    var result =
+        db.page(DETAIL + where + " order by r.start_at desc,r.id", page, size, p.toArray());
     return new PageData<>(
         result.items().stream().map(r -> present(u, r)).toList(), page, size, result.total());
   }

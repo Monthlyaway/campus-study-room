@@ -2,7 +2,7 @@
 /* eslint-disable */
 import { request } from "../../../api";
 
-/** Reservations GET /api/v1/reservations GET /api/v1/reservations */
+/** Reservations GET /api/v1/reservations Returns only the authenticated user’s reservations. Date and state predicates apply before both total counting and pagination; order is startAt descending, then id. Invalid timestamps or a non-increasing range return HTTP 400. GET /api/v1/reservations */
 export async function getApiV1Reservations(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.getApiV1ReservationsParams,
@@ -15,6 +15,7 @@ export async function getApiV1Reservations(
       page: "1",
       // size has a default value: 20
       size: "20",
+
       ...params,
     },
     ...(options || {}),

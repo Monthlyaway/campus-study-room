@@ -53,7 +53,7 @@ export default function Reservations() {
         ? range[0].format("YYYY-MM-DD") + "T00:00:00+08:00"
         : undefined,
       startTo: range?.[1]
-        ? range[1].format("YYYY-MM-DD") + "T23:59:59+08:00"
+        ? range[1].add(1, "day").format("YYYY-MM-DD") + "T00:00:00+08:00"
         : undefined,
     })}`
   );

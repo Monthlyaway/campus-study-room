@@ -11,6 +11,7 @@ from pathlib import Path
 import threading
 import unittest
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 
@@ -39,8 +40,9 @@ class Client:
             response = self.opener.open(req, timeout=30)
         except urllib.error.HTTPError as error:
             response = error
-        raw = response.read()
-        return response.status, json.loads(raw) if raw else {}
+        with response:
+            raw = response.read()
+            return response.status, json.loads(raw) if raw else {}
 
     def good(self, method, path, data=None):
         code, body = self.call(method, path, data)
@@ -155,6 +157,53 @@ class CoreAcceptance(unittest.TestCase):
         target = Client(name)
         self.admin.good('PATCH', '/users/' + u['id'], {'expectedVersion': u['version'], 'enabled': False})
         self.assertEqual(target.call('GET', '/auth/me')[0], 401)
+
+    def test_06_history_filters_start_bounds_before_pagination(self):
+        name = 'history-' + self.suffix
+        role = next(r['id'] for r in self.admin.good('GET', '/roles')['items'] if r['code'] == 'STUDENT')
+        account = self.admin.good('POST', '/users', {'username': name, 'password': PASSWORD,
+            'email': name + '@example.invalid', 'displayName': '日期筛选验收',
+            'departmentId': self.student.me['departmentId'], 'schoolNo': name})
+        self.admin.good('PUT', '/users/' + account['id'] + '/role-bindings', {
+            'expectedVersion': account['version'], 'bindings': [{'roleId': role, 'scopes': []}]})
+        client = Client(name)
+        lower = (self.start + dt.timedelta(days=3)).replace(hour=0)
+        upper = lower + dt.timedelta(days=1)
+        created = []
+        try:
+            for hour in (-1, 0, 23, 24):
+                at = lower + dt.timedelta(hours=hour)
+                created.append(client.good('POST', '/reservations', {'seatId': self.seats[0]['id'],
+                    'startAt': at.isoformat(), 'endAt': (at + dt.timedelta(hours=1)).isoformat()}))
+            created[1] = client.good('POST', '/reservations/' + created[1]['id'] + '/cancel',
+                                    {'expectedVersion': created[1]['version']})
+            def listing(**params):
+                return client.good('GET', '/reservations?' + urllib.parse.urlencode(params))
+            params = {'startFrom': lower.isoformat(), 'startTo': upper.isoformat(), 'size': 1}
+            first, second = listing(**params, page=1), listing(**params, page=2)
+            self.assertEqual(2, first['total'])
+            self.assertEqual(2, second['total'])
+            self.assertEqual([created[2]['id'], created[1]['id']],
+                             [first['items'][0]['id'], second['items'][0]['id']])
+            self.assertEqual([], listing(**params, page=3)['items'])
+            self.assertEqual(1, listing(**params, status='CANCELLED')['total'])
+            self.assertEqual(3, listing(startFrom=lower.astimezone(dt.timezone.utc).isoformat())['total'])
+            self.assertEqual(3, listing(startTo=upper.astimezone(dt.timezone.utc).isoformat())['total'])
+            self.assertEqual(0, listing(startFrom=upper.isoformat(), status='CANCELLED')['total'])
+            for malformed, expected in [
+                ({'startFrom': lower.replace(tzinfo=None).isoformat()}, 'INVALID_TIME'),
+                ({'startFrom': 'not-a-date'}, 'INVALID_TIME'),
+                ({'startFrom': upper.isoformat(), 'startTo': lower.isoformat()}, 'INVALID_DATE_RANGE'),
+                ({'startFrom': lower.isoformat(), 'startTo': lower.isoformat()}, 'INVALID_DATE_RANGE')]:
+                status, body = client.call('GET', '/reservations?' + urllib.parse.urlencode(malformed))
+                self.assertEqual((400, expected), (status, body['error']['code']))
+            self.assertEqual(4, listing()['total'], 'Rejected filters must not mutate business records')
+            self.assertEqual({account['id']}, {r['userId'] for r in listing()['items']})
+        finally:
+            for item in created:
+                if item['status'] == 'RESERVED':
+                    client.good('POST', '/reservations/' + item['id'] + '/cancel',
+                                {'expectedVersion': item['version']})
 
 
 if __name__ == '__main__':

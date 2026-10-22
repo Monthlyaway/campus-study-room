@@ -92,9 +92,11 @@ public class CoreController {
   Object bookings(
       Authentication a,
       @RequestParam(required = false) String status,
+      @RequestParam(required = false) String startFrom,
+      @RequestParam(required = false) String startTo,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ok(booking.list(user(a), status, page, size));
+    return ok(booking.list(user(a), status, startFrom, startTo, page, size));
   }
 
   @GetMapping("/reservations/{id}")
