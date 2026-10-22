@@ -1,0 +1,192 @@
+install.sh
+  s_8ca5a53b33de4c::t_e3d2742ef1a52d 1-8
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "735d73c90b2f9d9a5bddc00151ff2dca4d32a36d",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 68
+      }
+    },
+    {
+      "new_path": "docs/modules/portable-release.md",
+      "additions": {
+        "human": 84
+      }
+    },
+    {
+      "new_path": "docs/modules/release-operations.md",
+      "additions": {
+        "human": 83
+      }
+    },
+    {
+      "new_path": "install.sh",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 8
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "scripts/backup",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/build-release",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/check",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/deploy",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/deps",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/dev-up",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/export-release",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/import-release",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/migrate",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/portable_release.py",
+      "additions": {
+        "human": 297
+      }
+    },
+    {
+      "new_path": "scripts/restore",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/rollback",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/seed",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/status",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "scripts/studyroom.py",
+      "additions": {
+        "human": 735
+      }
+    },
+    {
+      "new_path": "scripts/web",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "tests/integration/deployment_maintenance.py",
+      "additions": {
+        "human": 44
+      }
+    },
+    {
+      "new_path": "tests/integration/linux_secret_bootstrap.py",
+      "additions": {
+        "human": 45
+      }
+    },
+    {
+      "new_path": "tests/integration/release_compatibility.py",
+      "additions": {
+        "human": 242
+      }
+    },
+    {
+      "new_path": "tests/ops/test_environment_lock.py",
+      "additions": {
+        "human": 71
+      }
+    },
+    {
+      "new_path": "tests/ops/test_portable_release.py",
+      "additions": {
+        "human": 243
+      }
+    },
+    {
+      "new_path": "tests/ops/test_release.py",
+      "additions": {
+        "human": 301
+      }
+    },
+    {
+      "old_path": "scripts/init-env",
+      "new_path": "scripts/init-env",
+      "additions": {
+        "human": 26
+      },
+      "deletions": {
+        "human": 23
+      }
+    }
+  ]
+}
