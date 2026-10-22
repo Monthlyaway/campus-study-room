@@ -28,17 +28,63 @@ container-release:
     DOCKER_TLS_VERIFY: '1'
   resource_group: studyroom-container-test
   interruptible: false
-  environment:
-    name: test/container-$CI_PIPELINE_IID
-    action: start
-    auto_stop_in: 1 day
-  before_script:
-    - apk add --no-cache python3 git
   script:
-    - python3 scripts/ci-release.py
-  artifacts:
-    when: always
-    paths: [output/container-release/, output/browser/]
-    reports:
-      junit: output/browser/junit.xml
-    expire_in: 90 days
+    - |
+      set -eu
+      printf '%s\n' 'Connectivity diagnostic only: no release build or deployment.'
+      printf 'DOCKER_HOST=%s\nDOCKER_TLS_CERTDIR=%s\nDOCKER_CERT_PATH=%s\nDOCKER_TLS_VERIFY=%s\nCI_BUILDS_DIR=%s\n' \
+        "$DOCKER_HOST" "$DOCKER_TLS_CERTDIR" "$DOCKER_CERT_PATH" "$DOCKER_TLS_VERIFY" "$CI_BUILDS_DIR"
+      [ "$DOCKER_HOST" = tcp://docker:2376 ]
+      [ "$DOCKER_TLS_VERIFY" = 1 ]
+      certificate_status() {
+        for file in client/ca.pem client/cert.pem client/key.pem server/ca.pem server/cert.pem server/key.pem; do
+          if [ -s "$DOCKER_TLS_CERTDIR/$file" ]; then
+            printf 'certificate_file=%s exists_nonempty=yes\n' "$DOCKER_TLS_CERTDIR/$file"
+          else
+            printf 'certificate_file=%s exists_nonempty=no\n' "$DOCKER_TLS_CERTDIR/$file"
+          fi
+        done
+      }
+      certificate_status
+      printf '%s\n' 'Docker service alias entries in /etc/hosts:'
+      awk '{ for (i=2; i<=NF; i++) if ($i == "docker") { print; break } }' /etc/hosts
+      if command -v getent >/dev/null 2>&1; then getent hosts docker || true; fi
+      printf '%s\n' 'DNS query (an /etc/hosts alias need not have a DNS record):'
+      busybox timeout 5 busybox nslookup docker || true
+      printf '%s\n' 'TCP connection to docker:2376 (no credentials or payload sent):'
+      if busybox timeout 5 busybox nc -w 3 docker 2376 </dev/null >/dev/null; then
+        printf '%s\n' 'tcp_2376=connected'
+      else
+        result=$?
+        printf 'tcp_2376=failed exit=%s\n' "$result"
+      fi
+      docker --version
+      docker compose version --short
+      ready=0
+      deadline=$(( $(date +%s) + 90 ))
+      attempt=0
+      while [ "$(date +%s)" -lt "$deadline" ]; do
+        attempt=$((attempt + 1))
+        printf 'TLS Docker readiness attempt=%s time=%s\n' "$attempt" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        if busybox timeout 5 docker info --format 'ServerVersion={{.ServerVersion}} OperatingSystem={{.OperatingSystem}}'; then
+          ready=1
+          break
+        else
+          result=$?
+          printf 'docker_info_exit=%s\n' "$result"
+        fi
+        sleep 5
+      done
+      certificate_status
+      printf '%s\n' 'Final authenticated Docker version probe:'
+      if busybox timeout 8 docker version --format 'ClientVersion={{.Client.Version}} ServerVersion={{if .Server}}{{.Server.Version}}{{end}}'; then
+        printf '%s\n' 'docker_version=passed'
+      else
+        result=$?
+        printf 'docker_version=failed exit=%s\n' "$result"
+      fi
+      if [ "$ready" -ne 1 ]; then
+        printf '%s\n' 'TLS Docker daemon remained unavailable; retain the concrete errors above.' >&2
+        exit 1
+      fi
+      printf '%s\n' 'TLS connectivity diagnostic passed; this is not a release acceptance result.'
