@@ -1,0 +1,35 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "6f78968940f2a03d648a21450414d025064922ab",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/gitlab-negative-gate.md",
+      "additions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 43
+      },
+      "deletions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 74
+      },
+      "deletions": {
+        "human": 63
+      }
+    }
+  ]
+}
