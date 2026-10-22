@@ -1,0 +1,317 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-22T16:41:36.697096+00:00",
+  "requirements": [
+    "T50-03",
+    "REQ-M1-05",
+    "REQ-M2-03",
+    "REQ-D-06"
+  ],
+  "passed": true,
+  "release": {
+    "releaseId": "r-20261022T161900-3c7a93c",
+    "releaseCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+    "manifestSha256": "2d334c604de51bc3a65c4d4d4715966420c0adf87c77d63a023b8f31fefcc03f"
+  },
+  "project": "studyroom-performance",
+  "performanceBaseline": {
+    "runId": "20261022T162929Z",
+    "resultSha256": "e107b9c2028508de5365cfdbbca8682def64ab5f2f975b449dd42f5a0c4946a4"
+  },
+  "runtimeLimits": {
+    "core": {
+      "id": "7e9478d0ada5e966b7d8fa6304c4cbe72d2e2269be52c890e5f049fa40b2d9e2",
+      "image": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+      "cpuSet": "0-3",
+      "memory": 2147483648,
+      "memorySwap": 2147483648
+    },
+    "mailpit": {
+      "id": "6db3b3c076e61991523e7b4dab16f88c2976079bd7909f5855aaf10999468c20",
+      "image": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "cpuSet": "0-3",
+      "memory": 536870912,
+      "memorySwap": 536870912
+    },
+    "postgres": {
+      "id": "247767f5fe49341a01a28cf8152a02fe7784b15f8112406d034a4ae3c516a6fb",
+      "image": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "cpuSet": "0-3",
+      "memory": 3221225472,
+      "memorySwap": 3221225472
+    },
+    "repair": {
+      "id": "3db09f56f45bfd88bfc3a93401b030ba772b659fff6de89a2d688886e8cebb2b",
+      "image": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+      "cpuSet": "0-3",
+      "memory": 2147483648,
+      "memorySwap": 2147483648
+    },
+    "web": {
+      "id": "7bbcc93e14ba472f5f15ad67d1f3cad074c4360c575e4600556b12e1fd3f2f32",
+      "image": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+      "cpuSet": "0-3",
+      "memory": 536870912,
+      "memorySwap": 536870912
+    }
+  },
+  "dockerHost": {
+    "Architecture": "aarch64",
+    "NCPU": 10,
+    "MemTotal": 8217448448,
+    "OperatingSystem": "Docker Desktop",
+    "KernelVersion": "6.12.54-linuxkit",
+    "ServerVersion": "28.5.2"
+  },
+  "hostLimit": "Docker services share CPUs 0-3 and total 8GiB; host and Docker VM are shared, not dedicated hardware.",
+  "runId": "22ec28db-00fd-4db1-a2cb-bd262aa4371d",
+  "normalStop": {
+    "ExitCode": 143,
+    "OOMKilled": false,
+    "FinishedAt": "2026-10-22T16:38:26.821244133Z"
+  },
+  "restartRequestedAt": "2026-10-22T16:38:28.440721+00:00",
+  "firstProcessingObservedSeconds": 11.183013665984618,
+  "allProcessedObservedSeconds": 11.18309254097403,
+  "healthyObservedSeconds": 7.511402624979382,
+  "firstProcessingLimitSeconds": 60,
+  "requiredStabilitySeconds": 65,
+  "snapshotObservationWindowSeconds": 65.390382,
+  "actualStabilityAndFinalCheckSeconds": 66.68101016699802,
+  "testSource": {
+    "workingTreeHeadAtRun": "9b940a1fe1a79cb095cd1f566a871fb013d1952c",
+    "actualScriptSha256": "1feaae99f566d5fc895e2801772570568dc17ae0fc3c0c99f899cc2b1bb2b23e",
+    "collectorPatchWasUncommittedAtRun": true,
+    "interpretation": "The HEAD is context, not the exact script revision; actualScriptSha256 binds the executed parser fix. Production images remain pinned to releaseCommit."
+  },
+  "fixture": {
+    "kind": "synthetic-overdue-orders-in-isolated-performance-database",
+    "note": "Historical fixtures are inserted while core is stopped, not submitted through the public API. All subsequent transitions, claims, audits and notifications must be produced by the real scheduler.",
+    "retained": true,
+    "orders": [
+      {
+        "id": "c5f4ec41-5d78-5913-8876-2335516a2ae5",
+        "sourceType": "M1",
+        "initialStatus": "RESERVED",
+        "initialVersion": 0,
+        "actualStatus": "NO_SHOW",
+        "actualVersion": 1,
+        "endedAt": "2026-10-22T16:38:38.570194+00:00"
+      },
+      {
+        "id": "4e477558-131c-5aa2-9c05-bed735ecca82",
+        "sourceType": "M1",
+        "initialStatus": "CHECKED_IN",
+        "initialVersion": 1,
+        "actualStatus": "COMPLETED",
+        "actualVersion": 2,
+        "endedAt": "2026-10-21T03:00:00+00:00"
+      },
+      {
+        "id": "a35aa477-6098-5593-97aa-88e1de76ba27",
+        "sourceType": "M2",
+        "initialStatus": "PENDING",
+        "initialVersion": 0,
+        "actualStatus": "EXPIRED",
+        "actualVersion": 1,
+        "endedAt": null
+      }
+    ]
+  },
+  "beforeRestart": {
+    "orderStatuses": {
+      "CHECKED_IN": 1,
+      "PENDING": 1,
+      "RESERVED": 1
+    },
+    "taskStatuses": {
+      "PENDING": 10
+    },
+    "auditCount": 0,
+    "notificationCount": 0,
+    "violationCount": 0
+  },
+  "afterRecovery": {
+    "taskStatuses": {
+      "DONE": 10
+    },
+    "taskTypes": {
+      "M2_EXPIRE": 1,
+      "M1_COMPLETE": 2,
+      "M1_PRE_START": 2,
+      "M1_LATE": 2,
+      "M2_COMPLETE": 1,
+      "M1_NO_SHOW": 2
+    },
+    "taskAttempts": 0,
+    "releasedClaims": 2,
+    "violations": [
+      {
+        "id": "17b4017e-d4a9-40ef-8f3b-d3495001a34b",
+        "reservation_id": "c5f4ec41-5d78-5913-8876-2335516a2ae5",
+        "user_id": "9dc7ff23-c11d-5b43-78db-a7feded72094",
+        "reason": "NO_SHOW"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "29aab86d-4460-45a0-9b50-18328bca1901",
+        "source_id": "c5f4ec41-5d78-5913-8876-2335516a2ae5",
+        "recipient_id": "9dc7ff23-c11d-5b43-78db-a7feded72094",
+        "event_type": "NO_SHOW",
+        "dedup_key": "M1:c5f4ec41-5d78-5913-8876-2335516a2ae5:NO_SHOW:0:9dc7ff23-c11d-5b43-78db-a7feded72094:EMAIL"
+      }
+    ],
+    "audits": [
+      {
+        "id": "5714fe74-a8f6-47c7-bbb9-6dcbab60a005",
+        "object_id": "c5f4ec41-5d78-5913-8876-2335516a2ae5",
+        "action": "RESOURCE_RELEASED",
+        "actor_type": "USER",
+        "request_id": "6161fac5-78dc-4745-857a-9333898cf7a6",
+        "created_at": "2026-10-22T16:38:38.606211+00:00"
+      },
+      {
+        "id": "66b43cdf-0f01-4dd1-abd9-a767a6cb5191",
+        "object_id": "c5f4ec41-5d78-5913-8876-2335516a2ae5",
+        "action": "RESERVATION_NO_SHOW",
+        "actor_type": "JOB",
+        "request_id": "c8dc5c8a-71a5-4acb-9617-f851ec309334",
+        "created_at": "2026-10-22T16:38:38.626948+00:00"
+      },
+      {
+        "id": "863a1e95-7179-42e7-ad5f-9e737082406b",
+        "object_id": "4e477558-131c-5aa2-9c05-bed735ecca82",
+        "action": "RESOURCE_RELEASED",
+        "actor_type": "USER",
+        "request_id": "80798257-3f32-4f10-b2f2-19ca68ed6ffe",
+        "created_at": "2026-10-22T16:38:38.673538+00:00"
+      },
+      {
+        "id": "b2907758-aebb-4f9f-b057-014a3ecb3a3b",
+        "object_id": "4e477558-131c-5aa2-9c05-bed735ecca82",
+        "action": "RESERVATION_COMPLETED",
+        "actor_type": "JOB",
+        "request_id": "d8c8ac40-3e68-4721-bf7f-852a012fde4d",
+        "created_at": "2026-10-22T16:38:38.674038+00:00"
+      },
+      {
+        "id": "f13e4235-eae7-49fa-8e95-f2b79c1938de",
+        "object_id": "a35aa477-6098-5593-97aa-88e1de76ba27",
+        "action": "APPLICATION_EXPIRED",
+        "actor_type": "JOB",
+        "request_id": "bd30174f-9d20-47b0-a087-0753a8ccdd5e",
+        "created_at": "2026-10-22T16:38:38.643858+00:00"
+      }
+    ],
+    "expiredPreStartLateNotifications": 0,
+    "allStableAcrossTwoScans": true
+  },
+  "dataBefore": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100001,
+    "reservations": 123059,
+    "claims": 123059,
+    "historicalTasks": 200010
+  },
+  "dataAfter": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100002,
+    "reservations": 123061,
+    "claims": 123061,
+    "historicalTasks": 200020
+  },
+  "originalBusinessFingerprints": {
+    "reservation": {
+      "count": 123059,
+      "rowDigestMd5": "cae3fe04a0434887ee8f49f82f08e3c4"
+    },
+    "room_application": {
+      "count": 1,
+      "rowDigestMd5": "a027ecbb1c70e02ad4075be70d9432e8"
+    },
+    "resource_claim": {
+      "count": 123059,
+      "rowDigestMd5": "477f5419eef21ef0b2f1511577b3121d"
+    }
+  },
+  "originalBusinessUnchanged": true,
+  "coreRunningAndHealthyAtExit": true,
+  "firstAttempt": {
+    "runId": "0b832ad5-00c6-4a1e-8cfa-4cc5645b7341",
+    "passed": false,
+    "failureType": "JSONDecodeError",
+    "cause": "Collector parsed only the last line of PostgreSQL multiline json_agg output; JSONDecodeError occurred after synthetic fixture INSERT committed.",
+    "scriptSha256": "f9c4f2e1e181f6a775b73e140b7157b05c857208bc4d082589c0c11100fcf329",
+    "fixturesRetained": true,
+    "cleanupRestartedSameCore": true,
+    "includedInSecondRunOriginalBusinessFingerprint": true,
+    "resultWasNotRewritten": true
+  },
+  "parserRegression": {
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 0.037,
+    "includesPostgresqlMultilineAggregate": true
+  },
+  "artifacts": {
+    "output/performance/core-recovery-20261022T163632Z-0b832ad5/fixture.json": {
+      "bytes": 4345,
+      "sha256": "8c98fdcac25d34856f8fadd950191a9f7337d6223520946a0601dc2672eade3b"
+    },
+    "output/performance/core-recovery-20261022T163632Z-0b832ad5/original-business-before.json": {
+      "bytes": 306,
+      "sha256": "9a49fb4eb9f48bd117698c46eb3c6118daeff616907cf731a80d8df30a9420b8"
+    },
+    "output/performance/core-recovery-20261022T163632Z-0b832ad5/result.json": {
+      "bytes": 2721,
+      "sha256": "cc03af7861dce94563ec46f8185f3c7c6ca3916e0f49315a60265115ee26fd65"
+    },
+    "output/performance/core-recovery-20261022T163632Z-0b832ad5/same-fixture-first-observation.json": {
+      "bytes": 7973,
+      "sha256": "e9ea5adb1355bf3a8e904d9aa3ecce5397c5b4aadba53dd3eb4c669d86e7e0a2"
+    },
+    "output/performance/core-recovery-20261022T163632Z-0b832ad5/fixture.sql": {
+      "bytes": 7303,
+      "sha256": "cd5073a066ef114380be20b5eb36ba2264adaa3188ebff252922dabcfd8e83f0"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/after-recovery.json": {
+      "bytes": 6225,
+      "sha256": "8c666fbba286e983b72d60c304ba7e8c1d14f77720351b8d36eb3328bcf425db"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/after-two-scans.json": {
+      "bytes": 6225,
+      "sha256": "6fd02ed39eb7491a710e8671d9e5e7aa91000d87d4472bdd3394ecfd7de7d667"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/before-restart.json": {
+      "bytes": 3981,
+      "sha256": "f1d3b9a5e6e5537cc5f87cf0596ac42ee87c9628c6bf24e05e53900cd0287862"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/fixture.json": {
+      "bytes": 4345,
+      "sha256": "2d0da12d8eee8ccac428111551a27b4de0a67e0c73cc5321323543a464f96ac4"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/original-business-after.json": {
+      "bytes": 306,
+      "sha256": "11fdea60241dad0071da2cdae44f9224e31b2d68b1cb2efa37f3e794d27097e6"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/original-business-before.json": {
+      "bytes": 306,
+      "sha256": "11fdea60241dad0071da2cdae44f9224e31b2d68b1cb2efa37f3e794d27097e6"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/result.json": {
+      "bytes": 3345,
+      "sha256": "c52d209a1dbb771c01028abf25d7b7e619087e95d55706457504f85ed99b8a83"
+    },
+    "output/performance/core-recovery-20261022T163826Z-22ec28db/fixture.sql": {
+      "bytes": 7303,
+      "sha256": "7d0e690a5c2bf47516c035535a301561adf5ad784ad4da05c4d03ce0a515b3e9"
+    }
+  }
+}

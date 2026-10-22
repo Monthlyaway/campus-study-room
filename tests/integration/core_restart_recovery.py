@@ -36,7 +36,9 @@ def require(condition, message):
 
 
 def json_sql(statement):
-    return json.loads(perf.sql(statement).strip().splitlines()[-1])
+    # PostgreSQL json_agg(row_to_json(...)) can insert newlines between rows.
+    # These probes each issue one SELECT, so parse its entire JSON value.
+    return json.loads(perf.sql(statement).strip())
 
 
 def literal(value):

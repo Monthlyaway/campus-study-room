@@ -110,6 +110,14 @@ class CoreRestartRecoverySafetyTests(unittest.TestCase):
             self.assertEqual(3, statement.count(row['id']))
         self.assertNotIn('UPDATE ', statement)
 
+    def test_sql_json_preserves_postgresql_multiline_aggregate_output(self):
+        # json_agg(composite rows) emits newlines between records under psql -At.
+        output = '{"orders" : [{"id":"first","status":"RESERVED"},\n {"id":"second","status":"CHECKED_IN"}], "tasks" : []}\n'
+        with patch.object(probe.perf, 'sql', return_value=output):
+            actual = probe.json_sql('SELECT json_build_object(...);')
+        self.assertEqual(['first', 'second'], [row['id'] for row in actual['orders']])
+        self.assertEqual([], actual['tasks'])
+
     def test_deployment_lock_is_nonblocking_and_preserves_existing_lock(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(probe.perf, 'STATE', Path(directory)):
             with probe.deployment_lock():
