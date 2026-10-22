@@ -29,6 +29,19 @@ class PrivateArtifactGateTests(unittest.TestCase):
             self.assertEqual(2, len(list((root / 'private').rglob('*.*'))))
             self.assertEqual(0o600, (root / 'private/0/unsafe.txt').stat().st_mode & 0o777)
 
+    def test_malformed_archive_does_not_leave_later_secret_available_for_upload(self):
+        sentinel = 'Only-A-Fake-Artifact-Sentinel-789'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); reports = root / 'output'; reports.mkdir()
+            (reports / 'malformed.html').write_bytes(b'data:application/zip;base64,' + base64.b64encode(b'not a ZIP'))
+            (reports / 'later-secret.txt').write_text(sentinel)
+            (reports / 'safe.json').write_text('{"tests":6}')
+            with self.assertRaisesRegex(RuntimeError, '2 report files'):
+                gate.protect_reports([reports], [sentinel], root / 'private')
+            self.assertEqual(['safe.json'], [p.name for p in reports.iterdir()])
+            for name in ('malformed.html', 'later-secret.txt'):
+                self.assertEqual(0o600, (root / 'private/0' / name).stat().st_mode & 0o777)
+
     def test_empty_secret_inventory_fails_and_safe_report_is_unchanged(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); data = root / 'safe.json'; data.write_text('{"tests":6}')

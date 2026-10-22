@@ -1,5 +1,6 @@
 """Prevent known runtime secrets from entering CI reports, including HTML ZIP payloads."""
 import base64
+import binascii
 import io
 from pathlib import Path
 import re
@@ -33,11 +34,18 @@ def protect_reports(directories, secret_values, quarantine):
         for path in directory.rglob('*'):
             if not path.is_file():
                 continue
-            if contains_secret(path.read_bytes(), secrets):
+            try:
+                unsafe_report = contains_secret(path.read_bytes(), secrets)
+            except (binascii.Error, zipfile.BadZipFile, RuntimeError, OSError):
+                # An unreadable embedded archive cannot be certified safe. Quarantine
+                # it and continue scanning, so a later secret-bearing file is not left
+                # in an always-uploaded directory after this validation error.
+                unsafe_report = True
+            if unsafe_report:
                 destination = quarantine / str(index) / path.relative_to(directory)
                 destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
                 shutil.move(str(path), destination)
                 destination.chmod(0o600)
                 unsafe.append(str(path.relative_to(directory)))
     if unsafe:
-        raise RuntimeError(f'{len(unsafe)} report files contained runtime secrets and were quarantined outside artifact paths')
+        raise RuntimeError(f'{len(unsafe)} report files failed private-artifact validation and were quarantined outside artifact paths')
