@@ -20,7 +20,14 @@ container-release:
   services:
     - name: $STUDYROOM_CI_REGISTRY/docker:28.5.2-dind@sha256:2a232a42256f70d78e3cc5d2b5d6b3276710a0de0596c145f627ecfae90282ac
       alias: docker
-      command: ["--registry-mirror=https://docker.m.daocloud.io"]
+      entrypoint: ["/bin/sh", "-c"]
+      command:
+        - |
+          set -eu
+          mkdir -p "$DOCKER_TLS_CERTDIR"
+          : > "$DOCKER_TLS_CERTDIR/daemon-startup.log"
+          chmod 600 "$DOCKER_TLS_CERTDIR/daemon-startup.log"
+          exec /usr/local/bin/dockerd-entrypoint.sh --registry-mirror=https://docker.m.daocloud.io > "$DOCKER_TLS_CERTDIR/daemon-startup.log" 2>&1
   variables:
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID
@@ -82,6 +89,20 @@ container-release:
       else
         result=$?
         printf 'docker_version=failed exit=%s\n' "$result"
+      fi
+      printf '%s\n' 'Bounded DinD startup log (last 160 sanitized lines, at most 24576 bytes):'
+      daemon_log="$DOCKER_TLS_CERTDIR/daemon-startup.log"
+      if [ -f "$daemon_log" ]; then
+        awk '
+          /-----BEGIN [A-Z0-9 ]+-----/ { hidden=1; print "[PEM content omitted]"; next }
+          hidden { if ($0 ~ /-----END [A-Z0-9 ]+-----/) hidden=0; next }
+          { lower=tolower($0) }
+          lower ~ /(password|authorization|cookie|token)[=:]/ || $0 ~ /https?:\/\/[^ ]+@/ { print "[sensitive startup line omitted]"; next }
+          { print substr($0, 1, 1000) }
+        ' "$daemon_log" | tail -n 160 | tail -c 24576
+        printf '\n%s\n' 'End of bounded DinD startup log.'
+      else
+        printf '%s\n' 'daemon-startup.log is absent in the shared directory.'
       fi
       if [ "$ready" -ne 1 ]; then
         printf '%s\n' 'TLS Docker daemon remained unavailable; retain the concrete errors above.' >&2
