@@ -1,0 +1,135 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "224d1454bd373bda56b0b7ac7d11f76928560752",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/browser-review.md",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 133
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AvailabilityReadRepository.java",
+      "additions": {
+        "human": 103
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CorePersistenceTest.java",
+      "additions": {
+        "human": 487
+      }
+    },
+    {
+      "new_path": "tests/integration/core_mutation.py",
+      "additions": {
+        "human": 97
+      }
+    },
+    {
+      "new_path": "tests/integration/run_core_persistence.py",
+      "additions": {
+        "human": 44
+      }
+    },
+    {
+      "old_path": "contracts/openapi/core.yaml",
+      "new_path": "contracts/openapi/core.yaml",
+      "additions": {
+        "human": 253
+      },
+      "deletions": {
+        "human": 24
+      }
+    },
+    {
+      "old_path": "docs/evidence/core/acceptance.md",
+      "new_path": "docs/evidence/core/acceptance.md",
+      "additions": {
+        "human": 38
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "additions": {
+        "human": 224
+      },
+      "deletions": {
+        "human": 192
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "additions": {
+        "human": 118
+      },
+      "deletions": {
+        "human": 110
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 25
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/QueryService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/QueryService.java",
+      "additions": {
+        "human": 64
+      },
+      "deletions": {
+        "human": 79
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/ResourceService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ResourceService.java",
+      "additions": {
+        "human": 114
+      },
+      "deletions": {
+        "human": 127
+      }
+    }
+  ]
+}
