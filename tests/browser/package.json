@@ -5,7 +5,9 @@
   "type": "module",
   "engines": { "node": ">=24 <25" },
   "scripts": {
+    "pretest": "node --test artifact-safety.test.mjs",
     "test": "playwright test",
+    "test:report-safety": "node --test artifact-safety.test.mjs",
     "test:headed": "playwright test --headed",
     "list": "playwright test --list",
     "install:browser": "playwright install chromium"

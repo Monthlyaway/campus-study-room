@@ -33,8 +33,8 @@ CI 可直接在已启动隔离应用的 job 中执行上述命令；Linux runner
 
 ## 证据与安全
 
-输出在仓库忽略目录 `output/browser/`：JUnit、JSON、HTML、发布版本元数据和按场景截图。成功与失败都保留需要的状态截图。为防止 auth 请求体、Cookie 或密码输入步骤进入附件，默认关闭 trace/HAR/video；密码通过不含值的 DOM 输入事件函数填入，报告不写秘密。不要在 CI 另外打开 `--trace`，也不要上传浏览器 storageState。
+输出在仓库忽略目录 `output/browser/`：JUnit、JSON、HTML、发布版本元数据和按场景截图。成功与失败都保留需要的状态截图。为防止 auth 请求体、Cookie 或密码输入步骤进入附件，默认关闭 trace/HAR/video；密码通过不含值的 DOM 输入事件函数填入。Playwright 1.64.1 的自动 ARIA 失败快照会包含密码框值，因此配置关闭自动页面文本快照，并在所有发布 reporter 前对断言自带的快照、错误和文本附件中的测试密码作脱敏。`npm test` 先执行真实 Chromium 失败报告探针：填入随机非秘密标记、故意失败，然后检查控制台、JUnit、JSON、HTML 及其内嵌 ZIP 数据不含标记。探针不连接应用，临时报告自动删除；可独立运行 `npm run test:report-safety`。不要在 CI 另外打开 `--trace`，也不要上传浏览器 storageState。
 
-CI artifacts 可收集 `output/browser/`，JUnit 路径为 `output/browser/junit.xml`。界面 screenshot/DOM 错误上下文仍包含测试业务数据，只应在项目受控的 CI artifacts 中保存。执行结果以实际报告为准；测试加载成功不能冒充真实浏览器通过。
+CI artifacts 可收集 `output/browser/`，JUnit 路径为 `output/browser/junit.xml`。界面截图、断言和源码错误上下文仍包含测试业务数据，只应在项目受控的 CI artifacts 中保存。执行结果以实际报告为准；测试加载成功不能冒充真实浏览器通过。
 
 本轮实际执行结果与尚未复现的问题见 [REVIEW.md](REVIEW.md)。

@@ -1,4 +1,10 @@
 import { defineConfig } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+
+// Playwright 1.64.1's automatic AI/ARIA failure snapshot includes password input values.
+// Disable that text snapshot, retaining masked screenshots and ordinary assertion errors.
+// The pinned-version report-safety probe verifies the actual generated failure artifacts.
+process.env.PLAYWRIGHT_NO_COPY_PROMPT = '1';
 
 export default defineConfig({
   testDir: '.',
@@ -12,6 +18,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   outputDir: '../../output/browser/results',
   reporter: [
+    [fileURLToPath(new URL('./privacy-reporter.mjs', import.meta.url))],
     ['line'],
     ['junit', { outputFile: '../../output/browser/junit.xml' }],
     ['json', { outputFile: '../../output/browser/results.json' }],

@@ -117,7 +117,7 @@ test('M2 applicant submits, two different reviewers approve, applicant cancels f
 
 test('M3 mobile reporter, dispatcher and repairer finish real assignment, resource synchronization and acceptance', async ({ browser }, info) => {
   const reporter = await actor(browser, 'student', true);
-  let dispatcher, worker, id;
+  let dispatcher, worker, id, cancelledId;
   const title = unique('repair workflow');
   try {
     await reporter.page.goto('/repairs');
@@ -135,15 +135,21 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     dispatcher = await actor(browser, 'dispatcher');
     await dispatcher.page.goto(`/repairs?id=${id}`);
     await drawer(dispatcher.page).getByRole('button', { name: '派单 / 重新派单' }).click();
-    await selectFirst(dispatcher.page, '维修人员');
-    await confirm(dispatcher.page, `/repairs/${id}/assign`);
+    const workerName = await selectFirst(dispatcher.page, '维修人员');
+    const assigned = await confirm(dispatcher.page, `/repairs/${id}/assign`);
+    expect(assigned.assignedToName).toBe(workerName);
     await expect(drawer(dispatcher.page).getByText('待维修', { exact: true }).first()).toBeVisible();
+    const workerDescription = (page) => drawer(page).locator('.ant-descriptions-item-container')
+      .filter({ has: page.locator('.ant-descriptions-item-label', { hasText: /^维修人员$/ }) })
+      .locator('.ant-descriptions-item-content');
+    await expect(workerDescription(dispatcher.page)).toHaveText(workerName);
 
     worker = await actor(browser, 'repairer');
     await worker.page.goto(`/repairs?id=${id}`);
     await drawer(worker.page).getByRole('button', { name: '开始维修', exact: true }).click();
     await confirm(worker.page, `/repairs/${id}/start`);
     await expect(drawer(worker.page).getByRole('button', { name: '提交完工', exact: true })).toBeVisible({ timeout: 45_000 });
+    await expect(drawer(worker.page).getByText('处理截止', { exact: true })).toBeVisible();
     await expect(drawer(worker.page).getByRole('button', { name: '验收通过', exact: true })).toHaveCount(0);
     await drawer(worker.page).getByRole('button', { name: '提交完工', exact: true }).click();
     await modal(worker.page).getByLabel('维修处理情况').fill('已检查模拟问题，测试完成后恢复教室资源。');
@@ -158,10 +164,29 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await modal(reporter.page).getByLabel('验收意见（选填）').fill('验收通过，结束浏览器测试');
     await confirm(reporter.page, `/repairs/${id}/acceptance`);
     await expect(drawer(reporter.page).getByRole('button', { name: '评价维修' })).toBeVisible({ timeout: 45_000 });
+    await expect(workerDescription(reporter.page)).toHaveText(workerName);
+    await expect(drawer(reporter.page).getByText('处理截止', { exact: true })).toHaveCount(0);
     await noHorizontalOverflow(reporter.page);
     await screenshot(reporter.page, info, 'mobile-repair-closed');
+
+    await reporter.page.goto('/repairs');
+    await reporter.page.getByRole('button', { name: '上报故障' }).click();
+    await selectFirst(reporter.page, '故障教室');
+    await modal(reporter.page).getByLabel('故障标题').fill(unique('cancelled repair'));
+    await modal(reporter.page).getByLabel('问题描述').fill('独立测试取消终态的截止字段；提交后由本人撤销。');
+    cancelledId = (await confirm(reporter.page, '/repairs', [201])).id;
+    await drawer(reporter.page).getByRole('button', { name: '取消工单', exact: true }).click();
+    await modal(reporter.page).getByLabel('取消原因').fill('检查后确认无需维修，撤销模拟工单');
+    await confirm(reporter.page, `/repairs/${cancelledId}/cancel`);
+    await expect(drawer(reporter.page).getByText('已取消', { exact: true }).first()).toBeVisible();
+    await expect(drawer(reporter.page).getByText('处理截止', { exact: true })).toHaveCount(0);
+    await noHorizontalOverflow(reporter.page);
+    await screenshot(reporter.page, info, 'mobile-repair-cancelled');
   } finally {
-    try { await finishRepair(reporter.context, worker?.context, dispatcher?.context, id); }
+    try {
+      await cancelOwned(reporter.context, 'repairs', cancelledId);
+      await finishRepair(reporter.context, worker?.context, dispatcher?.context, id);
+    }
     finally { await Promise.all([reporter.context.close(), worker?.context.close(), dispatcher?.context.close()]); }
   }
 });

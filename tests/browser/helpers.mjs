@@ -77,7 +77,9 @@ export async function selectFirst(page, label) {
   await modal(page).getByLabel(label, { exact: true }).click();
   const option = page.locator('.ant-select-dropdown:visible .ant-select-item-option').first();
   await expect(option).toBeVisible();
+  const labelText = (await option.locator('.ant-select-item-option-content').innerText()).trim();
   await option.click();
+  return labelText;
 }
 
 export async function noHorizontalOverflow(page) {
