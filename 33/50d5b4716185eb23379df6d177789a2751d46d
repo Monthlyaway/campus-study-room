@@ -1,0 +1,50 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "3350d5b4716185eb23379df6d177789a2751d46d",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "apps/web/src/components/business/common.tsx",
+      "new_path": "apps/web/src/components/business/common.tsx",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "tests/browser/helpers.mjs",
+      "new_path": "tests/browser/helpers.mjs",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/browser/studyroom.spec.mjs",
+      "new_path": "tests/browser/studyroom.spec.mjs",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
