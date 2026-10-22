@@ -1,10 +1,10 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.RequestIds;
+import com.campus.studyroom.security.RequestTelemetry;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.UUID;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,20 +17,18 @@ public class RequestCorrelationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest req, HttpServletResponse res, FilterChain chain)
       throws ServletException, IOException {
-    UUID id;
-    try {
-      id = UUID.fromString(req.getHeader("X-Request-ID"));
-    } catch (Exception e) {
-      id = UUID.randomUUID();
-    }
-    RequestIds.set(id);
-    res.setHeader("X-Request-ID", id.toString());
-    org.slf4j.MDC.put("requestId", id.toString());
+    var telemetry = new RequestTelemetry(req.getHeader("X-Request-ID"));
+    RequestIds.set(telemetry.id());
+    res.setHeader("X-Request-ID", telemetry.id().toString());
+    Throwable failure = null;
     try {
       chain.doFilter(req, res);
+    } catch (IOException | ServletException | RuntimeException | Error error) {
+      failure = error;
+      throw error;
     } finally {
+      telemetry.finish(res.getStatus(), !req.getRequestURI().startsWith("/actuator/"), failure);
       RequestIds.clear();
-      org.slf4j.MDC.remove("requestId");
     }
   }
 }

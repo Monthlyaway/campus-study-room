@@ -9,6 +9,8 @@ server:
         secure: ${COOKIE_SECURE:false}
         same-site: lax
 spring:
+  main:
+    banner-mode: "off"
   application:
     name: core-service
   datasource:
@@ -61,3 +63,9 @@ studyroom:
   mail-directory: ${MAIL_DIRECTORY:./output/mail}
   release-id: ${RELEASE_ID:development}
   commit: ${GIT_COMMIT:working-tree}
+
+logging:
+  structured:
+    format:
+      console: com.campus.studyroom.security.StudyroomLogFormatter
+      file: com.campus.studyroom.security.StudyroomLogFormatter

@@ -51,6 +51,7 @@ public class AuthController {
               UsernamePasswordAuthenticationToken.unauthenticated(
                   username, Objects.toString(b.get("password"), "")));
       UUID id = UUID.fromString(a.getName());
+      org.slf4j.MDC.put("actorId", id.toString());
       var u = access.user(id);
       var p = new SessionPrincipal(id, Store.number(u, "authVersion"), clock.instant());
       var context = SecurityContextHolder.createEmptyContext();

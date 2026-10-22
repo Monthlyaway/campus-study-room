@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 public class ApiErrors {
   @ExceptionHandler(ApiException.class)
   ResponseEntity<?> business(ApiException e) {
+    org.slf4j.MDC.put("errorCode", e.code);
     var b = ResponseEntity.status(e.status);
     if (e.status == 429)
       b.header("Retry-After", Objects.toString(e.details.getOrDefault("retryAfter", 60)));
@@ -18,6 +19,13 @@ public class ApiErrors {
             Map.of("code", e.code, "message", e.getMessage(), "details", e.details),
             "requestId",
             com.campus.studyroom.api.RequestIds.current().toString()));
+  }
+
+  @ExceptionHandler(Exception.class)
+  ResponseEntity<?> unexpected(Exception e) {
+    org.slf4j.LoggerFactory.getLogger(ApiErrors.class)
+        .error("event=core_unexpected_error exceptionType={}", e.getClass().getName());
+    return business(new ApiException(500, "INTERNAL_ERROR", "服务暂时无法完成请求，请保留请求编号"));
   }
 
   @ExceptionHandler({

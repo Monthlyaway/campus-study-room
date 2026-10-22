@@ -2,6 +2,8 @@ server:
   port: ${SERVER_PORT:8082}
   shutdown: graceful
 spring:
+  main:
+    banner-mode: "off"
   application:
     name: repair-service
   datasource:
@@ -46,3 +48,9 @@ studyroom:
   jobs-paused: ${JOBS_PAUSED:false}
   release-id: ${RELEASE_ID:local}
   commit: ${GIT_COMMIT:development}
+
+logging:
+  structured:
+    format:
+      console: com.campus.studyroom.security.StudyroomLogFormatter
+      file: com.campus.studyroom.security.StudyroomLogFormatter

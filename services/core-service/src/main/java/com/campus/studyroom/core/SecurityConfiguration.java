@@ -127,6 +127,9 @@ public class SecurityConfiguration {
                   HttpServletRequest req, HttpServletResponse res, FilterChain chain)
                   throws ServletException, IOException {
                 var a = SecurityContextHolder.getContext().getAuthentication();
+                if (a != null && a.getPrincipal() instanceof SessionPrincipal p) {
+                  org.slf4j.MDC.put("actorId", p.userId().toString());
+                }
                 if (a != null
                     && a.getPrincipal() instanceof SessionPrincipal p
                     && !access.valid(p)) {
@@ -144,6 +147,7 @@ public class SecurityConfiguration {
 
   static void writeError(HttpServletResponse r, int status, String code, String message)
       throws IOException {
+    org.slf4j.MDC.put("errorCode", code);
     r.setStatus(status);
     r.setContentType("application/json;charset=UTF-8");
     r.getWriter()
