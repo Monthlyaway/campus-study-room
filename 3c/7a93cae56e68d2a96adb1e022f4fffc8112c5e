@@ -1,0 +1,39 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java",
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java",
+      "new_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java",
+      "additions": {
+        "human": 87
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
