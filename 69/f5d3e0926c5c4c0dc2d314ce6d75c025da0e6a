@@ -1,0 +1,197 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "69f5d3e0926c5c4c0dc2d314ce6d75c025da0e6a",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/final-runtime-audit.json",
+      "additions": {
+        "human": 333
+      }
+    },
+    {
+      "new_path": "docs/evidence/final-runtime-audit.md",
+      "additions": {
+        "human": 43
+      }
+    },
+    {
+      "new_path": "docs/evidence/final-source-audit.json",
+      "additions": {
+        "human": 158
+      }
+    },
+    {
+      "new_path": "docs/evidence/final-source-audit.md",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "new_path": "docs/evidence/frontend-release.md",
+      "additions": {
+        "human": 35
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-actual-container-limits.json",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-artifacts.json",
+      "additions": {
+        "human": 58
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-contention.json",
+      "additions": {
+        "human": 248
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-data-scale.json",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-database-samples.json",
+      "additions": {
+        "human": 1740
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-environment.json",
+      "additions": {
+        "human": 35
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-page-query-counts.json",
+      "additions": {
+        "human": 294
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-queries-summary.txt",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-query-plans.json",
+      "additions": {
+        "human": 2437
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-recovery.json",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-release-binding.json",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-release-manifest.json",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-result.json",
+      "additions": {
+        "human": 269
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-sql-after.json",
+      "additions": {
+        "human": 722
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-sql-before.json",
+      "additions": {
+        "human": 302
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T162929Z-sql-counts.json",
+      "additions": {
+        "human": 310
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-actual-rollback.json",
+      "additions": {
+        "human": 85
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-compatibility.json",
+      "additions": {
+        "human": 105
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-portable-import.json",
+      "additions": {
+        "human": 128
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 14
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "docs/evidence/performance.md",
+      "new_path": "docs/evidence/performance.md",
+      "additions": {
+        "human": 51
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/evidence/release/README.md",
+      "new_path": "docs/evidence/release/README.md",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 8
+      }
+    }
+  ]
+}
