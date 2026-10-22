@@ -57,11 +57,11 @@ python3 scripts/studyroom.py status test
 
 应用回退更换三个应用镜像，不运行 down migration。若目标和当前或失败候选的迁移集合不同，要求绑定双方 commit 的兼容演练证据；不能仅凭“新增列”或人工写入 `passed` 就宣称已经实测。未满足兼容条件时保留维护，不能盲目重试。已实际执行 V1→V2 新可空列→V1 应用回退：两名用户的原会话、三类业务读写、新列哨兵值及 Flyway 状态均保留。详见 [发布演练](../evidence/release/README.md)。
 
-备份使用 `pg_dump -Fc`，保存 SHA-256 并用 `pg_restore --list` 验证可读性。恢复命令只创建新的隔离数据库，不替换在线库；恢复完成报告四类业务记录数量。数据恢复与应用回退是不同操作；不能用恢复旧备份替代回退而无说明地丢失新业务数据。禁止自动删除命名卷。
+备份使用 `pg_dump -Fc`，保存 SHA-256，先用 `pg_restore --list` 检查目录，再用 `pg_restore --file=/dev/null` 完整解码校验；仅成功后原子发布0600归档。恢复命令只创建新的隔离数据库，不替换在线库；恢复完成报告四类业务记录数量。数据恢复与应用回退是不同操作；不能用恢复旧备份替代回退而无说明地丢失新业务数据。禁止自动删除命名卷。
 
 ## GitLab 流水线
 
-`.gitlab-ci.yml` 在 push/MR/tag 触发，包含后端 verify、前端生成漂移/类型/单测/构建、独立 PostgreSQL 服务中的两应用 HTTP 与五类真实 JPA 集成、丢失已提交 BLOCK 响应后的原命令重试，以及源码制品归档。Python 运维校验也进入集成门禁。每个真实 JPA 套件必须产生非零且无 skip 的对应 JUnit，不能用默认跳过数据库测试冒充成功。
+`.gitlab-ci.yml` 在 push/MR/tag 触发，包含后端 verify、前端生成漂移/类型/单测/构建、独立 PostgreSQL 服务中的两应用 HTTP 与九组真实数据库/契约套件、丢失已提交 BLOCK 响应后的原命令重试，以及源码制品归档。Python 运维校验也进入集成门禁。每个真实 JPA 套件必须产生非零且无 skip 的对应 JUnit，不能用默认跳过数据库测试冒充成功。
 
 CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原 `k8s-amd64` 对应的 Runner 已长期离线。使用 `resource_group: studyroom-test` 串行化集成任务，秘密在每个 job 内随机生成。测试环境记录为 `test/ci-<pipeline>`；只有集成通过才允许打包。实际 pipeline、版本化 Docker 发布和完整自动部署的证据继续在进度表追踪；配置存在不等于门禁已执行。
 
@@ -71,7 +71,7 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 
 已执行：独立 test Compose 首次安装；容器入口管理 2 项、预约/审批 5 项、维修 2 项真实 HTTP；Linux 0600 秘密读取启动；维护 503、任务排空、内部接口 404 和恢复 200；隔离数据库备份恢复；三个应用生产入口与 375px 浏览器试用。
 
-待形成完整发布证据：版本化组合升级与兼容回退、离线包独立安装、真实 GitLab pipeline 正反门禁、自动 test 升级与保留卷重建。未执行项不计为通过。
+[发布演练](../evidence/release/README.md)已记录A/B及R3→B兼容回退、保留卷重建、完整备份隔离恢复和启动失败自动恢复；B首次离线独立安装及R3包导入核对通过。负面GitLab合并/发布门禁已实测，最终完整pipeline、main自动test及发版索引仍由[进度](../progress.md)追踪。
 
 ### CI 镜像拉取诊断
 
@@ -90,3 +90,9 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 Docker CLI/daemon固定28.5.2及内容摘要，Compose2.40.3；client通过2376验证TLS，证书置于共享builds目录内、checkout之外的每job目录，避免checkout清除证书。使用已存在的`amd64-build` Runner，不修改共享Runner权限、不挂宿主Docker socket。如果其配置不支持隔离DinD，门禁会明确失败，不能改成放行。依据[GitLab DinD](https://docs.gitlab.com/ci/docker/docker_in_docker/)及[共享builds目录](https://docs.gitlab.com/ci/services/#shared-builds-directory)说明；实际运行结果在发布证据中记录。
 
 该job中的test环境只在任务寿命内存在；结束时正常停止应用且不执行删卷。GitLab未启用容器仓库，不能把此临时构建当成远程镜像已发布；本机留存与可迁移五镜像包由正式发布步骤提供。
+
+### Runner 17.2 服务探针竞态
+
+R3 pipeline 682987的backend/frontend/integration均通过，集成任务4478645完成全部九组数据库套件、HTTP/真实SMTP和响应丢失重放；container-release任务4478646与重试4478766却都在18秒内以runner system failure结束，未执行项目脚本。日志明确为Pod仍Pending时服务health check提前返回错误。
+
+[GitLab Runner v17.2.0源码](https://gitlab.com/gitlab-org/gitlab-runner/-/blob/v17.2.0/executors/kubernetes/kubernetes.go#L2814)显示legacy路径创建Pod后立即进入可选服务探针，状态监视将Pending作为错误，而探针执行协程仍在等待Running。配置删除仅用于该探针的`HEALTHCHECK_TCP_PORT`，保留正常Pod启动等待；项目脚本仍通过TLS验证的`docker info`最多等待90次，并严格校验Docker28.5.2/Compose2.40.3、三镜像部署与真实浏览器。没有关闭TLS、修改共享runner或降低业务门禁。修正效果必须由后续实际CI确认；此源码定位不宣称已运行容器发布成功。

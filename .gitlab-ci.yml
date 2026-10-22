@@ -123,8 +123,6 @@ container-release:
     - name: $STUDYROOM_CI_REGISTRY/docker:28.5.2-dind@sha256:2a232a42256f70d78e3cc5d2b5d6b3276710a0de0596c145f627ecfae90282ac
       alias: docker
       command: ["--registry-mirror=https://docker.m.daocloud.io"]
-      variables:
-        HEALTHCHECK_TCP_PORT: '2376'
   variables:
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID
