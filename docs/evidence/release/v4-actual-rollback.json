@@ -1,0 +1,168 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "startedAt": "2026-10-22T17:04:06.782953+00:00",
+  "checkedAt": "2026-10-22T17:06:46.855353+00:00",
+  "sandboxProject": "studyroom-compat-release",
+  "fromRelease": "r-20261022T170200-3012051",
+  "toRelease": "r-20261022T132000-66f2b928550f",
+  "sourceCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "targetCommit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "fromManifestSha256": "d565e066b00157838e3572b5e3511d34df2e352f22b363b4654a1124cbe6f148",
+  "toManifestSha256": "3b061c8343fca5cbd8b2d535e24399a503b2296bc9b499b4d860efacfd01a5ed",
+  "compatibilityProofSha256": "e5ce46faa778341c7ba902a9448b5e4d050b6d29603f15c9d680eb1dabbdb047",
+  "fromImages": {
+    "core": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+    "repair": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+    "web": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4"
+  },
+  "runningImagesBeforeStop": {
+    "core": "sha256:80ff361cecb0e936e76b0e2a7315ff6206353f291c5ec4af4fd9d5885a045f3f",
+    "repair": "sha256:6fdbf7bbc48ee908bccc9ca6986f00dbd859a58b5d0b5f750e866399986d485b",
+    "web": "sha256:266ecde205f29a71998d0691c725e0c9b4d11509fac325d2701c8253cf16f560"
+  },
+  "originalSessions": 2,
+  "retainedCancelledBusinessRecords": 3,
+  "businessRecords": [
+    {
+      "kind": "reservations",
+      "status": "CANCELLED",
+      "version": 1
+    },
+    {
+      "kind": "repairs",
+      "status": "CANCELLED",
+      "version": 1
+    },
+    {
+      "kind": "room-applications",
+      "status": "CANCELLED",
+      "version": 3
+    }
+  ],
+  "expandedColumnRetained": "core.reservation.operator_note",
+  "originalFixtureFilesUnchanged": 5,
+  "currentReleaseCommit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "schemaReleaseCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "databaseUnchanged": true,
+  "database": {
+    "postgresVersion": "180006",
+    "migrations": [
+      {
+        "schema": "core",
+        "installed_rank": 1,
+        "version": "20261022000100",
+        "description": "core schema",
+        "type": "SQL",
+        "script": "V20261022000100__core_schema.sql",
+        "checksum": -2040106863,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 2,
+        "version": "20261022130000",
+        "description": "self role scope",
+        "type": "SQL",
+        "script": "V20261022130000__self_role_scope.sql",
+        "checksum": -892298813,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 3,
+        "version": "20261022143000",
+        "description": "reservation history index",
+        "type": "SQL",
+        "script": "V20261022143000__reservation_history_index.sql",
+        "checksum": 1340263816,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 4,
+        "version": "20261022150000",
+        "description": "reservation operator note",
+        "type": "SQL",
+        "script": "V20261022150000__reservation_operator_note.sql",
+        "checksum": 383066205,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 1,
+        "version": "20261022120000",
+        "description": "repair domain",
+        "type": "SQL",
+        "script": "V20261022120000__repair_domain.sql",
+        "checksum": 662384302,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 2,
+        "version": "20261022160000",
+        "description": "assigned worker name snapshot",
+        "type": "SQL",
+        "script": "V20261022160000__assigned_worker_name_snapshot.sql",
+        "checksum": -1184161627,
+        "success": true
+      },
+      {
+        "schema": "session",
+        "installed_rank": 1,
+        "version": "20261022000000",
+        "description": "spring session",
+        "type": "SQL",
+        "script": "V20261022000000__spring_session.sql",
+        "checksum": -174758120,
+        "success": true
+      }
+    ]
+  },
+  "databaseSha256": "3cd7d56228770440fc33c73df86398f68eb841199043ccbf4d2cdb10ea96114f",
+  "checks": {
+    "realCompatibilityProbe": true,
+    "actualRollbackCommand": true,
+    "originalStudentSession": true,
+    "originalApplicantSession": true,
+    "oldSessionRepairAccess": true,
+    "threeBusinessRecords": true,
+    "expandedColumnPreserved": true,
+    "threeImageIdsAndVersionEndpoints": true,
+    "noPendingRelease": true,
+    "noMaintenanceOrPauseFlags": true
+  },
+  "finalContainers": {
+    "core": {
+      "running": false,
+      "exitCode": 143,
+      "oomKilled": false,
+      "health": "unhealthy"
+    },
+    "repair": {
+      "running": false,
+      "exitCode": 143,
+      "oomKilled": false,
+      "health": "unhealthy"
+    },
+    "web": {
+      "running": false,
+      "exitCode": 0,
+      "oomKilled": false,
+      "health": "unhealthy"
+    },
+    "postgres": {
+      "running": true,
+      "exitCode": 0,
+      "oomKilled": false,
+      "health": "healthy"
+    },
+    "mailpit": {
+      "running": true,
+      "exitCode": 0,
+      "oomKilled": false,
+      "health": "healthy"
+    }
+  }
+}

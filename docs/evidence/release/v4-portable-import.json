@@ -1,0 +1,148 @@
+{
+  "formatVersion": 1,
+  "startedAt": "2026-10-22T17:05:53.705340+00:00",
+  "completedAt": "2026-10-22T17:07:05.700109+00:00",
+  "recordedAt": "2026-10-22T17:07:06.787429+00:00",
+  "result": "passed",
+  "releaseId": "r-20261022T170200-3012051",
+  "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "platform": {
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  "verificationMode": "Authorized official offline import into a new source directory, followed by independent read-only checks of immutable images, exact source files/modes, service versions, secrets and complete business rows.",
+  "bundle": {
+    "directory": ".local/releases/r-20261022T170200-3012051/portable",
+    "allFivePayloadChecksumsValid": true,
+    "sourceCommitMatches": true,
+    "sourceManifestAndMigrationInventoryMatch": true,
+    "artifactSha256": {
+      "manifest.json": "b24dc2ae24c6dea3ca159290602741fe546793082a896c18a16b1b2ac1f936f6",
+      "source.tar.gz": "b4eb603a7c8496c887031762c60c75f4641663688496b366008bb891de28b1ff",
+      "images.tar": "a3ce5294aff29cdb2230fb26e63aa91554b86b52d764683a2e46032795d14d81"
+    },
+    "imageArchiveBytes": 417842688
+  },
+  "import": {
+    "entrypoint": "scripts/import-release test <bundle> --source-dir <fresh-source>",
+    "exitCode": 0,
+    "existingStateDirectory": ".local/portable-install",
+    "preparationSnapshotMatchedImmediatelyBeforeImport": true,
+    "newSourceDirectoryWasAbsentBeforeImport": true
+  },
+  "extractedSource": {
+    "directory": ".local/portable-source-v4",
+    "containsGitDirectory": false,
+    "verifiedFileCount": 414,
+    "fileContentAndFullPermissionBitsMatch": true,
+    "mismatchPaths": [],
+    "unexpectedPaths": [],
+    "oldSourceDirectoriesRetained": [
+      ".local/portable-source-final",
+      ".local/portable-source"
+    ],
+    "oldSourceFileCount": 674,
+    "oldSourceFileContentAndModesUnchanged": true
+  },
+  "runningImages": {
+    "core": {
+      "expectedId": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+      "runningId": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+      "matches": true,
+      "running": true
+    },
+    "repair": {
+      "expectedId": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+      "runningId": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+      "matches": true,
+      "running": true
+    },
+    "web": {
+      "expectedId": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4",
+      "runningId": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4",
+      "matches": true,
+      "running": true
+    },
+    "postgres": {
+      "expectedId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "runningId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "matches": true,
+      "running": true
+    },
+    "mailpit": {
+      "expectedId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "runningId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "matches": true,
+      "running": true
+    }
+  },
+  "serviceVersions": {
+    "web": {
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+      "releaseId": "r-20261022T170200-3012051",
+      "matches": true
+    },
+    "core": {
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+      "releaseId": "r-20261022T170200-3012051",
+      "matches": true
+    },
+    "repair": {
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+      "releaseId": "r-20261022T170200-3012051",
+      "matches": true
+    }
+  },
+  "currentReleaseManifestMatches": true,
+  "secrets": {
+    "beforeFileCount": 7,
+    "afterFileCount": 7,
+    "fileNamesUnchanged": true,
+    "allFileHashesUnchanged": true,
+    "valuesOrHashesReported": false
+  },
+  "businessTables": {
+    "core.reservation": {
+      "beforeCount": 17,
+      "afterCount": 17,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    },
+    "core.room_application": {
+      "beforeCount": 14,
+      "afterCount": 14,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    },
+    "repair.repair_order": {
+      "beforeCount": 9,
+      "afterCount": 9,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    }
+  },
+  "readOnlyQuery": {
+    "transactionReadOnly": true,
+    "isolation": "REPEATABLE READ",
+    "rowDigestMethod": "md5(coalesce(string_agg(md5(row_to_json(r)::text), '' ORDER BY id), ''))",
+    "rawRowsReported": false
+  },
+  "importLog": {
+    "path": "output/release-final-v4-import.log",
+    "sha256": "a6f368496a6cf2cd4926441a405b9ebcc535c1fab2713e6c52772e358edfe1b3",
+    "lineCount": 64,
+    "deploymentSuccessMarker": true,
+    "offlineImportSuccessMarker": true,
+    "pullOrBuildIndicators": 0,
+    "knownSecretValueCount": 110,
+    "knownSecretEncodingVariants": 486,
+    "knownSecretMatches": 0
+  },
+  "limitations": [
+    "This import reused the existing isolated portable-install state; it proves preservation across import, not a second fresh-state installation.",
+    "The verified package is linux/arm64 on the local Docker daemon; no remote amd64 host was tested.",
+    "No network-disconnection experiment was performed; absence of pull/build is verified from the import log and the reviewed importer path.",
+    "R4 browser, performance, recovery and GitLab outcomes are separate evidence and are not implied by this import result.",
+    "Earlier source directories and R3 evidence were retained; this report does not replace prior snapshots."
+  ]
+}
