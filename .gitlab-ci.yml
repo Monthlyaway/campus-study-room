@@ -14,6 +14,7 @@ default:
 
 variables:
   STUDYROOM_CI_REGISTRY: m.daocloud.io/docker.io/library
+  MAVEN_CONFIG: ""
   MAVEN_OPTS: '-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository'
 
 backend:
@@ -42,7 +43,8 @@ frontend:
       files: [apps/web/pnpm-lock.yaml]
     paths: [apps/web/.pnpm-store/]
   before_script:
-    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
+    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
     - corepack enable
     - corepack prepare pnpm@10.34.7 --activate
     - cd apps/web
@@ -81,7 +83,8 @@ integration:
     action: start
     auto_stop_in: 1 day
   before_script:
-    - apt-get update -qq && apt-get install -y -qq --no-install-recommends python3 postgresql-client
+    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
+    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends python3 postgresql-client
   script:
     - python3 -m unittest discover -s tests/ops -v
     - python3 scripts/ci-integration.py
@@ -97,7 +100,8 @@ package:
   image: $STUDYROOM_CI_REGISTRY/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
   needs: [backend, frontend, integration]
   before_script:
-    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
+    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
   script:
     - mkdir -p output/release
     - git archive --format=tar.gz -o output/release/studyroom-source-$CI_COMMIT_SHORT_SHA.tar.gz "$CI_COMMIT_SHA"

@@ -70,3 +70,5 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 ### CI 镜像拉取诊断
 
 流水线 [682485](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682485) 已被在线 Runner #5170 接收，但 Kubernetes 在执行脚本前访问 Docker Hub 超时。CI 因此默认使用 `STUDYROOM_CI_REGISTRY=m.daocloud.io/docker.io/library`；三个镜像保持原厂版本及原 SHA-256，未改用可变 latest。已从该缓存读取并核对相同 manifest；实际 Runner 复跑结果仍需核验。该值可按部署网络改为 `docker.io/library`，不是全机 Docker 配置。缓存机制依据 [DaoCloud 官方说明](https://github.com/DaoCloud/public-image-mirror)，缓存不可达时任务失败，不绕过内容校验。
+
+镜像缓存已使 [682503](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682503) 的任务开始运行，暴露两个独立问题：官方 Maven 容器将 `MAVEN_CONFIG` 用作目录，wrapper将其解释为命令行参数；CI显式清空该变量，缓存路径仍由 `MAVEN_OPTS` 指定。Node镜像安装Git时系统源的HTTP 80端口超时；CI仅将原官方APT源改用HTTPS，保留TLS与包签名校验，限制连接超时和重试。上述失败已保留，后续以真实任务结果判断。
