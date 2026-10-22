@@ -1,0 +1,223 @@
+tests/integration/repair_http.py
+  s_8ca5a53b33de4c::t_4f9708d155ee9d 1-164
+  s_8ca5a53b33de4c::t_b4254ef1d38564 165-167
+contracts/openapi/repairs.yaml
+  s_8ca5a53b33de4c::t_9a1d5627d7c92b 1-2302
+  s_8ca5a53b33de4c::t_98af2c276a5e61 2303-2305
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "1ec7ccb6c04a7017ca93374d2dbd1a53b0ff4ad9",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "contracts/openapi/repairs.yaml",
+      "additions": {
+        "human": 59,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 2305
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-validation-2026-10-22.md",
+      "additions": {
+        "human": 40
+      }
+    },
+    {
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 58
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/CoreClient.java",
+      "additions": {
+        "human": 78
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/DeadlineTask.java",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/IdempotencyRecord.java",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/OutboxCommand.java",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairAcceptance.java",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairAccess.java",
+      "additions": {
+        "human": 46
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairAudit.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairController.java",
+      "additions": {
+        "human": 29
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairDtos.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairErrors.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairException.java",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairHistory.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairJobStatus.java",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairJson.java",
+      "additions": {
+        "human": 31
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairOrder.java",
+      "additions": {
+        "human": 39
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairPolicy.java",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairRating.java",
+      "additions": {
+        "human": 14
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairSecurity.java",
+      "additions": {
+        "human": 58
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java",
+      "additions": {
+        "human": 204
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairStatus.java",
+      "additions": {
+        "human": 5
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java",
+      "additions": {
+        "human": 84
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/main/java/com/campus/studyroom/repair/Repositories.java",
+      "additions": {
+        "human": 43
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairPersistenceTest.java",
+      "additions": {
+        "human": 81
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairPolicyTest.java",
+      "additions": {
+        "human": 73
+      }
+    },
+    {
+      "new_path": "tests/integration/fault_proxy.py",
+      "additions": {
+        "human": 79
+      }
+    },
+    {
+      "new_path": "tests/integration/repair_http.py",
+      "additions": {
+        "human": 20,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 167
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "tests/integration/run_repair_faults.py",
+      "additions": {
+        "human": 78
+      }
+    },
+    {
+      "new_path": "tests/integration/run_repair_persistence.py",
+      "additions": {
+        "human": 40
+      }
+    }
+  ]
+}
