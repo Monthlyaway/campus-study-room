@@ -1,0 +1,136 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "76aba67c27a59a2c010a83ddd1dd4e0a6faab396",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/restart-recovery-v4.json",
+      "additions": {
+        "human": 262
+      }
+    },
+    {
+      "new_path": "docs/evidence/core/restart-recovery-v4.md",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-actual-container-limits.json",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-artifacts.json",
+      "additions": {
+        "human": 81
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-contention.json",
+      "additions": {
+        "human": 248
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-data-scale.json",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-database-samples.json",
+      "additions": {
+        "human": 1421
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-environment.json",
+      "additions": {
+        "human": 50
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-page-query-counts.json",
+      "additions": {
+        "human": 294
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-queries-summary.txt",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-query-plans.json",
+      "additions": {
+        "human": 2437
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-recovery.json",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-release-binding.json",
+      "additions": {
+        "human": 63
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-release-manifest.json",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-result.json",
+      "additions": {
+        "human": 269
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-sql-after.json",
+      "additions": {
+        "human": 722
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-sql-before.json",
+      "additions": {
+        "human": 302
+      }
+    },
+    {
+      "new_path": "docs/evidence/performance/20261022T170955Z-sql-counts.json",
+      "additions": {
+        "human": 310
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-v4.json",
+      "additions": {
+        "human": 381
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-v4.md",
+      "additions": {
+        "human": 37
+      }
+    },
+    {
+      "old_path": "docs/evidence/performance.md",
+      "new_path": "docs/evidence/performance.md",
+      "additions": {
+        "human": 38
+      }
+    }
+  ]
+}
