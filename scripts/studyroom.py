@@ -509,17 +509,43 @@ def environment_lock(environment):
 
 
 def backup(environment):
-    state, _ = config(environment)
+    """Caller holds the environment lock, shared with deployment and scheduled backups."""
+    state, values = config(environment)
     directory = state / "backups"
+    if directory.is_symlink():
+        raise RuntimeError("Refusing to write backups through a directory symlink")
     directory.mkdir(exist_ok=True, mode=0o700)
     name = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     path = directory / f"{name}.dump"
-    with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as output:
+    partial = directory / f"{name}.dump.partial"
+    database = database_inventory(environment)
+    started = dt.datetime.now(dt.timezone.utc).isoformat()
+    with os.fdopen(os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as output:
         command = ["docker", "compose", "--env-file", str(state / "compose.env"), "-f", str(BASE), "exec", "-T", "postgres", "pg_dump", "-U", "studyroom_bootstrap", "-d", "studyroom", "-Fc"]
-        subprocess.run(command, check=True, cwd=ROOT, stdout=output)
-    os.chmod(path, 0o600)
-    compose(environment, "exec", "-T", "postgres", "pg_restore", "--list", input=path.read_bytes(), text=False, capture=True)
-    (directory / f"{name}.json").write_text(json.dumps({"file": path.name, "sha256": digest(path), "createdAt": name}, indent=2))
+        subprocess.run(command, check=True, cwd=ROOT, env={**os.environ, **values}, stdout=output)
+        output.flush()
+        os.fsync(output.fileno())
+    # The TOC alone can remain readable when a compressed data block is truncated.
+    # Decode every archive entry without connecting to or modifying any database.
+    for validation in ("--list", "--file=/dev/null"):
+        with partial.open("rb") as archive:
+            compose(environment, "exec", "-T", "postgres", "pg_restore", validation,
+                    stdin=archive, text=False, capture=True)
+    partial.replace(path)
+    current = state / "current-release.json"
+    release = json.loads(current.read_text()) if current.exists() else None
+    metadata = {"formatVersion": 2, "file": path.name, "sha256": digest(path), "createdAt": name,
+                "startedAt": started, "completedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "environment": environment, "project": values.get("COMPOSE_PROJECT_NAME", "studyroom-" + environment),
+                "database": database, "release": release,
+                "validation": {"archiveTocReadable": True, "fullArchiveDecoded": True},
+                "recoveryPoint": "Consistent PostgreSQL snapshot taken during pg_dump; later writes are not included."}
+    meta = directory / f"{name}.json"
+    with os.fdopen(os.open(meta, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as output:
+        json.dump(metadata, output, indent=2)
+        output.write("\n")
+        output.flush()
+        os.fsync(output.fileno())
     print(path)
     return path
 
