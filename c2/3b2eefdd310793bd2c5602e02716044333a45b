@@ -1,0 +1,78 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "c23b2eefdd310793bd2c5602e02716044333a45b",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/default-check-result.json",
+      "additions": {
+        "human": 53
+      }
+    },
+    {
+      "new_path": "docs/evidence/core/default-check.md",
+      "additions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "AGENTS.md",
+      "new_path": "AGENTS.md",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/ethics-and-risks.md",
+      "new_path": "docs/ethics-and-risks.md",
+      "additions": {
+        "human": 14
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/modules/release-operations.md",
+      "new_path": "docs/modules/release-operations.md",
+      "additions": {
+        "human": 26
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 6
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 9
+      }
+    }
+  ]
+}
