@@ -1,0 +1,32 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-22T13:37:47.077817+00:00",
+  "releaseId": "r-20261022T131500-6c9c47359404",
+  "backup": {
+    "backup": "20261022T133442309754Z.dump",
+    "sha256": "2a4562106f9e7f89a59626ad2c7750484e5791e31ec094776541cf45eb51ae7b",
+    "isolatedDatabase": "studyroom_restore_20261022133442",
+    "counts": [
+      "users=11",
+      "reservations=1",
+      "applications=1",
+      "repairs=1"
+    ],
+    "result": "restored"
+  },
+  "businessAndAuditSnapshots": {
+    "core.reservation": "1:ab3af482113a0419456f7b68eed4f156",
+    "core.room_application": "1:fffff07327751de2fc74099de8c2116e",
+    "repair.repair_order": "1:0ec60eca41da4d52b2a3d142a5263121",
+    "core.audit_event": "13:8ba1fa247c4d3ed3f2e2dfe97646dd34",
+    "repair.audit_event": "2:9150d0c8c268dc7328f18368a9fe73e0"
+  },
+  "checks": {
+    "restoredRowsExactlyMatchLive": true,
+    "threeContainersRecreated": true,
+    "bothOriginalSessions": true,
+    "threeBusinessRecordsReadable": true,
+    "expandedColumnRetained": true,
+    "businessAndAuditRowsUnchanged": true
+  }
+}

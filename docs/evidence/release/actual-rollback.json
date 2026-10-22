@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-22T13:33:14.855720+00:00",
+  "result": "passed",
+  "runningRelease": "r-20261022T131500-6c9c47359404",
+  "checks": {
+    "threeImageIdsAndVersions": true,
+    "bothOriginalSessions": true,
+    "threeCancelledBusinessRecords": true,
+    "expandedColumnRetained": true,
+    "flywayInventoryUnchanged": true
+  }
+}

@@ -1,0 +1,177 @@
+name: studyroom-${ENV_NAME:-local}
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:18.6-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc}
+    environment:
+      POSTGRES_DB: studyroom
+      POSTGRES_USER: studyroom_bootstrap
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    entrypoint: [/bin/sh, /opt/studyroom/postgres-entrypoint.sh]
+    command: [postgres]
+    secrets: [postgres_password, core_db_password, repair_db_password, migration_db_password]
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/10-studyroom.sh:ro
+      - ./postgres-entrypoint.sh:/opt/studyroom/postgres-entrypoint.sh:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U studyroom_bootstrap -d studyroom"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+    restart: unless-stopped
+    networks: [private]
+  mailpit:
+    image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387}
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: 1000
+      MP_SMTP_AUTH_ACCEPT_ANY: 0
+    volumes: [mail-data:/data]
+    ports:
+      - "127.0.0.1:${MAIL_UI_PORT:-18025}:8025"
+    networks: [private, access]
+    restart: unless-stopped
+  migrate:
+    image: ${CORE_IMAGE:-studyroom-core:development}
+    build:
+      context: ../..
+      dockerfile: infra/compose/Dockerfile.backend
+      args:
+        SERVICE: core-service
+    command: [migrate]
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/studyroom
+      DB_USERNAME: studyroom_migration
+      ENV_NAME: ${ENV_NAME:-local}
+    secrets:
+      - source: migration_db_password
+        target: db_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [private]
+    profiles: [tools]
+  core:
+    image: ${CORE_IMAGE:-studyroom-core:development}
+    build:
+      context: ../..
+      dockerfile: infra/compose/Dockerfile.backend
+      args:
+        SERVICE: core-service
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/studyroom
+      DB_USERNAME: studyroom_core
+      ENV_NAME: ${ENV_NAME:-local}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      INTERNAL_USERNAME: repair-service
+      SERVER_PORT: 8080
+      RELEASE_ID: ${RELEASE_ID:-development}
+      RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
+      GIT_COMMIT: ${RELEASE_COMMIT:-working-tree}
+      MAIL_MODE: ${MAIL_MODE:-smtp}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_FROM: ${SMTP_FROM:-study@studyroom.test}
+      CONTROL_DIR: /app/control
+      JOBS_PAUSED: ${JOBS_PAUSED:-false}
+    secrets:
+      - source: core_db_password
+        target: db_password
+      - internal_password
+      - checkin_key
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ${STUDYROOM_STATE_DIR:?Run scripts/init-env first}/control:/app/control:ro
+    networks: [private]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "curl -fsS http://localhost:8080/actuator/health/readiness >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+  repair:
+    image: ${REPAIR_IMAGE:-studyroom-repair:development}
+    build:
+      context: ../..
+      dockerfile: infra/compose/Dockerfile.backend
+      args:
+        SERVICE: repair-service
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/studyroom
+      DB_USERNAME: studyroom_repair
+      ENV_NAME: ${ENV_NAME:-local}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      CORE_INTERNAL_URL: http://core:8080
+      INTERNAL_USERNAME: repair-service
+      SERVER_PORT: 8080
+      RELEASE_ID: ${RELEASE_ID:-development}
+      RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
+      GIT_COMMIT: ${RELEASE_COMMIT:-working-tree}
+      CONTROL_DIR: /app/control
+      JOBS_PAUSED: ${JOBS_PAUSED:-false}
+    secrets:
+      - source: repair_db_password
+        target: db_password
+      - internal_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      core:
+        condition: service_healthy
+    volumes:
+      - ${STUDYROOM_STATE_DIR:?}/control:/app/control:ro
+    networks: [private]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "curl -fsS http://localhost:8080/actuator/health/readiness >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+  web:
+    image: ${WEB_IMAGE:-studyroom-web:development}
+    build:
+      context: ../..
+      dockerfile: infra/compose/Dockerfile.web
+      args:
+        RELEASE_ID: ${RELEASE_ID:-development}
+        RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-18080}:8080"
+    volumes:
+      - ${STUDYROOM_STATE_DIR:?}/control:/app/control:ro
+    depends_on:
+      core:
+        condition: service_healthy
+      repair:
+        condition: service_healthy
+    networks: [private, access]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "wget -q -O /dev/null http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+volumes:
+  postgres-data:
+  mail-data:
+networks:
+  private:
+    internal: true
+  access:
+secrets:
+  postgres_password:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/postgres_password
+  core_db_password:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/core_db_password
+  repair_db_password:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/repair_db_password
+  migration_db_password:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/migration_db_password
+  internal_password:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/internal_password
+  checkin_key:
+    file: ${STUDYROOM_STATE_DIR:?}/secrets/checkin_key

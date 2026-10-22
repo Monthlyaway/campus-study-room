@@ -1,0 +1,9 @@
+# Host access is only for native local development and always loopback-bound.
+services:
+  postgres:
+    networks: [private, access]
+    ports:
+      - "127.0.0.1:${DB_PORT:-15432}:5432"
+  mailpit:
+    ports:
+      - "127.0.0.1:${SMTP_PORT_HOST:-11025}:1025"

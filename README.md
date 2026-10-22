@@ -1,93 +1,88 @@
-# pj2
+# 栖学 · 校园自习室
 
+响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
+**当前状态：正在实现与集成验收。** 不将尚未验证的功能或正式服务器部署标记为完成。进展与证据见 [docs/progress.md](docs/progress.md)。
 
-## Getting started
+## 本地安装入口
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+需要 Docker Engine/Desktop、Compose v2、Python 3.10+。推荐至少 4 vCPU / 8 GiB。
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://code.agibot.com/yangchunyu/pj2.git
-git branch -M main
-git push -uf origin main
+```sh
+git clone git@code.agibot.com:yangchunyu/campus-study-room.git
+cd campus-study-room
+./install.sh local
 ```
 
-## Integrate with your tools
+该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。默认 local 端口如下；本次 test 实例使用应用 `18082`、邮件 `18027`。
 
-- [ ] [Set up project integrations](https://code.agibot.com/yangchunyu/pj2/-/settings/integrations)
+- 应用：`http://localhost:18080`
+- 本地邮件收件箱：`http://localhost:18025`
+- 配置：`.local/local/compose.env`
+- 随机生成的演示密码：`.local/local/secrets/demo_password`（只存在本机，权限 0600）
+- 演示账号：`student`、`student2`、`applicant`、`dept-approver`、`space-approver`、`dispatcher`、`repairer`、`property-admin`、`room-admin`、`operator`、`admin`
 
-## Collaborate with your team
+需要自动备份时使用 `./install.sh local --schedule-backups`，或在已有环境运行 `./scripts/schedule-backup install local`。调度器每天生成校验过的备份，成功后保留最近七天；macOS 使用 launchd，Linux 使用 systemd，详情见[发布运维](docs/modules/release-operations.md)。
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+演示账号仅允许 local/dev/test。生产不导入演示数据；正式服务器、域名和 SMTP 接入按用户选择留待后续。数据库和服务内部接口不发布到公网。
 
-## Test and Deploy
+## 原生开发
 
-Use the built-in continuous integration in GitLab.
+需要 Java 21、Node 24.22.1 和 Docker；Maven Wrapper 与 pnpm 版本固定。
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```sh
+./scripts/dev-up local     # PG/邮件、构建、迁移、种子、两个 Java 进程
+./scripts/web install --frozen-lockfile
+./scripts/web dev          # Umi 开发服务器，代理两个 API 服务
+./scripts/check            # 编译/类型/单元 + 隔离真实 PG、HTTP、SMTP、后端契约检查
+./scripts/check --unit-only # 日常快检；明确跳过真实集成与后端契约，不能作为完整验收
+```
 
-***
+默认检查需要可用的 Docker、Java、Node 和已安装的前端依赖；依赖不可用或测试被跳过时失败退出，不自动降级。它创建独占 PostgreSQL/Mailpit 容器与数据卷、随机凭据及本机空闲端口，运行两个临时后端和九组真实数据库套件（含公开/内部契约）、跨服务 HTTP、邮件与响应丢失补偿测试。检查不会重启现有 local/dev/test/prod 服务。整个检查持有工作区构建锁，集成环境锁覆盖依赖创建、迁移、测试和清理；结束只移除本轮容器/网络并停止本轮进程，保留命名数据卷。项目/卷名、0600 凭据与运行 JAR 留在私有 `.local/check/<运行编号>/` 供复查，不自动删除数据卷。日志和逐套件计数保留在 `output/check/<运行编号>/`，CI 调用同一集成函数与测试清单。性能、浏览器和发布演练仍有各自验收入口，不由该命令代替。
 
-# Editing this README
+开发用数据库端口为本机 `15432`，SMTP 为 `11025`；正常容器安装不发布数据库端口。原生进程日志在 `.local/local/`；构建输出与正在运行的 JAR 分开存放。更新代码后使用 `python3 scripts/studyroom.py native-restart local`，该命令等待旧进程正常退出后再构建、迁移和启动。所有时间按 Asia/Shanghai 展示。
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 架构与仓库
 
-## Suggestions for a good README
+| 路径 | 职责 |
+| --- | --- |
+| `services/core-service` | 账号权限、空间、通知审计、座位预约 M1、教室审批 M2、唯一资源裁决 |
+| `services/repair-service` | 报修 M3、可靠 outbox、通过 HTTP 请求资源封禁与释放 |
+| `apps/web` | React 19 / TypeScript / Umi 4 / Ant Design 6 |
+| `modules` | DTO、稳定共享会话身份 |
+| `tools/migration-runner`、`db` | 独立 Flyway 迁移、基线与演示种子 |
+| `infra`、`scripts` | Compose、安装、部署、备份、应用回退 |
+| `contracts/openapi` | API 契约与生成客户端来源 |
+| `docs` | 模块说明、ADR、需求追踪、测试与发布证据 |
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL 权限。后台任务持久化，维修服务不直接写 core 数据。写请求使用 CSRF、幂等键和版本号；预约、审批及维修共享房间锁协议。
 
-## Name
-Choose a self-explaining name for your project.
+## GitLab、提交与发布
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+[项目仓库](https://code.agibot.com/yangchunyu/campus-study-room)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。合入 main 使用 Fast-forward merge，必要时先 rebase 并重新验证；默认不 squash，保留提交记录且不生成 merge commit。GitLab 要求 pipeline 成功，skipped 不视为成功。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```sh
+./scripts/build-release r-YYYYMMDDTHHMMSS-commit
+./scripts/deploy test .local/releases/RELEASE_ID/manifest.json
+./scripts/backup test
+./scripts/rollback test .local/releases/PREVIOUS_ID/manifest.json
+./scripts/export-release .local/releases/RELEASE_ID/manifest.json
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+发布构建要求干净且已提交的 checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。发布脚本与兼容恢复流程正在集成验收，实际可用范围见进度记录。
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## 文档
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- [产品需求](01_PRD.md)、[技术方案](02_Technical_Design.md)、[里程碑](03_Development_Milestones.md)
+- [Agent 协作规则](AGENTS.md)（用户所说的 Agents.md，仓库采用标准大写命名）
+- [当前交付范围与 GitLab ADR](docs/adr/0002-delivery-and-gitlab.md)
+- [模块与公共层归属](docs/adr/0001-module-and-shared-layer-ownership.md)
+- [实施分工](docs/team.md)、[进度](docs/progress.md)、[风险记录](docs/ethics-and-risks.md)
+- [精确依赖与镜像基线](docs/dependency-baseline.json)
+- [安装与运维](docs/modules/operations.md)、[Ubuntu 一键运行环境](docs/modules/bootstrap.md)、[离线安装包](docs/modules/portable-release.md)
+- [账号管理](docs/modules/administration.md)、[核心预约与审批](docs/modules/core.md)、[维修](docs/modules/repair.md)、[前端](docs/modules/web.md)
+- [请求关联与运行日志](docs/modules/observability.md)
+- [维修负面矩阵、三期限和真实 SMTP 验收](docs/evidence/repair-acceptance.md)
+- [39 条 P0 需求追踪](docs/requirements-traceability.md)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+前端采用 Sites skill 的本地设计指导并使用 Playwright 调试，不注册或发布 Site。独立 agent 必须实际试用前端并记录反馈。P1 自然语言业务 Agent 尚未启动，P0 优先。

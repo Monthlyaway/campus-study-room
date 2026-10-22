@@ -1,0 +1,25 @@
+#!/bin/sh
+# Install CI-only tools through signed distribution repositories over HTTPS.
+set -eu
+[ "${CI:-}" = true ] || { echo 'This installer is restricted to disposable CI containers.' >&2; exit 2; }
+[ "$#" -gt 0 ] || exit 2
+for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
+  [ -f "$sources" ] || continue
+  sed -i \
+    -e 's|http://|https://|g' \
+    -e 's|https://deb.debian.org/debian-security|https://mirrors.tuna.tsinghua.edu.cn/debian-security|g' \
+    -e 's|https://deb.debian.org/debian|https://mirrors.tuna.tsinghua.edu.cn/debian|g' \
+    -e 's|https://security.ubuntu.com/ubuntu|https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' \
+    -e 's|https://archive.ubuntu.com/ubuntu|https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' \
+    -e 's|https://ports.ubuntu.com/ubuntu-ports|https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports|g' "$sources"
+done
+if [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then
+  # Official slim Node bundles Mozilla roots but omits the OS trust store.
+  node -e "require('fs').writeFileSync('/tmp/studyroom-ci-ca.pem', require('tls').rootCertificates.join('\n'))"
+  trap 'rm -f /tmp/studyroom-ci-ca.pem' EXIT
+  apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o APT::Update::Error-Mode=any -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
+  apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends "$@" ca-certificates
+else
+  apt-get -o APT::Update::Error-Mode=any -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
+  apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends "$@"
+fi

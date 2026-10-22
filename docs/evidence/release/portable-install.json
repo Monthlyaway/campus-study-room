@@ -1,0 +1,31 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-22T13:38:49.437256+00:00",
+  "releaseId": "r-20261022T132000-66f2b928550f",
+  "commit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "platform": {
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  "images": {
+    "core": "sha256:80ff361cecb0e936e76b0e2a7315ff6206353f291c5ec4af4fd9d5885a045f3f",
+    "repair": "sha256:6fdbf7bbc48ee908bccc9ca6986f00dbd859a58b5d0b5f750e866399986d485b",
+    "web": "sha256:266ecde205f29a71998d0691c725e0c9b4d11509fac325d2701c8253cf16f560",
+    "postgres": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+    "mailpit": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387"
+  },
+  "project": "studyroom-portable-install",
+  "publicBaseUrl": "http://localhost:19282",
+  "checks": {
+    "checksumAndSourceInventory": true,
+    "fiveRunningImageIds": true,
+    "freshSourceWithoutGit": true,
+    "independentNewSecrets": true,
+    "emptyTargetDeploySucceeded": true
+  },
+  "limitations": [
+    "Same ARM64 Docker daemon with isolated project, source, secrets and volumes; no remote host or AMD64 install claimed.",
+    "Importer does not invoke pull/build; external networking was not disabled during this run.",
+    "Complete business/browser validation recorded separately."
+  ]
+}

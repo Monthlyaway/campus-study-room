@@ -1,0 +1,24 @@
+---
+- name: Inspect the isolated Compose network
+  ansible.builtin.command:
+    argv: [docker, network, inspect, "{{ bootstrap_settings.project_name }}_{{ bootstrap_network.name }}"]
+  register: network_info
+  changed_when: false
+  failed_when: network_info.rc not in [0, 1]
+- name: Create a missing Compose-owned network
+  ansible.builtin.command:
+    argv: "{{ ['docker', 'network', 'create', '--driver', 'bridge', '--label', 'com.docker.compose.project=' + bootstrap_settings.project_name, '--label', 'com.docker.compose.network=' + bootstrap_network.name, '--label', 'com.docker.compose.version=' + bootstrap_lock.compose] + (['--internal'] if bootstrap_network.internal else []) + [bootstrap_settings.project_name + '_' + bootstrap_network.name] }}"
+  when: network_info.rc == 1
+  changed_when: true
+- name: Read the network configuration after creation
+  ansible.builtin.command:
+    argv: [docker, network, inspect, "{{ bootstrap_settings.project_name }}_{{ bootstrap_network.name }}"]
+  register: verified_network
+  changed_when: false
+- name: Reject a network belonging to another environment
+  ansible.builtin.assert:
+    that:
+      - (verified_network.stdout | from_json)[0].Driver == 'bridge'
+      - (verified_network.stdout | from_json)[0].Internal == bootstrap_network.internal
+      - (verified_network.stdout | from_json)[0].Labels['com.docker.compose.project'] == bootstrap_settings.project_name
+      - (verified_network.stdout | from_json)[0].Labels['com.docker.compose.network'] == bootstrap_network.name

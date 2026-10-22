@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "events": {
+    "ACCEPT_OVERDUE": {
+      "orderId": "6851452f-9da7-4a47-b23d-f5b981802b2a",
+      "recipientCounts": {
+        "reporter": 1,
+        "outsider": 0,
+        "worker_a": 0,
+        "worker_b": 0,
+        "dispatch": 0,
+        "dispatch_out": 0,
+        "property": 1,
+        "property_out": 0,
+        "self_worker": 1
+      },
+      "statePreservedAtDeadline": "AWAITING_ACCEPTANCE"
+    },
+    "WORK_OVERDUE": {
+      "orderId": "f9f78f07-f4fe-4bc3-a7e4-35dad8b52a72",
+      "recipientCounts": {
+        "reporter": 0,
+        "outsider": 0,
+        "worker_a": 1,
+        "worker_b": 0,
+        "dispatch": 0,
+        "dispatch_out": 0,
+        "property": 1,
+        "property_out": 0,
+        "self_worker": 1
+      },
+      "statePreservedAtDeadline": "ASSIGNED"
+    },
+    "ASSIGN_OVERDUE": {
+      "orderId": "f98fe3d6-45b3-4edc-8abb-befe5681b49c",
+      "recipientCounts": {
+        "reporter": 0,
+        "outsider": 0,
+        "worker_a": 0,
+        "worker_b": 0,
+        "dispatch": 1,
+        "dispatch_out": 0,
+        "property": 1,
+        "property_out": 0,
+        "self_worker": 1
+      },
+      "statePreservedAtDeadline": "SUBMITTED"
+    }
+  },
+  "cleanup": "business cancellation/independent acceptance; resource released",
+  "database": "studyroom_repair_deadlines",
+  "recipientAssertions": 27,
+  "publicAvailability": "No M1 seats after acceptance deadline; available again only after independent acceptance and confirmed RELEASE",
+  "executedAt": "2026-10-22T13:45:54Z",
+  "seconds": 12.923,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "javaTests": 1
+}

@@ -1,0 +1,30 @@
+{
+  "status": "RELEASE_PENDING",
+  "version": 7,
+  "sync": {
+    "pending": true,
+    "attempts": 2,
+    "lastErrorCode": "AUTHORIZATION_UNAVAILABLE",
+    "lastAttemptAt": "2026-10-22T15:22:27.638627Z",
+    "nextAttemptAt": "2026-10-22T15:22:31.656936Z",
+    "needsAttention": false
+  },
+  "commands": [
+    {
+      "command_id": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+      "command_type": "BLOCK",
+      "status": "DONE",
+      "attempts": 8,
+      "last_error_code": null,
+      "request_id": "245b240a-60a7-4b6d-be78-ed5bdfa963cb"
+    },
+    {
+      "command_id": "91bc835b-a492-486d-a70b-2953a01aff00",
+      "command_type": "RELEASE",
+      "status": "PENDING",
+      "attempts": 2,
+      "last_error_code": "AUTHORIZATION_UNAVAILABLE",
+      "request_id": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97"
+    }
+  ]
+}

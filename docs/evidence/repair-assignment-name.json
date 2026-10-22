@@ -1,0 +1,22 @@
+{
+  "migration": "V20261022160000__assigned_worker_name_snapshot.sql",
+  "existingRowsBefore": 19,
+  "existingRowsAfter": 19,
+  "legacyAssignedRowsWithNullName": 13,
+  "repairRuntime": "stable .local/local/run/repair.jar",
+  "coreRestarted": false,
+  "legacyApiDetail": {
+    "id": "b05964a4-047e-4119-80c0-81e92b9724f0",
+    "status": "CLOSED",
+    "assignedToName": null,
+    "readStatus": 200
+  },
+  "tests": 1,
+  "seconds": 9.863,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "executedAt": "2026-10-22T13:54:51.335105+00:00",
+  "contract": "assignedToName nullable string <=64, assignment-time snapshot",
+  "additionalListLookups": 0
+}

@@ -1,0 +1,53 @@
+{
+  "result": "passed",
+  "commit": "working-tree",
+  "releaseId": "check-6993be6981424dfba12dbbb7a37e3810",
+  "httpTestCounts": {
+    "admin_http": 2,
+    "core_http": 6,
+    "core_roles_http": 1,
+    "logging_http": 1,
+    "repair_acceptance_http": 5,
+    "repair_assignment_name_http": 1,
+    "repair_http": 2
+  },
+  "persistenceTestCounts": {
+    "CorePersistenceTest": 16,
+    "AdminPersistenceTest": 9,
+    "SharedPersistenceTest": 7,
+    "CoreAcceptanceMatrixTest": 15,
+    "CoreSmtpAcceptanceTest": 2,
+    "CoreContractTest": 5,
+    "CoreInputBoundaryTest": 6,
+    "RepairPersistenceTest": 4,
+    "RepairDeadlineHttpTest": 1
+  },
+  "postgres": "18.6",
+  "realServices": [
+    "core",
+    "repair"
+  ],
+  "suites": [
+    "admin_http.py",
+    "core_http.py",
+    "core_roles_http.py",
+    "logging_http.py",
+    "repair_acceptance_http.py",
+    "repair_assignment_name_http.py",
+    "repair_http.py"
+  ],
+  "realSmtp": "Mailpit",
+  "deadlineRecipientAssertions": 27,
+  "persistenceSuites": [
+    "CorePersistenceTest",
+    "AdminPersistenceTest",
+    "SharedPersistenceTest",
+    "CoreAcceptanceMatrixTest",
+    "CoreSmtpAcceptanceTest",
+    "CoreContractTest",
+    "CoreInputBoundaryTest",
+    "RepairPersistenceTest",
+    "RepairDeadlineHttpTest"
+  ],
+  "responseLossReplay": "passed"
+}

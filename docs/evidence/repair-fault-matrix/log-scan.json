@@ -1,0 +1,39 @@
+{
+  "logFiles": [
+    "core.log",
+    "repair.log",
+    "proxy.log",
+    "web.log",
+    "proxy-events.jsonl"
+  ],
+  "bytesScanned": 989935,
+  "knownSecretAndSessionValues": 34,
+  "exactValueMatches": 0,
+  "includesActualFullDailyCode": true,
+  "correlatedLogs": [
+    {
+      "service": "core",
+      "operation": "BLOCK",
+      "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+      "matchingLogEvents": 7
+    },
+    {
+      "service": "core",
+      "operation": "RELEASE",
+      "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+      "matchingLogEvents": 5
+    },
+    {
+      "service": "repair",
+      "operation": "BLOCK",
+      "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+      "matchingLogEvents": 9
+    },
+    {
+      "service": "repair",
+      "operation": "RELEASE",
+      "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+      "matchingLogEvents": 5
+    }
+  ]
+}

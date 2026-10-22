@@ -1,0 +1,233 @@
+---
+- name: Provision pinned campus study room runtime
+  hosts: studyroom
+  become: true
+  gather_facts: true
+  vars:
+    bootstrap_container_validation: false
+    conflicting_packages: [docker.io, docker-compose, docker-compose-v2, docker-doc, docker-buildx, podman-docker, containerd, runc]
+  pre_tasks:
+    - name: Require the supported operating system and environment
+      ansible.builtin.assert:
+        that:
+          - bootstrap_settings.environment in ['local', 'dev', 'test']
+          - ansible_facts.distribution == 'Ubuntu'
+          - ansible_facts.distribution_version == bootstrap_lock.ubuntu
+          - ansible_facts.architecture in ['x86_64', 'aarch64']
+          - ansible_facts.user_id == 'root'
+        fail_msg: Ubuntu 24.04 ARM64/AMD64 and authorized sudo are required; prod is unavailable.
+    - name: Identify explicit container-only validation
+      ansible.builtin.stat:
+        path: /.dockerenv
+      register: container_marker
+    - name: Require systemd and server capacity, or an explicit Docker package test
+      ansible.builtin.assert:
+        that:
+          - not bootstrap_container_validation or container_marker.stat.exists
+          - bootstrap_container_validation or ansible_facts.service_mgr == 'systemd'
+          - bootstrap_container_validation or ansible_facts.processor_vcpus | int >= 4
+          - bootstrap_container_validation or ansible_facts.memtotal_mb | int >= 7680
+        fail_msg: A real target needs systemd and at least 4 vCPU / nominal 8 GiB; container mode does not validate daemon operation.
+    - name: Reject symlinked target paths before changing ownership or permissions
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - -c
+          - |
+            import pathlib, sys
+            for item in sys.argv[1:]:
+                path = pathlib.Path(item)
+                if any(part.is_symlink() for part in [path, *path.parents]):
+                    raise SystemExit("Runtime directory or parent is a symlink")
+          - "{{ bootstrap_settings.state_directory }}"
+          - "{{ bootstrap_settings.release_directory }}"
+          - "{{ bootstrap_settings.backup_directory }}"
+      changed_when: false
+      check_mode: false
+    - name: Inspect existing runtime packages without modifying them
+      ansible.builtin.command:
+        argv: "{{ ['dpkg-query', '--show', '--showformat=${Package}\t${Version}\t${db:Status-Status}\n'] + (bootstrap_lock.packages.keys() | list) + conflicting_packages }}"
+      register: installed_query
+      changed_when: false
+      failed_when: installed_query.rc not in [0, 1]
+      check_mode: false
+    - name: Collect installed package versions
+      ansible.builtin.set_fact:
+        bootstrap_installed: "{{ dict(installed_query.stdout_lines | select('search', '\tinstalled$') | map('regex_replace', '\tinstalled$', '') | map('split', '\t')) }}"
+    - name: Refuse unmanaged or conflicting container runtimes
+      ansible.builtin.assert:
+        that: item not in bootstrap_installed
+        fail_msg: "Existing {{ item }} requires a separately planned host migration; bootstrap does not remove runtimes or volumes."
+      loop: "{{ conflicting_packages }}"
+    - name: Refuse implicit runtime upgrades or downgrades
+      ansible.builtin.assert:
+        that: item.key not in bootstrap_installed or bootstrap_installed[item.key] == item.value
+        fail_msg: "Installed {{ item.key }} differs from the pinned version; existing workloads were not modified."
+      loop: "{{ bootstrap_lock.packages | dict2items }}"
+  tasks:
+    - name: Install Ubuntu prerequisites
+      ansible.builtin.apt:
+        name: [ca-certificates, curl, gnupg, python3-apt, acl, sudo]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+        install_recommends: false
+    - name: Create the official keyring directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+    - name: Install the pinned official Docker signing key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/studyroom-docker.asc
+        checksum: "sha256:{{ bootstrap_lock.dockerKeySha256 }}"
+        mode: '0644'
+    - name: Configure the signed noble stable repository
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/studyroom-docker.sources
+        mode: '0644'
+        content: |
+          Types: deb
+          URIs: https://download.docker.com/linux/ubuntu
+          Suites: noble
+          Components: stable
+          Architectures: {{ 'arm64' if ansible_facts.architecture == 'aarch64' else 'amd64' }}
+          Signed-By: /etc/apt/keyrings/studyroom-docker.asc
+      register: docker_repository
+    - name: Pin each Docker component version
+      ansible.builtin.copy:
+        dest: /etc/apt/preferences.d/studyroom-docker
+        mode: '0644'
+        content: |
+          {% for package, version in bootstrap_lock.packages.items() %}
+          Package: {{ package }}
+          Pin: version {{ version }}
+          Pin-Priority: 1001
+
+          {% endfor %}
+    - name: Refresh repository metadata after source creation
+      ansible.builtin.apt:
+        update_cache: true
+      when: docker_repository.changed
+    - name: Install the exact Docker runtime combination
+      ansible.builtin.apt:
+        name: "{{ bootstrap_lock.packages | dict2items | map(attribute='key') | zip(bootstrap_lock.packages | dict2items | map(attribute='value')) | map('join', '=') | list }}"
+        state: present
+        install_recommends: false
+        allow_downgrade: false
+        policy_rc_d: "{{ 101 if bootstrap_container_validation else omit }}"
+    - name: Hold fixed runtime components against unrelated apt upgrades
+      ansible.builtin.dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop: "{{ bootstrap_lock.packages.keys() | list }}"
+    - name: Inspect an existing deployment account
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ bootstrap_settings.deployment_user }}"
+        fail_key: false
+    - name: Refuse to repurpose an interactive account
+      ansible.builtin.assert:
+        that: >-
+          ansible_facts.getent_passwd[bootstrap_settings.deployment_user] == none or
+          (ansible_facts.getent_passwd[bootstrap_settings.deployment_user][4] == (bootstrap_settings.release_directory | dirname)
+          and ansible_facts.getent_passwd[bootstrap_settings.deployment_user][5] == '/usr/sbin/nologin')
+    - name: Create the dedicated locked deployment account
+      ansible.builtin.user:
+        name: "{{ bootstrap_settings.deployment_user }}"
+        system: true
+        create_home: false
+        home: "{{ bootstrap_settings.release_directory | dirname }}"
+        shell: /usr/sbin/nologin
+        password_lock: true
+        groups: docker
+        append: true
+    - name: Create traversable application parent directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop: "{{ [bootstrap_settings.state_directory | dirname, bootstrap_settings.release_directory | dirname] | unique }}"
+    - name: Create private deployment and backup directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ bootstrap_settings.deployment_user }}"
+        group: "{{ bootstrap_settings.deployment_user }}"
+        mode: '0700'
+      loop: "{{ [bootstrap_settings.state_directory, bootstrap_settings.release_directory, bootstrap_settings.backup_directory] }}"
+    - name: Create the installer library directory
+      ansible.builtin.file:
+        path: /usr/local/lib/campus-study-room
+        state: directory
+        mode: '0755'
+    - name: Install the existing secret generator and state validator
+      ansible.builtin.copy:
+        src: "{{ item.source }}"
+        dest: "/usr/local/lib/campus-study-room/{{ item.target }}"
+        mode: '0755'
+      loop:
+        - source: "{{ bootstrap_repository_root }}/scripts/init-env"
+          target: init-env
+        - source: "{{ bootstrap_repository_root }}/infra/ansible/files/setup-state.py"
+          target: setup-state.py
+    - name: Initialize new state and validate existing state without replacing secrets
+      become_user: "{{ bootstrap_settings.deployment_user }}"
+      ansible.builtin.command:
+        argv: [/usr/bin/python3, /usr/local/lib/campus-study-room/setup-state.py, --settings, "{{ bootstrap_settings | to_json }}", --initializer, /usr/local/lib/campus-study-room/init-env]
+      register: state_result
+      changed_when: (state_result.stdout | from_json).changed
+      when: not ansible_check_mode
+    - name: Verify exact Docker CLI and Compose versions
+      ansible.builtin.command:
+        argv: "{{ item }}"
+      loop:
+        - [docker, --version]
+        - [docker, compose, version, --short]
+      register: binary_versions
+      changed_when: false
+      when: not ansible_check_mode
+    - name: Check component versions
+      ansible.builtin.assert:
+        that:
+          - "('Docker version ' + bootstrap_lock.docker + ',') in binary_versions.results[0].stdout"
+          - binary_versions.results[1].stdout | trim | regex_replace('^v', '') == bootstrap_lock.compose
+      when: not ansible_check_mode
+    - name: Enable Docker on a real Ubuntu host
+      ansible.builtin.systemd_service:
+        name: docker
+        enabled: true
+        state: started
+      when: not bootstrap_container_validation
+    - name: Validate the running daemon
+      ansible.builtin.command:
+        argv: [docker, info, --format, '{{ "{{.ServerVersion}}" }}']
+      changed_when: false
+      register: daemon_version
+      when: not bootstrap_container_validation and not ansible_check_mode
+    - name: Require the pinned daemon version
+      ansible.builtin.assert:
+        that: daemon_version.stdout | trim == bootstrap_lock.docker
+      when: not bootstrap_container_validation and not ansible_check_mode
+    - name: Create and validate the Compose project networks
+      ansible.builtin.include_tasks: networks.yml
+      loop:
+        - {name: private, internal: true}
+        - {name: access, internal: false}
+      loop_control:
+        loop_var: bootstrap_network
+      when: not bootstrap_container_validation and not ansible_check_mode
+    - name: Record the scope of completed bootstrap checks
+      ansible.builtin.copy:
+        dest: "{{ bootstrap_settings.state_directory }}/bootstrap-runtime.json"
+        owner: "{{ bootstrap_settings.deployment_user }}"
+        group: "{{ bootstrap_settings.deployment_user }}"
+        mode: '0600'
+        content: "{{ {'environment': bootstrap_settings.environment, 'ubuntu': bootstrap_lock.ubuntu, 'packages': bootstrap_lock.packages, 'validation': ('container_packages_paths_users_only' if bootstrap_container_validation else 'ubuntu_systemd_runtime'), 'daemonAndNetworksVerified': not bootstrap_container_validation} | to_nice_json }}\n"
+      when: not ansible_check_mode
+    - name: Explain the remaining release installation step
+      ansible.builtin.debug:
+        msg: "{{ 'Container validation completed; systemd, Docker daemon, SSH and host networking were not accepted.' if bootstrap_container_validation else 'Runtime ready. Import a verified portable release using the same state directory; application images are not pulled by bootstrap.' }}"

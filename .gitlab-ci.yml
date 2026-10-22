@@ -1,0 +1,148 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+stages: [verify, integration, release-test, package]
+
+default:
+  tags: [amd64]
+  interruptible: true
+
+variables:
+  STUDYROOM_CI_REGISTRY: m.daocloud.io/docker.io/library
+  MAVEN_CONFIG: ""
+  MAVEN_OPTS: '-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository'
+
+backend:
+  stage: verify
+  image: $STUDYROOM_CI_REGISTRY/maven:3.9.11-eclipse-temurin-21@sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237
+  cache:
+    key: maven-java21-boot411
+    paths: [.m2/repository/]
+  script:
+    - ./mvnw -B -ntp verify
+  artifacts:
+    when: always
+    reports:
+      junit: '**/target/surefire-reports/TEST-*.xml'
+    paths:
+      - services/core-service/target/*.jar
+      - services/repair-service/target/*.jar
+      - tools/migration-runner/target/*.jar
+    expire_in: 14 days
+
+frontend:
+  stage: verify
+  image: $STUDYROOM_CI_REGISTRY/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+  cache:
+    key:
+      files: [apps/web/pnpm-lock.yaml]
+    paths: [apps/web/.pnpm-store/]
+  before_script:
+    - ./scripts/ci-apt git ca-certificates
+    - corepack enable
+    - corepack prepare pnpm@10.34.7 --activate
+    - cd apps/web
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm generate
+    - git diff --exit-code -- src/services/generated
+    - pnpm typecheck
+    - pnpm test
+    - pnpm build
+  artifacts:
+    paths: [apps/web/dist/]
+    expire_in: 14 days
+
+integration:
+  stage: integration
+  image: $STUDYROOM_CI_REGISTRY/maven:3.9.11-eclipse-temurin-21@sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237
+  needs: [backend, frontend]
+  cache:
+    key: maven-java21-boot411
+    paths: [.m2/repository/]
+  services:
+    - name: $STUDYROOM_CI_REGISTRY/postgres:18.6-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
+      alias: postgres
+    - name: m.daocloud.io/docker.io/axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387
+      alias: mailpit
+  variables:
+    POSTGRES_DB: studyroom
+    POSTGRES_USER: studyroom_bootstrap
+    POSTGRES_PASSWORD: isolated-ci-service-only
+    PGHOST: postgres
+    PGPORT: '5432'
+    STUDYROOM_SMTP_HOST: mailpit
+    STUDYROOM_SMTP_PORT: '1025'
+    STUDYROOM_MAILPIT_URL: http://mailpit:8025
+  resource_group: studyroom-test
+  interruptible: false
+  environment:
+    name: test/ci-$CI_PIPELINE_ID
+    action: start
+    auto_stop_in: 1 day
+  before_script:
+    - ./scripts/ci-apt python3 postgresql-client
+  script:
+    - python3 -m unittest discover -s tests/ops -v
+    - python3 scripts/ci-integration.py
+  artifacts:
+    when: always
+    paths: [output/ci/]
+    reports:
+      junit: 'output/ci/*.xml'
+    expire_in: 14 days
+
+package:
+  stage: package
+  image: $STUDYROOM_CI_REGISTRY/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+  needs: [backend, frontend, integration, container-release]
+  before_script:
+    - ./scripts/ci-apt git ca-certificates
+  script:
+    - mkdir -p output/release
+    - git archive --format=tar.gz -o output/release/studyroom-source-$CI_COMMIT_SHORT_SHA.tar.gz "$CI_COMMIT_SHA"
+    - sha256sum output/release/*.tar.gz > output/release/SHA256SUMS
+    - printf '{"commit":"%s","pipeline":"%s","tag":"%s"}\n' "$CI_COMMIT_SHA" "$CI_PIPELINE_URL" "${CI_COMMIT_TAG:-}" > output/release/build.json
+  artifacts:
+    name: studyroom-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    paths: [output/release/]
+    expire_in: 90 days
+
+container-release:
+  stage: release-test
+  tags: [amd64-build]
+  image: $STUDYROOM_CI_REGISTRY/docker:28.5.2-cli@sha256:625d9431a9f54c5a2bc90f24f0e1c3d55b1349fd857dd85035f98c2c9acbdd4d
+  needs: [backend, frontend, integration]
+  services:
+    - name: $STUDYROOM_CI_REGISTRY/docker:28.5.2-dind@sha256:2a232a42256f70d78e3cc5d2b5d6b3276710a0de0596c145f627ecfae90282ac
+      alias: docker
+      command: ["--registry-mirror=https://docker.m.daocloud.io"]
+      variables:
+        HEALTHCHECK_TCP_PORT: '2376'
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID
+    DOCKER_CERT_PATH: $CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID/client
+    DOCKER_TLS_VERIFY: '1'
+  resource_group: studyroom-container-test
+  interruptible: false
+  environment:
+    name: test/container-$CI_PIPELINE_ID
+    action: start
+    auto_stop_in: 1 day
+  before_script:
+    - apk add --no-cache python3 git
+  script:
+    - python3 scripts/ci-release.py
+  artifacts:
+    when: always
+    paths: [output/container-release/, output/browser/]
+    reports:
+      junit: output/browser/junit.xml
+    expire_in: 90 days

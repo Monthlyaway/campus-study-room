@@ -1,0 +1,95 @@
+{
+  "formatVersion": 2,
+  "result": "passed",
+  "createdAt": "2026-10-22T13:27:50.261807+00:00",
+  "fromCommit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "toCommit": "6c9c47359404d9083ae67dad003ea7feb92d4544",
+  "fromManifestSha256": "3b061c8343fca5cbd8b2d535e24399a503b2296bc9b499b4d860efacfd01a5ed",
+  "toManifestSha256": "b2ab306d62a0875c3c09c1a96fe22d996a43433abaabe7f40726ad27a8cb8df5",
+  "fromImages": {
+    "core": "sha256:80ff361cecb0e936e76b0e2a7315ff6206353f291c5ec4af4fd9d5885a045f3f",
+    "repair": "sha256:6fdbf7bbc48ee908bccc9ca6986f00dbd859a58b5d0b5f750e866399986d485b",
+    "web": "sha256:266ecde205f29a71998d0691c725e0c9b4d11509fac325d2701c8253cf16f560"
+  },
+  "toImages": {
+    "core": "sha256:1d459c7f8f90ad4d283556fb128936d8bb6a27f99adce25fce1075210962acb9",
+    "repair": "sha256:50be670f04a2fadcf9682da421a16472a695a34fc2f7c2ed5b14e549b32b7e11",
+    "web": "sha256:c9b375f25380504115eee32d4d8d3a7349fde837df3111870f154ee910f08f06"
+  },
+  "database": {
+    "postgresVersion": "180006",
+    "migrations": [
+      {
+        "schema": "core",
+        "installed_rank": 1,
+        "version": "20261022000100",
+        "description": "core schema",
+        "type": "SQL",
+        "script": "V20261022000100__core_schema.sql",
+        "checksum": -2040106863,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 2,
+        "version": "20261022130000",
+        "description": "self role scope",
+        "type": "SQL",
+        "script": "V20261022130000__self_role_scope.sql",
+        "checksum": -892298813,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 3,
+        "version": "20261022143000",
+        "description": "reservation history index",
+        "type": "SQL",
+        "script": "V20261022143000__reservation_history_index.sql",
+        "checksum": 1340263816,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 4,
+        "version": "20261022150000",
+        "description": "reservation operator note",
+        "type": "SQL",
+        "script": "V20261022150000__reservation_operator_note.sql",
+        "checksum": 383066205,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 1,
+        "version": "20261022120000",
+        "description": "repair domain",
+        "type": "SQL",
+        "script": "V20261022120000__repair_domain.sql",
+        "checksum": 662384302,
+        "success": true
+      },
+      {
+        "schema": "session",
+        "installed_rank": 1,
+        "version": "20261022000000",
+        "description": "spring session",
+        "type": "SQL",
+        "script": "V20261022000000__spring_session.sql",
+        "checksum": -174758120,
+        "success": true
+      }
+    ]
+  },
+  "databaseSha256": "6efca332072363810892bc3e4b8f5d25cc8312c4fef794fa032dcad08aa5bbe2",
+  "sandboxProject": "studyroom-compat-release",
+  "checks": {
+    "threeImageIds": true,
+    "threeVersions": true,
+    "oldSessionCore": true,
+    "oldSessionRepair": true,
+    "businessData": true,
+    "oldVersionWrite": true,
+    "expandedColumnPreserved": true
+  }
+}
