@@ -2,7 +2,18 @@
 
 响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
-**当前状态：正在实现与集成验收。** 不将尚未验证的功能或正式服务器部署标记为完成。进展与证据见 [docs/progress.md](docs/progress.md)。
+**当前状态：R3 本机发布验收收尾，整体尚未完成。** R3 的浏览器6流程、应用回退、完整性能和真实 core/repair 重启恢复已通过；GitLab 最终流水线、main 合并及发版归档仍在执行。R3 离线包实际导入及独立只读核对通过：五镜像、三版本、源码、原密钥和业务数据保持一致。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
+
+**R4 正在准备，尚未构建或验收。** 下一版将把 CI runner 兼容修正和验收工具修正一并纳入离线源码；业务代码与 R3 相同。当前入口与下述成功证据仍属于 R3，不提前作为 R4 的验收结果。
+
+## 本机当前 R3 入口
+
+- 应用：[http://localhost:19282](http://localhost:19282)
+- Mailpit：[http://localhost:19227](http://localhost:19227)
+- 发布号：`r-20261022T161900-3c7a93c`；完整源码：`3c7a93cae56e68d2a96adb1e022f4fffc8112c5e`
+- 状态目录：`.local/portable-install/`；随机演示密码：`.local/portable-install/secrets/demo_password`（只存在本机，权限0600）
+
+这是当前 R3 验收实例；下述源码安装默认使用18080，既有18082测试实例与8000开发实例不代表R3。[R3前端证据](docs/evidence/frontend-release.md)记录6/6通过、真实隐私反证，以及另行标明版本的跨升级午夜签到。
 
 ## 本地安装入口
 
@@ -14,7 +25,7 @@ cd campus-study-room
 ./install.sh local
 ```
 
-该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。默认 local 端口如下；本次 test 实例使用应用 `18082`、邮件 `18027`。
+该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。以下是新建源码安装的默认 local 端口；请与上方现有 R3 验收实例区分。
 
 - 应用：`http://localhost:18080`
 - 本地邮件收件箱：`http://localhost:18025`
@@ -69,7 +80,7 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 ./scripts/export-release .local/releases/RELEASE_ID/manifest.json
 ```
 
-发布构建要求干净且已提交的 checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。发布脚本与兼容恢复流程正在集成验收，实际可用范围见进度记录。
+发布构建要求干净且已提交的 checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。R3→B的兼容演练及正式回退已通过：保留原2个会话、3类业务记录及扩展schema，没有数据库降级。本机 `.local/releases/` 保留A、B、R3三份发布清单；R3的五镜像离线包位于 `.local/releases/r-20261022T161900-3c7a93c/portable/`，含三应用、PostgreSQL和Mailpit、指定提交源码及校验和。该包为linux/arm64，AMD64服务器需要对应平台构建。最终发布状态仍以进度记录及实际验收证据为准。
 
 ## 文档
 

@@ -1,0 +1,158 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-22T16:24:28.830859+00:00",
+  "result": "passed",
+  "sourceCommit": "d5b4f8423f088bae939310b408a721ab48fd7589",
+  "releaseCandidateCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "scope": {
+    "currentTrackedPaths": 387,
+    "history": "first-parent lineage from prior audit checkpoint through sourceCommit, inclusive",
+    "historyStartCommit": "8b8a3d345263f0529a569aab4fa18b8605fca176",
+    "historyCommits": [
+      "d5b4f8423f088bae939310b408a721ab48fd7589",
+      "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+      "6f78968940f2a03d648a21450414d025064922ab",
+      "a5695c36a0d4bed39c88c19d0a999eefc1fd36ee",
+      "e70b9174bbd1003c24d881efee8524010282bfe3",
+      "3350d5b4716185eb23379df6d177789a2751d46d",
+      "247b02db971a181b70aee1322c3d13cd8197b3d8",
+      "8b8a3d345263f0529a569aab4fa18b8605fca176"
+    ],
+    "historyCommitCount": 8,
+    "historyUniqueBlobs": 404,
+    "negativeGateBranchIncluded": false,
+    "runtimeReportsIncluded": false,
+    "privateDataIncludedAsScanTargets": false,
+    "privateDataUsedOnlyAsInMemoryNeedles": true,
+    "filesWritten": [
+      "docs/evidence/final-source-audit.json",
+      "docs/evidence/final-source-audit.md"
+    ]
+  },
+  "method": {
+    "privateSourceFileCount": 51,
+    "privateSourceCategories": [
+      "runtime secrets files",
+      "isolated check credentials",
+      "private compatibility session fixtures",
+      "private browser storage-state cookies",
+      "private daily check-in code",
+      "private fault-test secret needles"
+    ],
+    "knownUniqueValuesIncludingTextDecoding": 140,
+    "uniqueEncodedVariants": 563,
+    "encodings": [
+      "raw UTF-8",
+      "Base64 standard and URL-safe, padded and unpadded",
+      "lowercase and uppercase hexadecimal",
+      "URL percent encoding and form encoding",
+      "JSON string escaping",
+      "HTML escaping"
+    ],
+    "currentFiles": "raw bytes of tracked files; symlink targets inspected as text without following links",
+    "historyFiles": "raw bytes of every unique blob from the listed first-parent commit trees",
+    "secretValuesPersisted": false,
+    "secretValueDigestsPersisted": false
+  },
+  "currentTrackedSource": {
+    "secretMatches": [],
+    "legacyNamePaths": [],
+    "legacyNameText": [],
+    "integrityTokenExceptions": [
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 2105,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 3044,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 4299,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged"
+      }
+    ],
+    "temporaryDownloadProxyMatches": []
+  },
+  "recentHistory": {
+    "secretMatches": [],
+    "legacyNamePaths": [],
+    "legacyNameText": [],
+    "integrityTokenExceptions": [
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 2105,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged",
+        "blob": "b421e5c540140bce5c977fe57305f9fcbe855c0a",
+        "commits": [
+          "247b02db971a181b70aee1322c3d13cd8197b3d8",
+          "3350d5b4716185eb23379df6d177789a2751d46d",
+          "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+          "6f78968940f2a03d648a21450414d025064922ab",
+          "8b8a3d345263f0529a569aab4fa18b8605fca176",
+          "a5695c36a0d4bed39c88c19d0a999eefc1fd36ee",
+          "d5b4f8423f088bae939310b408a721ab48fd7589",
+          "e70b9174bbd1003c24d881efee8524010282bfe3"
+        ]
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 3044,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged",
+        "blob": "b421e5c540140bce5c977fe57305f9fcbe855c0a",
+        "commits": [
+          "247b02db971a181b70aee1322c3d13cd8197b3d8",
+          "3350d5b4716185eb23379df6d177789a2751d46d",
+          "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+          "6f78968940f2a03d648a21450414d025064922ab",
+          "8b8a3d345263f0529a569aab4fa18b8605fca176",
+          "a5695c36a0d4bed39c88c19d0a999eefc1fd36ee",
+          "d5b4f8423f088bae939310b408a721ab48fd7589",
+          "e70b9174bbd1003c24d881efee8524010282bfe3"
+        ]
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 4299,
+        "occurrences": 1,
+        "reason": "random dependency integrity token; value unchanged",
+        "blob": "b421e5c540140bce5c977fe57305f9fcbe855c0a",
+        "commits": [
+          "247b02db971a181b70aee1322c3d13cd8197b3d8",
+          "3350d5b4716185eb23379df6d177789a2751d46d",
+          "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+          "6f78968940f2a03d648a21450414d025064922ab",
+          "8b8a3d345263f0529a569aab4fa18b8605fca176",
+          "a5695c36a0d4bed39c88c19d0a999eefc1fd36ee",
+          "d5b4f8423f088bae939310b408a721ab48fd7589",
+          "e70b9174bbd1003c24d881efee8524010282bfe3"
+        ]
+      }
+    ],
+    "temporaryDownloadProxyMatches": []
+  },
+  "candidateConsistency": {
+    "workingTreeMatchesSourceCommit": true,
+    "productionSourcesMatchReleaseCandidate": true,
+    "productionDifferencePaths": [],
+    "postCandidateDocumentationAndTestPaths": [
+      "docs/evidence/repair-timestamp-precision.json",
+      "docs/evidence/repair-timestamp-precision.md",
+      "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java"
+    ]
+  },
+  "limitations": [
+    "This is a bounded exact-match scan against known credentials and session fixtures, not proof that every possible secret is absent.",
+    "Growing runtime logs, browser reports and later commits are outside this snapshot and require their final artifact gate.",
+    "Intentional negative-gate branch and unrelated projects were not read.",
+    "Dependency integrity-token exceptions are random hash content; no lockfile or digest was edited."
+  ]
+}

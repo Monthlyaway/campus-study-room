@@ -1,0 +1,23 @@
+{
+  "releaseId": "r-20261022T161900-3c7a93c",
+  "releaseCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "manifestSource": ".local/releases/r-20261022T161900-3c7a93c/manifest.json",
+  "manifest": {
+    "bytes": 1934,
+    "sha256": "2d334c604de51bc3a65c4d4d4715966420c0adf87c77d63a023b8f31fefcc03f"
+  },
+  "observedImages": {
+    "core": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+    "repair": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+    "web": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d"
+  },
+  "manifestImages": {
+    "core": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+    "repair": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+    "web": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d"
+  },
+  "allImageIdsMatch": true,
+  "collectorCheckoutCommit": "d5b4f8423f088bae939310b408a721ab48fd7589",
+  "note": "Collector checkout commit is not the running image source; releaseCommit and manifest image IDs bind this measurement.",
+  "manifestCanonicalSha256": "24d348c8f8a16d15cd84cc7065a659d23a6cb60ed63394bcfe1d625e99e419b7"
+}
