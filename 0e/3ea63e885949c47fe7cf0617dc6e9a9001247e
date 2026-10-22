@@ -1,0 +1,125 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "0e3ea63e885949c47fe7cf0617dc6e9a9001247e",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/repair-acceptance.md",
+      "additions": {
+        "human": 75
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-acceptance/deadline-result.json",
+      "additions": {
+        "human": 60
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-acceptance/http-result.json",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-acceptance/smtp-result.json",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "new_path": "scripts/ci_reports.py",
+      "additions": {
+        "human": 19
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CoreSmtpAcceptanceTest.java",
+      "additions": {
+        "human": 382
+      }
+    },
+    {
+      "new_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java",
+      "additions": {
+        "human": 261
+      }
+    },
+    {
+      "new_path": "tests/integration/repair_acceptance_http.py",
+      "additions": {
+        "human": 288
+      }
+    },
+    {
+      "new_path": "tests/integration/run_repair_acceptance.py",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "tests/integration/run_repair_deadlines.py",
+      "additions": {
+        "human": 82
+      }
+    },
+    {
+      "new_path": "tests/integration/run_smtp_acceptance.py",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "tests/ops/test_ci_reports.py",
+      "additions": {
+        "human": 39
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/repair.md",
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 38
+      },
+      "deletions": {
+        "human": 35
+      }
+    },
+    {
+      "old_path": "scripts/ci-integration.py",
+      "new_path": "scripts/ci-integration.py",
+      "additions": {
+        "human": 39
+      },
+      "deletions": {
+        "human": 8
+      }
+    }
+  ]
+}
