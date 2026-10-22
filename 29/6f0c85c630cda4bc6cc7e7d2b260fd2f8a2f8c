@@ -1,0 +1,127 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "296f0c85c630cda4bc6cc7e7d2b260fd2f8a2f8c",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "old_path": "apps/web/src/pages/Reservations.tsx",
+      "new_path": "apps/web/src/pages/Reservations.tsx",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/reservations.ts",
+      "new_path": "apps/web/src/services/generated/core/api/reservations.ts",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "new_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "contracts/openapi/core.yaml",
+      "new_path": "contracts/openapi/core.yaml",
+      "additions": {
+        "human": 36
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/evidence/core/acceptance.md",
+      "new_path": "docs/evidence/core/acceptance.md",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "docs/evidence/core/browser-review.md",
+      "new_path": "docs/evidence/core/browser-review.md",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/test/java/com/campus/studyroom/core/CorePersistenceTest.java",
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CorePersistenceTest.java",
+      "additions": {
+        "human": 57
+      }
+    },
+    {
+      "old_path": "tests/integration/core_http.py",
+      "new_path": "tests/integration/core_http.py",
+      "additions": {
+        "human": 51
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
