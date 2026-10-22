@@ -386,13 +386,17 @@ export default function Repairs() {
                     label: "上报时间",
                     children: dateTime(r.submittedAt),
                   },
-                  {
-                    key: "due",
-                    label: "处理截止",
-                    children: dateTime(
-                      r.acceptDueAt || r.workDueAt || r.assignDueAt
-                    ),
-                  },
+                  ...(["CLOSED", "CANCELLED"].includes(r.status || "")
+                    ? []
+                    : [
+                        {
+                          key: "due",
+                          label: "处理截止",
+                          children: dateTime(
+                            r.acceptDueAt || r.workDueAt || r.assignDueAt
+                          ),
+                        },
+                      ]),
                   {
                     key: "worker",
                     label: "维修人员",

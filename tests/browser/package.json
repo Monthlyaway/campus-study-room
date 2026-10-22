@@ -1,0 +1,14 @@
+{
+  "name": "@campus-study-room/browser-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "list": "playwright test --list",
+    "install:browser": "playwright install chromium"
+  },
+  "devDependencies": { "@playwright/test": "1.64.1" }
+}
