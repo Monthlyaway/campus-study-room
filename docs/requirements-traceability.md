@@ -124,6 +124,8 @@
 
 P1 `REQ-AGENT-01` 未启动，不计入以上39项，也不用于替代P0验收。
 
+ENG-05补充证据：`098d8a2`的精确受保护分支工作流与专用ARM64标签经本地122项运维回归及[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)通过，实际模拟保留五个阻断job。隔离VM与本地DinD/TLS已验证，Runner注册及启用仍待用户确认持续执行权限；真实完整pipeline、MR最新SHA、main自动部署与最终tag仍未完成。以上不改变39项需求状态，不将配置模拟计作完整发布成功。
+
 [auth]: ../services/core-service/src/main/java/com/campus/studyroom/core/AuthController.java
 [security]: ../services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java
 [admin]: ../services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java
