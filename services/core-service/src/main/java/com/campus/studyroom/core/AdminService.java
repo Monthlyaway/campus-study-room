@@ -1,29 +1,87 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.*;
+import com.campus.studyroom.core.persistence.*;
+import jakarta.persistence.*;
 import java.time.*;
 import java.util.*;
+import java.util.function.Function;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminService {
-  final Store db;
+  final AccountRepository accounts;
+  final DepartmentRepository departments;
+  final CampusRepository campuses;
+  final BuildingRepository buildings;
+  final RoomRepository rooms;
+  final SeatRepository seats;
+  final OpeningRuleRepository openings;
+  final RoleRepository roles;
+  final PermissionRepository permissions;
+  final UserRoleRepository userRoles;
+  final RoleScopeRepository scopes;
+  final RolePermissionRepository rolePermissions;
+  final BookingGuardRepository guards;
+  final SystemConfigRepository configs;
+  final ConfigRevisionRepository revisions;
+  final AdministrationResourceRepository claims;
+  final AdministrationLocks locks;
   final AccessService access;
   final ResourceService resource;
   final Events events;
   final PasswordEncoder encoder;
   final Clock clock;
+  @PersistenceContext EntityManager em;
 
   public AdminService(
-      Store d, AccessService a, ResourceService r, Events e, PasswordEncoder p, Clock c) {
-    db = d;
-    access = a;
-    resource = r;
-    events = e;
-    encoder = p;
-    clock = c;
+      AccountRepository accounts,
+      DepartmentRepository departments,
+      CampusRepository campuses,
+      BuildingRepository buildings,
+      RoomRepository rooms,
+      SeatRepository seats,
+      OpeningRuleRepository openings,
+      RoleRepository roles,
+      PermissionRepository permissions,
+      UserRoleRepository userRoles,
+      RoleScopeRepository scopes,
+      RolePermissionRepository rolePermissions,
+      BookingGuardRepository guards,
+      SystemConfigRepository configs,
+      ConfigRevisionRepository revisions,
+      AdministrationResourceRepository claims,
+      AdministrationLocks locks,
+      AccessService access,
+      ResourceService resource,
+      Events events,
+      PasswordEncoder encoder,
+      Clock clock) {
+    this.accounts = accounts;
+    this.departments = departments;
+    this.campuses = campuses;
+    this.buildings = buildings;
+    this.rooms = rooms;
+    this.seats = seats;
+    this.openings = openings;
+    this.roles = roles;
+    this.permissions = permissions;
+    this.userRoles = userRoles;
+    this.scopes = scopes;
+    this.rolePermissions = rolePermissions;
+    this.guards = guards;
+    this.configs = configs;
+    this.revisions = revisions;
+    this.claims = claims;
+    this.locks = locks;
+    this.access = access;
+    this.resource = resource;
+    this.events = events;
+    this.encoder = encoder;
+    this.clock = clock;
   }
 
   static final Map<String, String> TABLE =
@@ -38,213 +96,295 @@ public class AdminService {
           "room",
           "seats",
           "seat");
+  static final Map<String, Class<?>> ENTITY =
+      Map.of(
+          "departments",
+          DepartmentEntity.class,
+          "campuses",
+          CampusEntity.class,
+          "buildings",
+          BuildingEntity.class,
+          "rooms",
+          Room.class,
+          "seats",
+          SeatEntity.class);
+  static final List<String> VISIBLE_PERMISSIONS =
+      List.of(
+          "room:manage", "repair:read_scope", "room_application:review_space", "statistics:read");
+
+  static Pageable pageable(int page, int size, String sort) {
+    if (page < 1 || size < 1 || size > 100)
+      throw new ApiException(400, "INVALID_PAGE", "页码从1开始，每页1至100条");
+    return PageRequest.of(page - 1, size, Sort.by(sort));
+  }
+
+  static <T> PageData<Map<String, Object>> page(Page<T> p, Function<T, Map<String, Object>> map) {
+    return new PageData<>(
+        p.getContent().stream().map(map).toList(),
+        p.getNumber() + 1,
+        p.getSize(),
+        p.getTotalElements());
+  }
+
+  static UUID optionalId(Object value) {
+    return value == null ? null : Store.id(value);
+  }
+
+  static void version(long version, Object expected) {
+    DomainPolicy.version(Map.of("version", version), expected);
+  }
+
+  static String kind(String kind) {
+    if (!TABLE.containsKey(kind)) throw ApiException.notFound();
+    return kind;
+  }
 
   @Transactional(readOnly = true)
   public Object masters(UUID u, String kind, Map<String, String> q, int page, int size) {
-    String table = TABLE.get(kind);
-    if (table == null) throw ApiException.notFound();
-    if (kind.equals("seats"))
-      return Pages.of(
-          db.list(
-              "select * from core.seat where room_id=?1 order by code", Store.id(q.get("roomId"))),
-          page,
-          size);
-    String sql =
-        kind.equals("rooms")
-            ? "select r.*,b.name building_name,c.name campus_name,(select count(*) from core.seat s"
-                  + " where s.room_id=r.id and s.enabled) seat_count from core.room r join"
-                  + " core.building b on b.id=r.building_id join core.campus c on c.id=b.campus_id"
-                  + " order by r.code"
-            : "select * from core." + table + " order by code";
-    var rows = db.list(sql);
-    if (kind.equals("rooms"))
-      rows =
-          rows.stream()
-              .filter(r -> visibleRoom(u, Store.id(r.get("id"))))
-              .filter(
-                  r ->
-                      !q.containsKey("buildingId")
-                          || q.get("buildingId").equals(r.get("buildingId")))
-              .toList();
-    if (kind.equals("buildings") && q.containsKey("campusId"))
-      rows = rows.stream().filter(r -> q.get("campusId").equals(r.get("campusId"))).toList();
-    return Pages.of(rows, page, size);
+    kind(kind);
+    var p = pageable(page, size, "code");
+    return switch (kind) {
+      case "departments" -> page(departments.findAll(p), AdminViews::master);
+      case "campuses" -> page(campuses.findAll(p), AdminViews::master);
+      case "buildings" ->
+          page(
+              buildings.findAll(
+                  (root, query, cb) ->
+                      q.containsKey("campusId")
+                          ? cb.equal(root.get("campusId"), Store.id(q.get("campusId")))
+                          : cb.conjunction(),
+                  p),
+              AdminViews::master);
+      case "rooms" ->
+          page(
+              rooms.visible(
+                  u,
+                  accounts.findById(u).orElseThrow(ApiException::notFound).departmentId,
+                  optionalId(q.get("buildingId")),
+                  VISIBLE_PERMISSIONS,
+                  p),
+              this::roomView);
+      case "seats" -> {
+        UUID room = Store.id(q.get("roomId"));
+        if (!visibleRoom(u, room)) throw ApiException.notFound();
+        yield page(seats.findByRoomId(room, p), AdminViews::master);
+      }
+      default -> throw ApiException.notFound();
+    };
   }
 
   boolean visibleRoom(UUID u, UUID room) {
     return access.admissible(u, room)
-        || access.roomScope(u, "room:manage", room)
-        || access.roomScope(u, "repair:read_scope", room)
-        || access.roomScope(u, "room_application:review_space", room)
-        || access.roomScope(u, "statistics:read", room);
+        || VISIBLE_PERMISSIONS.stream().anyMatch(p -> access.roomScope(u, p, room));
+  }
+
+  Map<String, Object> roomView(Room room) {
+    var m = AdminViews.master(room);
+    var b = buildings.findById(room.buildingId).orElseThrow(ApiException::notFound);
+    m.put("buildingName", b.name);
+    m.put("campusName", campuses.findById(b.campusId).orElseThrow(ApiException::notFound).name);
+    m.put("seatCount", seats.countByRoomIdAndEnabledTrue(room.id));
+    return m;
   }
 
   @Transactional(readOnly = true)
   public Object room(UUID u, UUID id) {
     if (!visibleRoom(u, id)) throw ApiException.notFound();
-    var r =
-        db.need(
-            "select r.*,b.name building_name,c.name campus_name from core.room r join core.building"
-                + " b on b.id=r.building_id join core.campus c on c.id=b.campus_id where r.id=?1",
-            id);
-    r.put(
+    var m = roomView(rooms.findById(id).orElseThrow(ApiException::notFound));
+    m.put(
         "openingRules",
-        db.list(
-            "select weekday,start_minute,end_minute from core.opening_rule where room_id=?1 order"
-                + " by weekday,start_minute",
-            id));
-    return r;
+        openings.findByRoomIdOrderByWeekdayAscStartMinuteAsc(id).stream()
+            .map(AdminViews::opening)
+            .toList());
+    return m;
+  }
+
+  UUID masterRoom(String kind, UUID id, Map<String, Object> body) {
+    return kind.equals("rooms")
+        ? id
+        : kind.equals("seats")
+            ? (id == null
+                ? Store.id(body.get("roomId"))
+                : seats.findById(id).orElseThrow(ApiException::notFound).roomId)
+            : null;
   }
 
   void manage(UUID u, String kind, UUID id, Map<String, Object> b) {
+    kind(kind);
     if (kind.equals("rooms") || kind.equals("seats")) {
-      UUID room =
-          kind.equals("rooms")
-              ? id
-              : id == null
-                  ? Store.id(b.get("roomId"))
-                  : Store.id(
-                      db.need("select room_id from core.seat where id=?1", id).get("roomId"));
-      if (room == null) {
-        UUID department = b.get("departmentId") == null ? null : Store.id(b.get("departmentId"));
-        if (!access.scope(u, "room:manage", null, department)) throw ApiException.forbidden();
-      } else if (!access.roomScope(u, "room:manage", room)) throw ApiException.forbidden();
+      UUID room = masterRoom(kind, id, b);
+      if (room == null
+          ? !access.createRoomScope(u, optionalId(b.get("departmentId")))
+          : !access.roomScope(u, "room:manage", room)) throw ApiException.forbidden();
     } else access.require(u, "user:manage");
   }
 
   @Transactional
   public Object createMaster(UUID u, String kind, Map<String, Object> b) {
     manage(u, kind, null, b);
-    String table = TABLE.get(kind);
     UUID id = UUID.randomUUID();
     String code = DomainPolicy.text(b.get("code"), 32);
     String name = kind.equals("seats") ? null : DomainPolicy.text(b.get("name"), 100);
+    Object entity;
     switch (kind) {
-      case "departments", "campuses" ->
-          db.update(
-              "insert into core." + table + "(id,code,name) values(?1,?2,?3)", id, code, name);
-      case "buildings" ->
-          db.update(
-              "insert into core.building(id,campus_id,code,name) values(?1,?2,?3,?4)",
-              id,
-              Store.id(b.get("campusId")),
-              code,
-              name);
-      case "rooms" ->
-          db.update(
-              "insert into core.room(id,building_id,code,name,department_id)"
-                  + " values(?1,?2,?3,?4,?5)",
-              id,
-              Store.id(b.get("buildingId")),
-              code,
-              name,
-              b.get("departmentId") == null ? null : Store.id(b.get("departmentId")));
+      case "departments" -> {
+        var x = new DepartmentEntity();
+        x.id = id;
+        x.code = code;
+        x.name = name;
+        x.createdAt = clock.instant();
+        x.updatedAt = x.createdAt;
+        entity = departments.saveAndFlush(x);
+      }
+      case "campuses" -> {
+        var x = new CampusEntity();
+        x.id = id;
+        x.code = code;
+        x.name = name;
+        entity = campuses.saveAndFlush(x);
+      }
+      case "buildings" -> {
+        var x = new BuildingEntity();
+        x.id = id;
+        x.campusId = Store.id(b.get("campusId"));
+        requireEnabled(parent(CampusEntity.class, x.campusId).enabled);
+        x.code = code;
+        x.name = name;
+        entity = buildings.saveAndFlush(x);
+      }
+      case "rooms" -> {
+        var x = new Room();
+        x.id = id;
+        x.buildingId = Store.id(b.get("buildingId"));
+        requireEnabled(parent(BuildingEntity.class, x.buildingId).enabled);
+        x.departmentId = optionalId(b.get("departmentId"));
+        if (x.departmentId != null)
+          requireEnabled(parent(DepartmentEntity.class, x.departmentId).enabled);
+        x.code = code;
+        x.name = name;
+        x.enabled = true;
+        entity = rooms.saveAndFlush(x);
+      }
       case "seats" -> {
-        UUID room = Store.id(b.get("roomId"));
-        resource.lock(room);
-        db.update(
-            "insert into core.seat(id,room_id,code,has_power) values(?1,?2,?3,?4)",
-            id,
-            room,
-            code,
-            Boolean.TRUE.equals(b.get("hasPower")));
+        var x = new SeatEntity();
+        x.id = id;
+        x.roomId = Store.id(b.get("roomId"));
+        requireEnabled(resource.lock(x.roomId).enabled);
+        x.code = code;
+        x.hasPower = bool(b, "hasPower", false);
+        entity = seats.saveAndFlush(x);
       }
       default -> throw ApiException.notFound();
     }
     events.audit(
         u,
         "MASTER_CREATED",
-        table,
+        TABLE.get(kind),
         id,
         kind.equals("rooms") ? id : null,
         null,
         Map.of("code", code));
-    return db.need("select * from core." + table + " where id=?1", id);
+    return AdminViews.master(entity);
+  }
+
+  <T> T parent(Class<T> type, UUID id) {
+    T parent = em.find(type, id, LockModeType.PESSIMISTIC_WRITE);
+    if (parent == null) throw ApiException.notFound();
+    return parent;
+  }
+
+  static void requireEnabled(boolean enabled) {
+    if (!enabled) throw new ApiException(422, "RESOURCE_DISABLED", "所属资源已停用");
+  }
+
+  static boolean bool(Map<String, Object> b, String key, boolean fallback) {
+    if (!b.containsKey(key)) return fallback;
+    if (!(b.get(key) instanceof Boolean v))
+      throw new ApiException(422, "INVALID_BOOLEAN", "状态必须为布尔值");
+    return v;
   }
 
   @Transactional
   public Object updateMaster(UUID u, String kind, UUID id, Map<String, Object> b) {
     manage(u, kind, id, b);
-    String table = TABLE.get(kind);
-    UUID room =
-        kind.equals("rooms")
-            ? id
-            : kind.equals("seats")
-                ? Store.id(db.need("select room_id from core.seat where id=?1", id).get("roomId"))
-                : null;
+    UUID room = masterRoom(kind, id, b);
     if (room != null) resource.lock(room);
-    var old = db.need("select * from core." + table + " where id=?1 for update", id);
-    DomainPolicy.version(old, b.get("expectedVersion"));
+    Object old = em.find(ENTITY.get(kind), id, LockModeType.PESSIMISTIC_WRITE);
+    if (old == null) throw ApiException.notFound();
+    version(((Number) AdminViews.master(old).get("version")).longValue(), b.get("expectedVersion"));
     if (b.containsKey("departmentId")
         || b.containsKey("roomId")
         || b.containsKey("buildingId")
         || b.containsKey("campusId"))
       throw new ApiException(422, "IMMUTABLE_RELATION", "资源归属不能直接修改");
     if (Boolean.FALSE.equals(b.get("enabled"))) {
-      if (room != null
-          && db.count(
-                  "select count(*) from core.resource_claim where room_id=?1 and released_at is"
-                      + " null and (end_at is null or end_at>?2) and (cast(?3 as uuid) is null or"
-                      + " seat_id is null or seat_id=?3)",
-                  room,
-                  clock.instant(),
-                  kind.equals("seats") ? id : null)
-              > 0) throw ApiException.conflict("RESOURCE_IN_USE", "存在有效占用，不能停用");
-      String referenced =
+      if (room != null && claims.inUse(room, kind.equals("seats") ? id : null, clock.instant()))
+        throw ApiException.conflict("RESOURCE_IN_USE", "存在有效占用，不能停用");
+      boolean referenced =
           switch (kind) {
             case "departments" ->
-                "select (select count(*) from core.app_user where department_id=?1 and"
-                    + " enabled)+(select count(*) from core.room where department_id=?1 and"
-                    + " enabled)";
-            case "campuses" -> "select count(*) from core.building where campus_id=?1 and enabled";
-            case "buildings" -> "select count(*) from core.room where building_id=?1 and enabled";
-            default -> null;
+                accounts.existsByDepartmentIdAndEnabledTrue(id)
+                    || rooms.existsByDepartmentIdAndEnabledTrue(id);
+            case "campuses" -> buildings.existsByCampusIdAndEnabledTrue(id);
+            case "buildings" -> rooms.existsByBuildingIdAndEnabledTrue(id);
+            default -> false;
           };
-      if (referenced != null && db.count(referenced, id) > 0)
-        throw ApiException.conflict("RESOURCE_IN_USE", "仍有启用数据引用此资源");
+      if (referenced) throw ApiException.conflict("RESOURCE_IN_USE", "仍有启用数据引用此资源");
     }
-    if (b.containsKey("name") && !kind.equals("seats"))
-      db.update(
-          "update core." + table + " set name=?1 where id=?2",
-          DomainPolicy.text(b.get("name"), 100),
-          id);
-    if (b.containsKey("enabled"))
-      db.update("update core." + table + " set enabled=?1 where id=?2", b.get("enabled"), id);
-    if (kind.equals("seats") && b.containsKey("hasPower"))
-      db.update("update core.seat set has_power=?1 where id=?2", b.get("hasPower"), id);
-    db.update("update core." + table + " set version=version+1 where id=?1", id);
+    String name =
+        b.containsKey("name") && !kind.equals("seats")
+            ? DomainPolicy.text(b.get("name"), 100)
+            : null;
+    if (old instanceof DepartmentEntity x) {
+      if (name != null) x.name = name;
+      x.enabled = bool(b, "enabled", x.enabled);
+      x.updatedAt = clock.instant();
+    }
+    if (old instanceof CampusEntity x) {
+      if (name != null) x.name = name;
+      x.enabled = bool(b, "enabled", x.enabled);
+    }
+    if (old instanceof BuildingEntity x) {
+      if (name != null) x.name = name;
+      x.enabled = bool(b, "enabled", x.enabled);
+    }
+    if (old instanceof Room x) {
+      if (name != null) x.name = name;
+      x.enabled = bool(b, "enabled", x.enabled);
+    }
+    if (old instanceof SeatEntity x) {
+      x.enabled = bool(b, "enabled", x.enabled);
+      x.hasPower = bool(b, "hasPower", x.hasPower);
+    }
+    em.flush();
+    var result = AdminViews.master(old);
     events.audit(
         u,
         "MASTER_UPDATED",
-        table,
+        TABLE.get(kind),
         id,
         room,
         null,
-        Map.of("version", Store.number(old, "version") + 1));
-    db.clear();
-    return db.need("select * from core." + table + " where id=?1", id);
+        Map.of("version", result.get("version")));
+    return result;
   }
 
   @Transactional
   public Object opening(UUID u, UUID room, Map<String, Object> b) {
     manage(u, "rooms", room, b);
-    resource.lock(room);
-    var r = db.need("select * from core.room where id=?1", room);
-    DomainPolicy.version(r, b.get("expectedVersion"));
-    if (db.count(
-            "select count(*) from core.resource_claim where room_id=?1 and released_at is null and"
-                + " (end_at is null or end_at>?2)",
-            room,
-            clock.instant())
-        > 0) throw ApiException.conflict("RESOURCE_IN_USE", "存在有效占用，不能修改开放时间");
-    if (!(b.get("rules") instanceof List<?> rules))
+    var r = resource.lock(room);
+    version(r.version, b.get("expectedVersion"));
+    if (claims.inUse(room, null, clock.instant()))
+      throw ApiException.conflict("RESOURCE_IN_USE", "存在有效占用，不能修改开放时间");
+    if (!(b.get("rules") instanceof List<?> list))
       throw new ApiException(422, "INVALID_RULES", "请提供一周开放时间");
-    List<int[]> ranges = new ArrayList<>();
-    for (Object x : rules) {
-      var rule = (Map<?, ?>) x;
-      int day = ((Number) rule.get("weekday")).intValue(),
-          start = ((Number) rule.get("startMinute")).intValue(),
-          end = ((Number) rule.get("endMinute")).intValue();
+    List<OpeningRuleEntity> ranges = new ArrayList<>();
+    for (Object item : list) {
+      if (!(item instanceof Map<?, ?> rule))
+        throw new ApiException(422, "INVALID_RULES", "开放时间格式不正确");
+      int day = integer(rule.get("weekday"), "INVALID_RULES"),
+          start = integer(rule.get("startMinute"), "INVALID_RULES"),
+          end = integer(rule.get("endMinute"), "INVALID_RULES");
       if (day < 1
           || day > 7
           || start < 0
@@ -252,48 +392,74 @@ public class AdminService {
           || start >= end
           || start % 60 != 0
           || end % 60 != 0
-          || ranges.stream().anyMatch(a -> a[0] == day && a[1] < end && a[2] > start))
+          || ranges.stream()
+              .anyMatch(a -> a.weekday == day && a.startMinute < end && a.endMinute > start))
         throw new ApiException(422, "INVALID_RULES", "开放区间必须为整小时且不能重叠");
-      ranges.add(new int[] {day, start, end});
+      var x = new OpeningRuleEntity();
+      x.id = UUID.randomUUID();
+      x.roomId = room;
+      x.weekday = (short) day;
+      x.startMinute = start;
+      x.endMinute = end;
+      ranges.add(x);
     }
-    db.update("delete from core.opening_rule where room_id=?1", room);
-    for (int[] x : ranges)
-      db.update(
-          "insert into core.opening_rule(id,room_id,weekday,start_minute,end_minute)"
-              + " values(?1,?2,?3,?4,?5)",
-          UUID.randomUUID(),
-          room,
-          x[0],
-          x[1],
-          x[2]);
-    db.update("update core.room set version=version+1 where id=?1", room);
+    openings.deleteByRoomId(room);
+    openings.flush();
+    openings.saveAllAndFlush(ranges);
+    locks.changedRelation(r);
     events.audit(u, "OPENING_RULES_UPDATED", "room", room, room, null, b.get("rules"));
-    db.clear();
     return room(u, room);
+  }
+
+  static int integer(Object v, String code) {
+    if (!(v instanceof Number n) || n.doubleValue() != n.intValue())
+      throw new ApiException(422, code, "请输入整数");
+    return n.intValue();
   }
 
   @Transactional(readOnly = true)
   public Object users(UUID u, int page, int size) {
-    access.require(u, "user:manage");
-    var rows =
-        db.list(
-            "select"
-                + " id,username,school_no,display_name,email,department_id,enabled,auth_version,version"
-                + " from core.app_user order by username");
-    for (var x : rows) x.put("roleBindings", bindings(Store.id(x.get("id"))));
-    return Pages.of(rows, page, size);
+    return users(u, "", page, size);
   }
 
-  List<Map<String, Object>> bindings(UUID u) {
-    var bindings = db.list("select id,role_id from core.user_role where user_id=?1", u);
-    for (var b : bindings)
-      b.put(
-          "scopes",
-          db.list(
-              "select scope_type,department_id,room_id from core.user_role_scope where"
-                  + " user_role_id=?1",
-              Store.id(b.get("id"))));
-    return bindings;
+  @Transactional(readOnly = true)
+  public Object users(UUID u, String search, int page, int size) {
+    access.require(u, "user:manage");
+    String needle =
+        Objects.toString(search, "")
+            .trim()
+            .toLowerCase(Locale.ROOT)
+            .replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+    return page(
+        accounts.findAll(
+            (root, query, cb) ->
+                needle.isEmpty()
+                    ? cb.conjunction()
+                    : cb.or(
+                        cb.like(cb.lower(root.get("username")), "%" + needle + "%", '\\'),
+                        cb.like(cb.lower(root.get("displayName")), "%" + needle + "%", '\\')),
+            pageable(page, size, "username")),
+        a -> {
+          var m = AdminViews.user(a, false);
+          m.put("roleBindings", bindings(a.id));
+          return m;
+        });
+  }
+
+  List<Map<String, Object>> bindings(UUID id) {
+    return userRoles.findByUserId(id).stream()
+        .map(
+            b ->
+                AdminViews.map(
+                    "id",
+                    b.id,
+                    "roleId",
+                    b.roleId,
+                    "scopes",
+                    scopes.findByUserRoleId(b.id).stream().map(AdminViews::scope).toList()))
+        .toList();
   }
 
   void password(String p) {
@@ -301,32 +467,6 @@ public class AdminService {
         || p.length() > 64
         || p.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
       throw new ApiException(422, "INVALID_PASSWORD", "密码须12至64字符，UTF-8不超过72字节");
-  }
-
-  @Transactional
-  public Object createUser(UUID u, Map<String, Object> b) {
-    access.require(u, "user:manage");
-    String pw = Objects.toString(b.get("password"), "");
-    password(pw);
-    String email = email(b.get("email")),
-        username = DomainPolicy.text(b.get("username"), 64).toLowerCase(Locale.ROOT);
-    UUID id = UUID.randomUUID();
-    db.update(
-        "insert into"
-            + " core.app_user(id,username,school_no,display_name,password_hash,email,department_id)"
-            + " values(?1,?2,?3,?4,?5,?6,?7)",
-        id,
-        username,
-        b.get("schoolNo"),
-        DomainPolicy.text(b.get("displayName"), 64),
-        encoder.encode(pw),
-        email,
-        Store.id(b.get("departmentId")));
-    db.update("insert into core.booking_guard(user_id) values(?1)", id);
-    events.audit(u, "USER_CREATED", "user", id, null, null, Map.of("username", username));
-    var r = access.user(id);
-    r.remove("passwordHash");
-    return r;
   }
 
   String email(Object v) {
@@ -337,63 +477,66 @@ public class AdminService {
   }
 
   @Transactional
+  public Object createUser(UUID u, Map<String, Object> b) {
+    access.require(u, "user:manage");
+    String pw = Objects.toString(b.get("password"), "");
+    password(pw);
+    var a = new AccountEntity();
+    a.id = UUID.randomUUID();
+    a.username = DomainPolicy.text(b.get("username"), 64).toLowerCase(Locale.ROOT);
+    a.schoolNo = b.get("schoolNo") == null ? null : DomainPolicy.text(b.get("schoolNo"), 32);
+    a.displayName = DomainPolicy.text(b.get("displayName"), 64);
+    a.email = email(b.get("email"));
+    a.departmentId = Store.id(b.get("departmentId"));
+    requireEnabled(parent(DepartmentEntity.class, a.departmentId).enabled);
+    a.passwordHash = encoder.encode(pw);
+    a.createdAt = clock.instant();
+    a.updatedAt = a.createdAt;
+    a = accounts.saveAndFlush(a);
+    var guard = new BookingGuard();
+    guard.userId = a.id;
+    guards.saveAndFlush(guard);
+    events.audit(u, "USER_CREATED", "user", a.id, null, null, Map.of("username", a.username));
+    return AdminViews.user(a, false);
+  }
+
+  @Transactional
   public Object updateUser(UUID u, UUID id, Map<String, Object> b) {
     access.require(u, "user:manage");
-    db.advisory("admin-membership");
-    var old = db.need("select * from core.app_user where id=?1 for update", id);
-    DomainPolicy.version(old, b.get("expectedVersion"));
+    locks.membership();
+    var a = accounts.lock(id).orElseThrow(ApiException::notFound);
+    version(a.version, b.get("expectedVersion"));
     if (Boolean.FALSE.equals(b.get("enabled"))) lastAdmin(id);
-    if (b.containsKey("email"))
-      db.update("update core.app_user set email=?1 where id=?2", email(b.get("email")), id);
-    if (b.containsKey("displayName"))
-      db.update(
-          "update core.app_user set display_name=?1 where id=?2",
-          DomainPolicy.text(b.get("displayName"), 64),
-          id);
-    if (b.containsKey("departmentId"))
-      db.update(
-          "update core.app_user set department_id=?1 where id=?2",
-          Store.id(b.get("departmentId")),
-          id);
-    if (b.containsKey("enabled"))
-      db.update("update core.app_user set enabled=?1 where id=?2", b.get("enabled"), id);
-    db.update(
-        "update core.app_user set auth_version=auth_version+1,version=version+1,updated_at=?1 where"
-            + " id=?2",
-        clock.instant(),
-        id);
+    if (b.containsKey("email")) a.email = email(b.get("email"));
+    if (b.containsKey("displayName")) a.displayName = DomainPolicy.text(b.get("displayName"), 64);
+    if (b.containsKey("departmentId")) {
+      a.departmentId = Store.id(b.get("departmentId"));
+      requireEnabled(parent(DepartmentEntity.class, a.departmentId).enabled);
+    }
+    a.enabled = bool(b, "enabled", a.enabled);
+    a.authVersion++;
+    a.updatedAt = clock.instant();
+    accounts.flush();
     events.audit(u, "USER_UPDATED", "user", id, null, null, Map.of("changedFields", b.keySet()));
-    var r = access.user(id);
-    r.remove("passwordHash");
-    return r;
+    return AdminViews.user(a, false);
   }
 
   void lastAdmin(UUID id) {
-    if (db.count(
-                "select count(*) from core.user_role ur join core.role r on r.id=ur.role_id where"
-                    + " ur.user_id=?1 and r.code='SYSTEM_ADMIN'",
-                id)
-            > 0
-        && db.count(
-                "select count(distinct u.id) from core.app_user u join core.user_role ur on"
-                    + " ur.user_id=u.id join core.role r on r.id=ur.role_id where u.enabled and"
-                    + " r.code='SYSTEM_ADMIN' and u.id<>?1",
-                id)
-            == 0) throw ApiException.conflict("LAST_SYSTEM_ADMIN", "不能移除最后一个启用的系统管理员");
+    if (userRoles.hasRole(id, "SYSTEM_ADMIN") && accounts.otherEnabledAdministrators(id) == 0)
+      throw ApiException.conflict("LAST_SYSTEM_ADMIN", "不能移除最后一个启用的系统管理员");
   }
 
   @Transactional
   public Object resetPassword(UUID u, UUID id, Map<String, Object> b) {
     access.require(u, "user:manage");
-    var old = db.need("select * from core.app_user where id=?1 for update", id);
-    DomainPolicy.version(old, b.get("expectedVersion"));
+    var a = accounts.lock(id).orElseThrow(ApiException::notFound);
+    version(a.version, b.get("expectedVersion"));
     String pw = Objects.toString(b.get("newPassword"), "");
     password(pw);
-    db.update(
-        "update core.app_user set password_hash=?1,auth_version=auth_version+1,version=version+1"
-            + " where id=?2",
-        encoder.encode(pw),
-        id);
+    a.passwordHash = encoder.encode(pw);
+    a.authVersion++;
+    a.updatedAt = clock.instant();
+    accounts.flush();
     events.audit(u, "PASSWORD_RESET", "user", id, null, null, Map.of());
     return Map.of("updated", true);
   }
@@ -401,72 +544,78 @@ public class AdminService {
   @Transactional(readOnly = true)
   public Object roles(UUID u) {
     access.require(u, "role:manage");
-    var rows = db.list("select * from core.role where enabled order by code");
-    for (var r : rows)
-      r.put(
-          "permissionCodes",
-          db
-              .list(
-                  "select p.code from core.role_permission rp join core.permission p on"
-                      + " p.id=rp.permission_id where rp.role_id=?1",
-                  Store.id(r.get("id")))
-              .stream()
-              .map(p -> p.get("code"))
-              .toList());
-    return Pages.of(rows, 1, 100);
+    return Pages.of(
+        roles.findByEnabledTrueOrderByCode().stream()
+            .map(
+                r -> {
+                  var m = AdminViews.role(r);
+                  m.put("permissionCodes", permissions.codesForRole(r.id));
+                  return m;
+                })
+            .toList(),
+        1,
+        100);
   }
 
   @Transactional
   public Object createRole(UUID u, Map<String, Object> b) {
     access.require(u, "role:manage");
-    UUID id = UUID.randomUUID();
-    db.update(
-        "insert into core.role(id,code,name) values(?1,?2,?3)",
-        id,
-        DomainPolicy.text(b.get("code"), 64),
-        DomainPolicy.text(b.get("name"), 100));
-    events.audit(u, "ROLE_CREATED", "role", id, null, null, Map.of());
-    return db.need("select * from core.role where id=?1", id);
+    var r = new RoleEntity();
+    r.id = UUID.randomUUID();
+    r.code = DomainPolicy.text(b.get("code"), 64);
+    r.name = DomainPolicy.text(b.get("name"), 100);
+    r = roles.saveAndFlush(r);
+    events.audit(u, "ROLE_CREATED", "role", r.id, null, null, Map.of());
+    return AdminViews.role(r);
   }
 
   @Transactional
   public Object rolePermissions(UUID u, UUID id, Map<String, Object> b) {
     access.require(u, "role:manage");
-    var role = db.need("select * from core.role where id=?1 for update", id);
-    DomainPolicy.version(role, b.get("expectedVersion"));
-    List<?> codes = (List<?>) b.get("permissionCodes");
-    if (codes == null) throw new ApiException(422, "INVALID_PERMISSIONS", "权限列表不能为空");
-    if (role.get("code").equals("SYSTEM_ADMIN")
-        && !codes.containsAll(List.of("user:manage", "role:manage")))
+    locks.membership();
+    var r = roles.lock(id).orElseThrow(ApiException::notFound);
+    version(r.version, b.get("expectedVersion"));
+    if (!(b.get("permissionCodes") instanceof List<?> codes))
+      throw new ApiException(422, "INVALID_PERMISSIONS", "权限列表不能为空");
+    if (r.code.equals("SYSTEM_ADMIN") && !codes.containsAll(List.of("user:manage", "role:manage")))
       throw ApiException.conflict("SYSTEM_ROLE_PROTECTED", "系统管理员必须保留账号和权限管理能力");
-    Set<UUID> ids = new HashSet<>();
-    for (Object code : codes) {
-      var p = db.one("select id from core.permission where code=?1", code.toString());
-      if (p == null) throw new ApiException(422, "UNKNOWN_PERMISSION", "只能分配已注册的权限");
-      ids.add(Store.id(p.get("id")));
+    Set<UUID> ids = new LinkedHashSet<>();
+    for (Object code : codes)
+      ids.add(
+          permissions
+              .findByCode(Objects.toString(code))
+              .orElseThrow(() -> new ApiException(422, "UNKNOWN_PERMISSION", "只能分配已注册的权限"))
+              .id);
+    rolePermissions.deleteByRoleId(id);
+    rolePermissions.flush();
+    for (UUID permission : ids) {
+      var rp = new RolePermissionEntity();
+      rp.roleId = id;
+      rp.permissionId = permission;
+      rolePermissions.save(rp);
     }
-    db.update("delete from core.role_permission where role_id=?1", id);
-    for (UUID p : ids)
-      db.update("insert into core.role_permission(role_id,permission_id) values(?1,?2)", id, p);
-    db.update("update core.role set version=version+1 where id=?1", id);
-    db.update(
-        "update core.app_user set auth_version=auth_version+1 where id in(select user_id from"
-            + " core.user_role where role_id=?1)",
-        id);
+    rolePermissions.flush();
+    locks.changedRelation(r);
+    for (var a : accounts.assignedToRole(id)) {
+      a.authVersion++;
+      a.updatedAt = clock.instant();
+    }
+    accounts.flush();
     events.audit(
         u, "ROLE_PERMISSIONS_CHANGED", "role", id, null, null, Map.of("permissionCodes", codes));
-    return db.need("select * from core.role where id=?1", id);
+    return AdminViews.role(r);
   }
 
   @Transactional
   public Object deleteRole(UUID u, UUID id, Map<String, Object> b) {
     access.require(u, "role:manage");
-    var r = db.need("select * from core.role where id=?1 for update", id);
-    DomainPolicy.version(r, b.get("expectedVersion"));
-    if (r.get("code").equals("SYSTEM_ADMIN")
-        || db.count("select count(*) from core.user_role where role_id=?1", id) > 0)
+    locks.membership();
+    var r = roles.lock(id).orElseThrow(ApiException::notFound);
+    version(r.version, b.get("expectedVersion"));
+    if (r.code.equals("SYSTEM_ADMIN") || userRoles.existsByRoleId(id))
       throw ApiException.conflict("ROLE_IN_USE", "此角色仍被关联或为关键角色，不能停用");
-    db.update("update core.role set enabled=false,version=version+1 where id=?1", id);
+    r.enabled = false;
+    roles.flush();
     events.audit(u, "ROLE_DISABLED", "role", id, null, null, Map.of());
     return Map.of("disabled", true);
   }
@@ -474,52 +623,64 @@ public class AdminService {
   @Transactional
   public Object roleBindings(UUID u, UUID id, Map<String, Object> b) {
     access.require(u, "role:manage");
-    db.advisory("admin-membership");
-    var old = db.need("select * from core.app_user where id=?1 for update", id);
-    DomainPolicy.version(old, b.get("expectedVersion"));
-    var bs = (List<?>) b.get("bindings");
-    if (bs == null) throw new ApiException(422, "INVALID_BINDINGS", "请提供角色绑定");
-    Set<UUID> roleIds = new HashSet<>();
+    locks.membership();
+    var a = accounts.lock(id).orElseThrow(ApiException::notFound);
+    version(a.version, b.get("expectedVersion"));
+    if (!(b.get("bindings") instanceof List<?> list))
+      throw new ApiException(422, "INVALID_BINDINGS", "请提供角色绑定");
+    Set<UUID> roleIds = new LinkedHashSet<>();
     boolean keepsAdmin = false;
-    for (Object x : bs) {
-      var bind = (Map<?, ?>) x;
+    List<UserRoleEntity> newBindings = new ArrayList<>();
+    List<RoleScopeEntity> newScopes = new ArrayList<>();
+    for (Object item : list) {
+      if (!(item instanceof Map<?, ?> bind) || !(bind.get("scopes") instanceof List<?> scopeList))
+        throw new ApiException(422, "INVALID_BINDINGS", "请提供角色与授权范围");
       UUID rid = Store.id(bind.get("roleId"));
       if (!roleIds.add(rid)) throw new ApiException(422, "DUPLICATE_ROLE", "角色不能重复");
-      var role = db.need("select * from core.role where id=?1 and enabled", rid);
-      if (role.get("code").equals("STUDENT") && old.get("schoolNo") == null)
+      var r = roles.findById(rid).filter(x -> x.enabled).orElseThrow(ApiException::notFound);
+      if (r.code.equals("STUDENT") && a.schoolNo == null)
         throw new ApiException(422, "SCHOOL_NUMBER_REQUIRED", "学生账号必须有学号");
-      if (role.get("code").equals("SYSTEM_ADMIN")) keepsAdmin = true;
-    }
-    if (!keepsAdmin) lastAdmin(id);
-    db.update("delete from core.user_role where user_id=?1", id);
-    for (Object x : bs) {
-      var bind = (Map<?, ?>) x;
-      UUID bid = UUID.randomUUID();
-      db.update(
-          "insert into core.user_role(id,user_id,role_id) values(?1,?2,?3)",
-          bid,
-          id,
-          Store.id(bind.get("roleId")));
-      for (Object y : (List<?>) bind.get("scopes")) {
-        var s = (Map<?, ?>) y;
-        String type = Objects.toString(s.get("scopeType"));
-        if (!Set.of("ALL", "ROOM", "DEPARTMENT", "SHARED").contains(type))
+      if (r.code.equals("SYSTEM_ADMIN")) keepsAdmin = true;
+      var ur = new UserRoleEntity();
+      ur.id = UUID.randomUUID();
+      ur.userId = id;
+      ur.roleId = rid;
+      newBindings.add(ur);
+      Set<String> seen = new HashSet<>();
+      for (Object scope : scopeList) {
+        if (!(scope instanceof Map<?, ?> s))
           throw new ApiException(422, "INVALID_SCOPE", "授权范围不合法");
-        db.update(
-            "insert into core.user_role_scope(id,user_role_id,scope_type,room_id,department_id)"
-                + " values(?1,?2,?3,?4,?5)",
-            UUID.randomUUID(),
-            bid,
-            type,
-            s.get("roomId") == null ? null : Store.id(s.get("roomId")),
-            s.get("departmentId") == null ? null : Store.id(s.get("departmentId")));
+        var rs = new RoleScopeEntity();
+        rs.id = UUID.randomUUID();
+        rs.userRoleId = ur.id;
+        rs.scopeType = Objects.toString(s.get("scopeType"));
+        rs.roomId = optionalId(s.get("roomId"));
+        rs.departmentId = optionalId(s.get("departmentId"));
+        boolean valid =
+            switch (rs.scopeType) {
+              case "ALL", "SELF", "SHARED" -> rs.roomId == null && rs.departmentId == null;
+              case "ROOM" -> rs.roomId != null && rs.departmentId == null;
+              case "DEPARTMENT" -> rs.departmentId != null && rs.roomId == null;
+              default -> false;
+            };
+        if (!valid || !seen.add(rs.scopeType + ":" + rs.roomId + ":" + rs.departmentId))
+          throw new ApiException(422, "INVALID_SCOPE", "授权范围不合法或重复");
+        if (rs.roomId != null && !rooms.existsById(rs.roomId)) throw ApiException.notFound();
+        if (rs.departmentId != null && !departments.existsById(rs.departmentId))
+          throw ApiException.notFound();
+        newScopes.add(rs);
       }
     }
-    db.update(
-        "update core.app_user set auth_version=auth_version+1,version=version+1 where id=?1", id);
+    if (!keepsAdmin) lastAdmin(id);
+    userRoles.deleteByUserId(id);
+    userRoles.flush();
+    userRoles.saveAllAndFlush(newBindings);
+    scopes.saveAllAndFlush(newScopes);
+    a.authVersion++;
+    a.updatedAt = clock.instant();
+    accounts.flush();
     events.audit(u, "USER_ROLE_BINDINGS_CHANGED", "user", id, null, null, Map.of("roles", roleIds));
-    return Map.of(
-        "id", id, "roleBindings", bindings(id), "version", Store.number(old, "version") + 1);
+    return Map.of("id", id, "roleBindings", bindings(id), "version", a.version);
   }
 
   @Transactional(readOnly = true)
@@ -527,35 +688,37 @@ public class AdminService {
     access.require(u, "config:manage");
     return Map.of(
         "version",
-        db.count("select version from core.config_revision where id=1"),
+        revisions.findById(1).orElseThrow(ApiException::notFound).version,
         "items",
-        db.list("select key,value_json as value,version from core.system_config order by key"));
+        configs.findAll(Sort.by("key")).stream()
+            .map(c -> AdminViews.map("key", c.key, "value", c.value, "version", c.version))
+            .toList());
   }
 
   @Transactional
   public Object configUpdate(UUID u, Map<String, Object> b) {
     access.require(u, "config:manage");
-    var revision = db.need("select * from core.config_revision where id=1 for update");
-    DomainPolicy.version(revision, b.get("expectedVersion"));
-    for (Object x : (List<?>) b.get("changes")) {
-      var c = (Map<?, ?>) x;
+    var revision = revisions.lock().orElseThrow(ApiException::notFound);
+    version(revision.version, b.get("expectedVersion"));
+    if (!(b.get("changes") instanceof List<?> changes) || changes.isEmpty())
+      throw new ApiException(422, "INVALID_CONFIG", "请提供配置修改");
+    Set<String> seen = new HashSet<>();
+    for (Object item : changes) {
+      if (!(item instanceof Map<?, ?> c)) throw new ApiException(422, "INVALID_CONFIG", "配置格式不正确");
       String key = Objects.toString(c.get("key"));
-      Object value = c.get("value");
+      int value = integer(c.get("value"), "INVALID_CONFIG");
       if (!Set.of("M1_MAX_DURATION_HOURS", "M2_MAX_DURATION_HOURS").contains(key)
-          || !(value instanceof Number n)
-          || n.doubleValue() != n.intValue()
-          || n.intValue() < 1
-          || n.intValue() > 12) throw new ApiException(422, "INVALID_CONFIG", "最长时长必须为1至12整数小时");
-      db.update(
-          "update core.system_config set value_json=cast(?1 as"
-              + " jsonb),updated_by=?2,version=version+1,updated_at=?3 where key=?4",
-          value.toString(),
-          u,
-          clock.instant(),
-          key);
+          || value < 1
+          || value > 12
+          || !seen.add(key)) throw new ApiException(422, "INVALID_CONFIG", "最长时长必须为1至12整数小时且键不能重复");
+      var x = configs.findById(key).orElseThrow(ApiException::notFound);
+      x.value = value;
+      x.updatedBy = u;
+      x.updatedAt = clock.instant();
     }
-    db.update("update core.config_revision set version=version+1 where id=1");
-    events.audit(u, "CONFIG_UPDATED", "config", new UUID(0, 1), null, null, b.get("changes"));
+    configs.flush();
+    locks.changedRelation(revision);
+    events.audit(u, "CONFIG_UPDATED", "config", new UUID(0, 1), null, null, changes);
     return config(u);
   }
 }

@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.ApiException;
+import com.campus.studyroom.core.persistence.*;
 import com.campus.studyroom.security.SessionPrincipal;
 import java.time.*;
 import java.util.*;
@@ -10,105 +11,96 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class AccessService {
-  final Store db;
+  final AccountRepository accounts;
+  final UserRoleRepository bindings;
+  final RoleScopeRepository scopes;
+  final RoomRepository rooms;
+  final SystemConfigRepository configs;
   final Clock clock;
 
-  public AccessService(Store db, Clock clock) {
-    this.db = db;
+  public AccessService(
+      AccountRepository accounts,
+      UserRoleRepository bindings,
+      RoleScopeRepository scopes,
+      RoomRepository rooms,
+      SystemConfigRepository configs,
+      Clock clock) {
+    this.accounts = accounts;
+    this.bindings = bindings;
+    this.scopes = scopes;
+    this.rooms = rooms;
+    this.configs = configs;
     this.clock = clock;
   }
 
   public Map<String, Object> user(UUID id) {
-    return db.need("select * from core.app_user where id=?1", id);
+    return AdminViews.user(accounts.findById(id).orElseThrow(ApiException::notFound), true);
   }
 
   public boolean valid(SessionPrincipal p) {
-    if (p == null || p.authenticatedAt().plus(Duration.ofHours(8)).isBefore(clock.instant()))
+    if (p == null || !p.authenticatedAt().plus(Duration.ofHours(8)).isAfter(clock.instant()))
       return false;
-    var u = db.one("select enabled,auth_version from core.app_user where id=?1", p.userId());
-    return u != null
-        && Boolean.TRUE.equals(u.get("enabled"))
-        && Store.number(u, "authVersion") == p.authVersion();
+    return accounts
+        .findById(p.userId())
+        .filter(a -> a.enabled && a.authVersion == p.authVersion())
+        .isPresent();
   }
 
   public Set<String> permissions(UUID user) {
-    return new LinkedHashSet<>(
-        db
-            .list(
-                "select distinct p.code from core.user_role ur join core.role r on r.id=ur.role_id"
-                    + " and r.enabled join core.role_permission rp on rp.role_id=r.id join"
-                    + " core.permission p on p.id=rp.permission_id where ur.user_id=?1",
-                user)
-            .stream()
-            .map(m -> m.get("code").toString())
-            .toList());
+    return new LinkedHashSet<>(bindings.permissionCodes(user));
   }
 
-  public boolean has(UUID u, String permission) {
-    return permissions(u).contains(permission);
+  public boolean has(UUID user, String permission) {
+    return permissions(user).contains(permission);
   }
 
-  public void require(UUID u, String p) {
-    if (!has(u, p)) throw ApiException.forbidden();
+  public void require(UUID user, String permission) {
+    if (!has(user, permission)) throw ApiException.forbidden();
   }
 
-  public boolean scope(UUID u, String permission, UUID room, UUID department) {
-    return db.count(
-            "select count(*) from core.user_role ur join core.role r on r.id=ur.role_id and"
-                + " r.enabled join core.role_permission rp on rp.role_id=r.id join core.permission"
-                + " p on p.id=rp.permission_id join core.user_role_scope s on s.user_role_id=ur.id"
-                + " where ur.user_id=?1 and p.code=?2 and (s.scope_type='ALL' or"
-                + " (s.scope_type='ROOM' and s.room_id=?3) or (s.scope_type='DEPARTMENT' and"
-                + " s.department_id=?4) or (s.scope_type='SHARED' and cast(?4 as uuid) is null and"
-                + " cast(?3 as uuid) is not null))",
-            u,
-            permission,
-            room,
-            department)
-        > 0;
+  public boolean scope(UUID user, String permission, UUID room, UUID department) {
+    return bindings.grantsScope(
+        user, permission, room, department, room != null && department == null);
   }
 
-  public boolean roomScope(UUID u, String permission, UUID room) {
-    var r = db.one("select department_id from core.room where id=?1", room);
-    return r != null
-        && scope(
-            u,
-            permission,
-            room,
-            r.get("departmentId") == null ? null : Store.id(r.get("departmentId")));
+  public boolean createRoomScope(UUID user, UUID department) {
+    return bindings.grantsScope(user, "room:manage", null, department, department == null);
   }
 
-  public boolean admissible(UUID u, UUID room) {
-    return db.count(
-            "select count(*) from core.room r join core.app_user u on u.id=?1 where r.id=?2 and"
-                + " (r.department_id is null or r.department_id=u.department_id)",
-            u,
-            room)
-        > 0;
+  public boolean roomScope(UUID user, String permission, UUID room) {
+    return rooms
+        .findById(room)
+        .map(r -> scope(user, permission, room, r.departmentId))
+        .orElse(false);
   }
 
-  public Map<String, Object> me(UUID u) {
-    var m = user(u);
-    m.remove("passwordHash");
+  public boolean admissible(UUID user, UUID room) {
+    var a = accounts.findById(user);
+    var r = rooms.findById(room);
+    return a.isPresent()
+        && r.isPresent()
+        && (r.get().departmentId == null
+            || Objects.equals(r.get().departmentId, a.get().departmentId));
+  }
+
+  public Map<String, Object> me(UUID user) {
+    var m = AdminViews.user(accounts.findById(user).orElseThrow(ApiException::notFound), false);
     m.put("userId", m.get("id"));
-    m.put("permissions", permissions(u));
+    m.put("permissions", permissions(user));
+    m.put("roles", bindings.roleCodes(user));
+    m.put("scopes", scopes.forUser(user).stream().map(AdminViews::scope).toList());
     m.put(
-        "roles",
-        db
-            .list(
-                "select r.code from core.user_role ur join core.role r on r.id=ur.role_id and"
-                    + " r.enabled where ur.user_id=?1",
-                u)
-            .stream()
-            .map(x -> x.get("code"))
-            .toList());
-    m.put(
-        "scopes",
-        db.list(
-            "select s.scope_type,s.department_id,s.room_id from core.user_role ur join"
-                + " core.user_role_scope s on s.user_role_id=ur.id where ur.user_id=?1",
-            u));
+        "bookingLimits",
+        Map.of(
+            "reservationMaxHours",
+            maxHours("M1_MAX_DURATION_HOURS"),
+            "applicationMaxHours",
+            maxHours("M2_MAX_DURATION_HOURS")));
     return m;
+  }
+
+  int maxHours(String key) {
+    return ((Number) configs.findById(key).orElseThrow(ApiException::notFound).value).intValue();
   }
 
   public boolean allowed(UUID u, String p, UUID room, UUID owner, UUID assigned) {
