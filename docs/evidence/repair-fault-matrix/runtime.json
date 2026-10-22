@@ -1,0 +1,36 @@
+{
+  "recordedAt": 1792681446.7008839,
+  "checkoutCommitAtCopy": "67af68be77a4a614fbd09427b298f14017e1924c",
+  "warning": "Stable runtime copies are independently hashed; checkout HEAD is not proof of their source commit or final typed DTO version.",
+  "database": "studyroom_fault_matrix",
+  "ports": [
+    18180,
+    18181,
+    18182,
+    18183
+  ],
+  "artifacts": {
+    "core": {
+      "copiedFrom": ".local/local/run/core.jar",
+      "sha256": "57d0981b9d0f27fb5023c87842a30eb92071581b68d87bf0c21de09f0ecbe684",
+      "sourceMtime": 1792673607.9000924
+    },
+    "repair": {
+      "copiedFrom": ".local/local/run/repair.jar",
+      "sha256": "d6be9642c991317b0289631b1563c99432c5e0d9c8492addf7fd9587b746ab2d",
+      "sourceMtime": 1792677135.4689136
+    },
+    "migration": {
+      "sha256": "b73b066ae24bb246c58add0093a14f7ef34c48474116a1cc484cff266079cfa2"
+    },
+    "web": {
+      "69.087d996d.async.js": "499a73a847097f2c7670da9eb5bc0e15053c0cffc5c742d56520e66a3d99b23f",
+      "favicon.svg": "81ffeec81f9241aa410e29529237cafa1542e18f29e11c07b2b68b6d91f84594",
+      "index.html": "23a69700d3c2d01609a3f087b467cb192132a5ab36483f4ac5d49c80bb7cc082",
+      "p__App.c3ebca13.async.js": "52289283b851fe13ef1fcc585442383022e9b049d5fc8abf5cac299f0567d0f0",
+      "preload_helper.ce3fcac4.js": "a8ff55dd1dcf0b9c466f9384fc6cc051b1d86f5298a728324db78d2b71bb1204",
+      "umi.6016dd86.js": "55046d8c8cefac4140e29cdcaec20466a6f5af64440eb5dbe13789d225a35b4f",
+      "umi.809a9400.css": "a49ebb23500158f6a625f9d3d322b93b39be5714db3b301827338c87ad826153"
+    }
+  }
+}

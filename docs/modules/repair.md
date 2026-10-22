@@ -72,3 +72,7 @@ python3 tests/integration/run_smtp_acceptance.py
 运行环境、精确断言与剩余部署边界见[补充证据](../evidence/repair-acceptance.md)。CI显式启用两个隔离数据库suite，并将公共HTTP套件连接到真实Mailpit；任何套件零测试或跳过都会失败。CI执行结果以真实流水线为准，本机通过不等同GitLab已通过。
 
 姓名快照的真实HTTP与既有数据升级证据见[姓名展示回归](../evidence/repair-assignment-name.md)，新测试 `repair_assignment_name_http.py` 由CI公共API套件自动收集。
+
+## 隔离网络故障验收
+
+`tests/integration/run_fault_matrix.py` 只使用独立18180–18183端口、独立数据库与稳定运行包副本，提供资源写入断网、恢复、全core授权中断、双侧审计关联与日志敏感值扫描。复现步骤、实际证据与运行包边界见[故障矩阵](../evidence/repair-fault-matrix.md)。资源命令单独不可达时允许已获授权的动作进入同步中；整个core不可达时权限不能确认，返回503并保持原工单，不能跳过授权。

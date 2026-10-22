@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-10-22T15:20:20.052740+00:00",
+  "checkoutCommit": "67af68be77a4a614fbd09427b298f14017e1924c",
+  "dirty": true,
+  "scope": "Polling restart plus needsAttention/next retry time; uncommitted fix preview",
+  "sourceDiffSha256": "5c8749678f9cdef6378b1e7876ad449092622082a76d597d6ba20bd46fbffa6d",
+  "files": {
+    "69.087d996d.async.js": "499a73a847097f2c7670da9eb5bc0e15053c0cffc5c742d56520e66a3d99b23f",
+    "favicon.svg": "81ffeec81f9241aa410e29529237cafa1542e18f29e11c07b2b68b6d91f84594",
+    "index.html": "3e2925b9ec4d257c5ca70be056430575a7161f15bd6d70d6307766fc38dbbb13",
+    "p__App.2be8d4ce.async.js": "ead595d71a02ba7da12b4db3c13f3c2abf6ca89bf580af3c1c38567704f1c6bf",
+    "p__App.603d86a9.async.js": "3dfdf5d164582c7f28d6cfdfc8e8135b9488b2a5c850ce5a7eb2a1d82f25ed6a",
+    "p__App.c3ebca13.async.js": "52289283b851fe13ef1fcc585442383022e9b049d5fc8abf5cac299f0567d0f0",
+    "preload_helper.43719254.js": "49c0f9f127de5c637bfa15b28858936920780a1c145008f8c5037d18fcb93eb3",
+    "preload_helper.ce3fcac4.js": "a8ff55dd1dcf0b9c466f9384fc6cc051b1d86f5298a728324db78d2b71bb1204",
+    "preload_helper.ec33638b.js": "caebb3364f70622ecc8042bb44fa16bc1db7503e47e964267922afc567f32f46",
+    "umi.6016dd86.js": "55046d8c8cefac4140e29cdcaec20466a6f5af64440eb5dbe13789d225a35b4f",
+    "umi.809a9400.css": "a49ebb23500158f6a625f9d3d322b93b39be5714db3b301827338c87ad826153",
+    "umi.c670da65.js": "6c4744edc0262088432c82e91f4a8f85881d78a53e0871677de0012edc6977e0",
+    "umi.d8ad7a11.js": "104df82ee147c91bf521b6d7f73ffdae6030e22b2f8f14b3a233d4b39e97c674"
+  }
+}

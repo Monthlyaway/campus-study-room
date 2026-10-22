@@ -1,0 +1,129 @@
+[
+  {
+    "time": 1792681736.618892,
+    "commandId": "0f9d20e9-29d2-4185-ad5e-f9760d1ec66f",
+    "requestId": "3d4adf23-e69b-4e48-808b-14d9f72ff4ce",
+    "operation": "RELEASE",
+    "payloadHash": "bc84e2b1a0196d9000a1e3255a61bcf8f6281453531ba46f2937ea1dc25d4506",
+    "upstreamStatus": 200,
+    "responseDropped": false
+  },
+  {
+    "time": 1792681826.826219,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792681856.872363,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792681886.9377868,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792681916.985197,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792681947.036258,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682007.122648,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682097.20419,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682127.244204,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682427.4384599,
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "operation": "BLOCK",
+    "payloadHash": "63df90b7338eec8895fd696518fa56ec8e5eeb26564bafe256ecaf36134f06f2",
+    "upstreamStatus": 200,
+    "responseDropped": false
+  },
+  {
+    "time": 1792682517.586741,
+    "commandId": "91bc835b-a492-486d-a70b-2953a01aff00",
+    "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+    "operation": "RELEASE",
+    "payloadHash": "4e59edf762dedff746947d77618275848669c57c939e3f3a8bf1377dfcd3b78c",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682547.6525,
+    "commandId": "91bc835b-a492-486d-a70b-2953a01aff00",
+    "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+    "operation": "RELEASE",
+    "payloadHash": "4e59edf762dedff746947d77618275848669c57c939e3f3a8bf1377dfcd3b78c",
+    "upstreamStatus": null,
+    "responseDropped": false,
+    "requestBlocked": true
+  },
+  {
+    "time": 1792682577.792691,
+    "commandId": "91bc835b-a492-486d-a70b-2953a01aff00",
+    "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+    "operation": "RELEASE",
+    "payloadHash": "4e59edf762dedff746947d77618275848669c57c939e3f3a8bf1377dfcd3b78c",
+    "upstreamStatus": 200,
+    "responseDropped": false
+  }
+]

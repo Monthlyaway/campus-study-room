@@ -35,6 +35,7 @@ export default function Repairs() {
     new URLSearchParams(window.location.search).get("id") || undefined
   );
   const [pollEnded, setPollEnded] = useState(false);
+  const [pollGeneration, setPollGeneration] = useState(0);
   const started = useRef(Date.now());
   const data = useData<Page<RecordData>>(
     `/repairs?${query({ view, page, size: 12 })}`
@@ -54,6 +55,8 @@ export default function Repairs() {
       setId(result.id);
       started.current = Date.now();
       setPollEnded(false);
+      // A retry can retain the same pending status after the previous timer expired.
+      setPollGeneration((generation) => generation + 1);
     }
   });
   useEffect(() => {
@@ -69,7 +72,7 @@ export default function Repairs() {
       } else detail.reload();
     }, 2000);
     return () => clearInterval(timer);
-  }, [id, r?.status, detail.reload]);
+  }, [id, r?.status, detail.reload, pollGeneration]);
   const roomName = (roomId: string) =>
     items<Room>(rooms.data).find((room) => room.id === roomId)?.name || "教室";
   const create = () =>
@@ -425,12 +428,21 @@ export default function Repairs() {
                   }
                   description={
                     <>
+                      {r.sync?.needsAttention && (
+                        <p>
+                          <strong>需要人工关注：</strong>
+                          资源同步多次失败，请联系工作人员检查。系统仍会继续重试。
+                        </p>
+                      )}
                       {pollEnded
                         ? "同步仍未确认，可手动刷新。"
                         : "正在自动刷新进展。"}
                       <br />
                       尝试次数：{r.sync?.attempts || 0} · 最近尝试：
                       {dateTime(r.sync?.lastAttemptAt)}
+                      {r.sync?.nextAttemptAt && (
+                        <p>下次重试计划：{dateTime(r.sync.nextAttemptAt)}</p>
+                      )}
                       {r.sync?.lastErrorCode && (
                         <p>最近错误：{r.sync.lastErrorCode}</p>
                       )}

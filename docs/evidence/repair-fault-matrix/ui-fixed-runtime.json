@@ -1,0 +1,20 @@
+{
+  "recordedAt": "2026-10-22T15:13:50.404507+00:00",
+  "checkoutCommit": "67af68be77a4a614fbd09427b298f14017e1924c",
+  "dirty": true,
+  "scope": "Repairs.tsx polling generation restart; uncommitted fix preview",
+  "sourceDiffSha256": "55b156568a2783ec65e98561a3ee12bbaf9a99ebd46c6ea185a26d21e07c98ac",
+  "url": "http://127.0.0.1:18183",
+  "files": {
+    "69.087d996d.async.js": "499a73a847097f2c7670da9eb5bc0e15053c0cffc5c742d56520e66a3d99b23f",
+    "favicon.svg": "81ffeec81f9241aa410e29529237cafa1542e18f29e11c07b2b68b6d91f84594",
+    "index.html": "13a7cce1e7c2773ad7906299fad58a1a54cd73ee6b37e5a295dc38981059bc48",
+    "p__App.603d86a9.async.js": "3dfdf5d164582c7f28d6cfdfc8e8135b9488b2a5c850ce5a7eb2a1d82f25ed6a",
+    "p__App.c3ebca13.async.js": "52289283b851fe13ef1fcc585442383022e9b049d5fc8abf5cac299f0567d0f0",
+    "preload_helper.ce3fcac4.js": "a8ff55dd1dcf0b9c466f9384fc6cc051b1d86f5298a728324db78d2b71bb1204",
+    "preload_helper.ec33638b.js": "caebb3364f70622ecc8042bb44fa16bc1db7503e47e964267922afc567f32f46",
+    "umi.6016dd86.js": "55046d8c8cefac4140e29cdcaec20466a6f5af64440eb5dbe13789d225a35b4f",
+    "umi.809a9400.css": "a49ebb23500158f6a625f9d3d322b93b39be5714db3b301827338c87ad826153",
+    "umi.d8ad7a11.js": "104df82ee147c91bf521b6d7f73ffdae6030e22b2f8f14b3a233d4b39e97c674"
+  }
+}

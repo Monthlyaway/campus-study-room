@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Local-only transparent HTTP fault injector: forward to the real core and drop one committed BLOCK response.
+"""Local-only transparent HTTP fault injector targeting the real core.
 
-No resource decisions or authorization are mocked. Only the network response is
-lost. Logs contain command/request IDs and a payload digest, never credentials.
+Default: drop one committed BLOCK response. Optional file gate: close resource
+command connections before forwarding while all other paths remain available.
+No resource decisions or authorization are mocked. Logs contain command/request
+IDs and a payload digest, never credentials.
 """
 import argparse
 import hashlib
@@ -21,6 +23,8 @@ def main():
     parser.add_argument("--upstream", default="http://localhost:8081")
     parser.add_argument("--port", type=int, default=18081)
     parser.add_argument("--events", type=Path, required=True)
+    parser.add_argument("--resource-block-file", type=Path)
+    parser.add_argument("--no-response-loss", action="store_true")
     args = parser.parse_args()
     upstream = urlsplit(args.upstream)
     if upstream.hostname not in {"localhost", "127.0.0.1"} or upstream.scheme != "http":
@@ -36,6 +40,14 @@ def main():
 
         def forward(self):
             body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
+            if self.path == "/internal/v1/resource-commands" and args.resource_block_file and args.resource_block_file.exists():
+                command = json.loads(body)
+                with lock, args.events.open("a") as stream:
+                    stream.write(json.dumps({"time": time.time(), "commandId": command["commandId"], "requestId": self.headers.get("X-Request-ID"), "operation": command["operation"], "payloadHash": hashlib.sha256(body).hexdigest(), "upstreamStatus": None, "responseDropped": False, "requestBlocked": True}) + "\n")
+                self.close_connection = True
+                self.connection.shutdown(socket.SHUT_RDWR)
+                self.connection.close()
+                return
             headers = {key: value for key, value in self.headers.items() if key.lower() not in {"host", "connection"}}
             headers["Connection"] = "close"
             connection = http.client.HTTPConnection(upstream.hostname, upstream.port or 80, timeout=15)
@@ -47,7 +59,7 @@ def main():
                 if self.path == "/internal/v1/resource-commands":
                     command = json.loads(body)
                     with lock:
-                        if command.get("operation") == "BLOCK" and 200 <= response.status < 300 and not state["dropped"]:
+                        if not args.no_response_loss and command.get("operation") == "BLOCK" and 200 <= response.status < 300 and not state["dropped"]:
                             state["dropped"] = should_drop = True
                         event = {"time": time.time(), "commandId": command["commandId"], "requestId": self.headers.get("X-Request-ID"), "operation": command["operation"], "payloadHash": hashlib.sha256(body).hexdigest(), "upstreamStatus": response.status, "responseDropped": should_drop}
                         with args.events.open("a") as stream:
@@ -66,6 +78,13 @@ def main():
                 self.end_headers()
                 self.wfile.write(response_body)
                 self.close_connection = True
+            except (ConnectionError, TimeoutError, OSError):
+                self.close_connection = True
+                try:
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+                self.connection.close()
             finally:
                 connection.close()
 

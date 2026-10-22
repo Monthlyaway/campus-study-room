@@ -1,0 +1,22 @@
+{
+  "status": "BLOCK_PENDING",
+  "version": 4,
+  "sync": {
+    "pending": true,
+    "attempts": 8,
+    "lastErrorCode": "AUTHORIZATION_UNAVAILABLE",
+    "lastAttemptAt": "2026-10-22T15:15:27.238140Z",
+    "nextAttemptAt": "2026-10-22T15:20:27.247021Z",
+    "needsAttention": true
+  },
+  "commands": [
+    {
+      "command_id": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+      "command_type": "BLOCK",
+      "status": "PENDING",
+      "attempts": 8,
+      "last_error_code": "AUTHORIZATION_UNAVAILABLE",
+      "request_id": "245b240a-60a7-4b6d-be78-ed5bdfa963cb"
+    }
+  ]
+}

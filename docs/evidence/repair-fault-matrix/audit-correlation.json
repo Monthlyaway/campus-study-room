@@ -1,0 +1,18 @@
+[
+  {
+    "operation": "BLOCK",
+    "commandId": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+    "requestId": "245b240a-60a7-4b6d-be78-ed5bdfa963cb",
+    "coreAuditId": "ef85c887-a599-49e6-a409-680742ec593a",
+    "repairAuditId": "d9e99f3e-07de-43b8-b7eb-7014e5638484",
+    "initiatingUserAuditId": "0c19e9a5-707d-436f-8811-9a24efab6e81"
+  },
+  {
+    "operation": "RELEASE",
+    "commandId": "91bc835b-a492-486d-a70b-2953a01aff00",
+    "requestId": "ef9402db-f18a-4d79-9a20-25fa4e0d9d97",
+    "coreAuditId": "1e012285-6e16-4aee-8ae8-54278da92723",
+    "repairAuditId": "f2436645-05e9-4eab-aa62-a73b79df3685",
+    "initiatingUserAuditId": "69eb9a1c-4ca5-4826-8e9c-93f6a5a87698"
+  }
+]

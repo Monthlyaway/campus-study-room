@@ -1,0 +1,64 @@
+{
+  "originalReplay": {
+    "result": "APPLIED",
+    "claimId": "2c9288cc-520d-471b-ac89-515e32706624",
+    "sourceState": "ACTIVE",
+    "sourceVersion": 1
+  },
+  "staleReplay": {
+    "result": "STALE_IGNORED",
+    "sourceVersion": 2,
+    "sourceState": "RELEASED"
+  },
+  "source": [
+    {
+      "source_type": "M3",
+      "source_id": "d0a806ed-469a-4283-9bd7-cf3536561c04",
+      "max_version": 2,
+      "state": "RELEASED",
+      "last_command_id": "91bc835b-a492-486d-a70b-2953a01aff00"
+    }
+  ],
+  "claims": [
+    {
+      "id": "2c9288cc-520d-471b-ac89-515e32706624",
+      "released_at": "2026-10-22T15:22:57.753808+00:00"
+    }
+  ],
+  "processedCommands": [
+    {
+      "command_id": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+      "payload_hash": "12af7c35613b020ffeb5349c89dc857e6e191b78df72ed561b40a23743f77d19",
+      "http_status": 200,
+      "result_json": {
+        "result": "APPLIED",
+        "claimId": "2c9288cc-520d-471b-ac89-515e32706624",
+        "sourceState": "ACTIVE",
+        "sourceVersion": 1
+      },
+      "processed_at": "2026-10-22T15:20:27.433534+00:00"
+    },
+    {
+      "command_id": "91bc835b-a492-486d-a70b-2953a01aff00",
+      "payload_hash": "d8e7283ed770b73da2b135bc3b26505569507cde7b9276941ae522f4482fc110",
+      "http_status": 200,
+      "result_json": {
+        "result": "APPLIED",
+        "sourceState": "RELEASED",
+        "sourceVersion": 2
+      },
+      "processed_at": "2026-10-22T15:22:57.784653+00:00"
+    },
+    {
+      "command_id": "36fd8fc9-a4f8-4d94-bc7b-2da8fd9cb718",
+      "payload_hash": "62fd0e908933f595e77f5ec3455a4ade5be91c8b3f01898522c074f4ac7ae992",
+      "http_status": 200,
+      "result_json": {
+        "result": "STALE_IGNORED",
+        "sourceState": "RELEASED",
+        "sourceVersion": 2
+      },
+      "processed_at": "2026-10-22T15:23:56.369346+00:00"
+    }
+  ]
+}
