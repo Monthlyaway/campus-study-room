@@ -1,0 +1,361 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "6d68cd4186534c00bf409e4c5e17f6dc3ddc59f7",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "db/migration/core/V20261022130000__self_role_scope.sql",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/AccountEntity.java",
+      "additions": {
+        "human": 47
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/AccountRepository.java",
+      "additions": {
+        "human": 29
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/AdministrationResourceRepository.java",
+      "additions": {
+        "human": 14
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApplicationEntity.java",
+      "additions": {
+        "human": 62
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApplicationRepository.java",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApprovalActionEntity.java",
+      "additions": {
+        "human": 31
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApprovalActionRepository.java",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApprovalStepEntity.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ApprovalStepRepository.java",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/AuditEventEntity.java",
+      "additions": {
+        "human": 34
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/AuditEventRepository.java",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/BookingGuardRepository.java",
+      "additions": {
+        "human": 7
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/BuildingEntity.java",
+      "additions": {
+        "human": 28
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/BuildingRepository.java",
+      "additions": {
+        "human": 10
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/CampusEntity.java",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/CampusRepository.java",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/CheckinCodeEntity.java",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/CheckinCodeRepository.java",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ClaimEntity.java",
+      "additions": {
+        "human": 46
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ClaimRepository.java",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ConfigRevisionEntity.java",
+      "additions": {
+        "human": 15
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ConfigRevisionRepository.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/DepartmentEntity.java",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/DepartmentRepository.java",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/IdempotencyEntity.java",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/IdempotencyRepository.java",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/NotificationEntity.java",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/NotificationRepository.java",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/OpeningRuleEntity.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/OpeningRuleRepository.java",
+      "additions": {
+        "human": 14
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/PermissionEntity.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/PermissionRepository.java",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ProcessedCommandEntity.java",
+      "additions": {
+        "human": 26
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ProcessedCommandRepository.java",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RateLimitEntity.java",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RateLimitRepository.java",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ReservationEntity.java",
+      "additions": {
+        "human": 56
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ReservationRepository.java",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleEntity.java",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RolePermissionEntity.java",
+      "additions": {
+        "human": 42
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RolePermissionRepository.java",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleRepository.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleScopeEntity.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/RoleScopeRepository.java",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ScheduledTaskEntity.java",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ScheduledTaskRepository.java",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SeatEntity.java",
+      "additions": {
+        "human": 28
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SeatRepository.java",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SourceStateEntity.java",
+      "additions": {
+        "human": 50
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SourceStateRepository.java",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SystemConfigEntity.java",
+      "additions": {
+        "human": 29
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/SystemConfigRepository.java",
+      "additions": {
+        "human": 9
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/UserRoleEntity.java",
+      "additions": {
+        "human": 18
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/UserRoleRepository.java",
+      "additions": {
+        "human": 45
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ViolationEntity.java",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/persistence/ViolationRepository.java",
+      "additions": {
+        "human": 8
+      }
+    }
+  ]
+}
