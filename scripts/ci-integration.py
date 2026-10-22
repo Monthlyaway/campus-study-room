@@ -71,7 +71,7 @@ try:
             subprocess.run([sys.executable, str(test)], env={**common, "STUDYROOM_TEST_PASSWORD": demo_password}, stdout=report, stderr=subprocess.STDOUT, check=True)
     # Every JPA suite gets its own migrated database and a paused scheduler.
     persistence = [("core", "CorePersistenceTest"), ("core", "AdminPersistenceTest"),
-                   ("core", "SharedPersistenceTest"), ("repair", "RepairPersistenceTest")]
+                   ("core", "SharedPersistenceTest"), ("core", "CoreAcceptanceMatrixTest"), ("repair", "RepairPersistenceTest")]
     for service, test_class in persistence:
         database = "studyroom_ci_" + test_class.lower()
         subprocess.run(["createdb", "--owner=studyroom_migration", database], env=env, check=True)
@@ -90,7 +90,7 @@ try:
         (control / "jobs-paused").touch()
         test_env = {**common, "DB_URL": jdbc, "DB_USERNAME": "studyroom_" + service,
                     "DB_PASSWORD": env[service.upper() + "_DB_PASSWORD"], "CONTROL_DIR": str(control),
-                    "STUDYROOM_CORE_DB_TESTS": "true", "STUDYROOM_ADMIN_DB_TESTS": "true", "STUDYROOM_REPAIR_DB_TESTS": "true"}
+                    "STUDYROOM_CORE_DB_TESTS": "true", "STUDYROOM_MATRIX_DB_TESTS": "true", "STUDYROOM_ADMIN_DB_TESTS": "true", "STUDYROOM_REPAIR_DB_TESTS": "true"}
         with open(output / (test_class + ".txt"), "w") as report:
             subprocess.run([str(root / "mvnw"), "-B", "-ntp", "-pl", "services/" + service + "-service", "-am", "-Dtest=" + test_class,
                             "-Dsurefire.failIfNoSpecifiedTests=false", "test"], env=test_env, stdout=report, stderr=subprocess.STDOUT, check=True)

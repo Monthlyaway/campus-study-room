@@ -736,6 +736,8 @@ public class AdminService {
     if (!(b.get("changes") instanceof List<?> changes) || changes.isEmpty())
       throw new ApiException(422, "INVALID_CONFIG", "请提供配置修改");
     Set<String> seen = new HashSet<>();
+    List<Map<String, Object>> previousValues = new ArrayList<>();
+    List<Map<String, Object>> nextValues = new ArrayList<>();
     for (Object item : changes) {
       if (!(item instanceof Map<?, ?> c)) throw new ApiException(422, "INVALID_CONFIG", "配置格式不正确");
       String key = Objects.toString(c.get("key"));
@@ -745,13 +747,15 @@ public class AdminService {
           || value > 12
           || !seen.add(key)) throw new ApiException(422, "INVALID_CONFIG", "最长时长必须为1至12整数小时且键不能重复");
       var x = configs.findById(key).orElseThrow(ApiException::notFound);
+      previousValues.add(Map.of("key", key, "value", x.value));
+      nextValues.add(Map.of("key", key, "value", value));
       x.value = value;
       x.updatedBy = u;
       x.updatedAt = clock.instant();
     }
     configs.flush();
     locks.changedRelation(revision);
-    events.audit(u, "CONFIG_UPDATED", "config", new UUID(0, 1), null, null, changes);
+    events.audit(u, "CONFIG_UPDATED", "config", new UUID(0, 1), null, previousValues, nextValues);
     return config(u);
   }
 }

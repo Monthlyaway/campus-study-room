@@ -35,3 +35,7 @@ runner 使用独立 `studyroom_admin_integration` PostgreSQL 数据库，执行�
 ## 性能回归
 
 教室分页按本页 ID 批量读取教学楼、校区和启用座位数量，避免逐行触发统计查询；空页无需额外读取关联数据。`AdminPersistenceTest.roomPageUsesBoundedQueriesAndBatchedSeatCounts` 用 21 间真实教室检查 size 1/20 的 SQL 数量保持有界，校验有/无座位的统计及建筑/校区名称。角色列表也按数据库页批量读取权限码，不逐角色查权限。加入两项后真实 PostgreSQL 管理回归为 9/9 通过，性能环境前后 SQL 和完整负载证据见 [性能验收](../evidence/performance.md)。
+
+## 配置审计补充验证
+
+批量配置更新在同一事务内保存旧值与新值：审计`beforeJson`和`afterJson`均为`[{key,value}]`数组，只包含此次更新的配置项。操作者与生效时间保留在审计字段中。真实HTTP与PG矩阵已验证旧4小时订单不变、新3小时拒绝、新2小时成功，以及0/13/1.5拒绝、非管理员拒绝、审计旧4新2与版本不被失败请求改变，见[矩阵证据](../evidence/core/acceptance-matrix.md)。

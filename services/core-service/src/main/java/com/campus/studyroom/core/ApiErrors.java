@@ -23,6 +23,21 @@ public class ApiErrors {
 
   @ExceptionHandler(Exception.class)
   ResponseEntity<?> unexpected(Exception e) {
+    if (e instanceof org.springframework.web.ErrorResponse framework
+        && framework.getStatusCode().is4xxClientError()) {
+      int status = framework.getStatusCode().value();
+      String code =
+          switch (status) {
+            case 404 -> "NOT_FOUND";
+            case 405 -> "METHOD_NOT_ALLOWED";
+            case 406 -> "NOT_ACCEPTABLE";
+            case 415 -> "UNSUPPORTED_MEDIA_TYPE";
+            default -> "INVALID_REQUEST";
+          };
+      // Framework messages may contain rejected input; expose only a stable safe message.
+      var result = business(new ApiException(status, code, "请检查请求地址、方法与输入格式"));
+      return ResponseEntity.status(status).headers(framework.getHeaders()).body(result.getBody());
+    }
     org.slf4j.LoggerFactory.getLogger(ApiErrors.class)
         .error("event=core_unexpected_error exceptionType={}", e.getClass().getName());
     return business(new ApiException(500, "INTERNAL_ERROR", "服务暂时无法完成请求，请保留请求编号"));
