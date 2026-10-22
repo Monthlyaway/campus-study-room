@@ -1,0 +1,56 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "bf17ca104177ce908782c5d4b76558e88117d841",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "docs/evidence/release/README.md",
+      "new_path": "docs/evidence/release/README.md",
+      "additions": {
+        "human": 16
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 23
+      },
+      "deletions": {
+        "human": 15
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 49
+      },
+      "deletions": {
+        "human": 45
+      }
+    }
+  ]
+}
