@@ -1,0 +1,67 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "c1d5c9a4e3374a957171fc1a13318c56d4ee698a",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "infra/compose/check.yml",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "scripts/integration_harness.py",
+      "additions": {
+        "human": 439
+      }
+    },
+    {
+      "new_path": "tests/ops/test_check.py",
+      "additions": {
+        "human": 188
+      }
+    },
+    {
+      "old_path": "scripts/ci-integration.py",
+      "new_path": "scripts/ci-integration.py",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 170
+      }
+    },
+    {
+      "old_path": "scripts/studyroom.py",
+      "new_path": "scripts/studyroom.py",
+      "additions": {
+        "human": 64
+      },
+      "deletions": {
+        "human": 16
+      }
+    },
+    {
+      "old_path": "tests/integration/repair_acceptance_http.py",
+      "new_path": "tests/integration/repair_acceptance_http.py",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
