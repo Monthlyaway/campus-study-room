@@ -44,7 +44,11 @@ frontend:
     paths: [apps/web/.pnpm-store/]
   before_script:
     - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
-    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
+    # The slim image has no OS trust store. Bootstrap HTTPS using Node's bundled roots.
+    - node -e "require('fs').writeFileSync('/tmp/studyroom-ci-ca.pem', require('tls').rootCertificates.join('\\n'))"
+    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
+    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
+    - rm /tmp/studyroom-ci-ca.pem
     - corepack enable
     - corepack prepare pnpm@10.34.7 --activate
     - cd apps/web
@@ -101,7 +105,11 @@ package:
   needs: [backend, frontend, integration]
   before_script:
     - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
-    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
+    # The slim image has no OS trust store. Bootstrap HTTPS using Node's bundled roots.
+    - node -e "require('fs').writeFileSync('/tmp/studyroom-ci-ca.pem', require('tls').rootCertificates.join('\\n'))"
+    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
+    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
+    - rm /tmp/studyroom-ci-ca.pem
   script:
     - mkdir -p output/release
     - git archive --format=tar.gz -o output/release/studyroom-source-$CI_COMMIT_SHORT_SHA.tar.gz "$CI_COMMIT_SHA"

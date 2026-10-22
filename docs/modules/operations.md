@@ -51,13 +51,13 @@ python3 scripts/studyroom.py status test
 ./scripts/restore test .local/test/backups/TIMESTAMP.dump
 ```
 
-应用回退更换三个应用镜像，不运行 down migration。若目标和当前或失败候选的迁移集合不同，要求绑定双方 commit 的兼容演练证据；不能仅凭“新增列”或人工写入 `passed` 就宣称已经实测。未满足兼容条件时保留维护，不能盲目重试。完整 V1→V2 新列→V1 应用回退的实际证据另行归档，当前进度见 `docs/progress.md`。
+应用回退更换三个应用镜像，不运行 down migration。若目标和当前或失败候选的迁移集合不同，要求绑定双方 commit 的兼容演练证据；不能仅凭“新增列”或人工写入 `passed` 就宣称已经实测。未满足兼容条件时保留维护，不能盲目重试。已实际执行 V1→V2 新可空列→V1 应用回退：两名用户的原会话、三类业务读写、新列哨兵值及 Flyway 状态均保留。详见 [发布演练](../evidence/release/README.md)。
 
 备份使用 `pg_dump -Fc`，保存 SHA-256 并用 `pg_restore --list` 验证可读性。恢复命令只创建新的隔离数据库，不替换在线库；恢复完成报告四类业务记录数量。数据恢复与应用回退是不同操作；不能用恢复旧备份替代回退而无说明地丢失新业务数据。禁止自动删除命名卷。
 
 ## GitLab 流水线
 
-`.gitlab-ci.yml` 在 push/MR/tag 触发，包含后端 verify、前端生成漂移/类型/单测/构建、独立 PostgreSQL 服务中的两应用 HTTP 与四类真实 JPA 集成、丢失已提交 BLOCK 响应后的原命令重试，以及源码制品归档。Python 运维校验也进入集成门禁。每个真实 JPA 套件必须产生非零且无 skip 的对应 JUnit，不能用默认跳过数据库测试冒充成功。
+`.gitlab-ci.yml` 在 push/MR/tag 触发，包含后端 verify、前端生成漂移/类型/单测/构建、独立 PostgreSQL 服务中的两应用 HTTP 与五类真实 JPA 集成、丢失已提交 BLOCK 响应后的原命令重试，以及源码制品归档。Python 运维校验也进入集成门禁。每个真实 JPA 套件必须产生非零且无 skip 的对应 JUnit，不能用默认跳过数据库测试冒充成功。
 
 CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原 `k8s-amd64` 对应的 Runner 已长期离线。使用 `resource_group: studyroom-test` 串行化集成任务，秘密在每个 job 内随机生成。测试环境记录为 `test/ci-<pipeline>`；只有集成通过才允许打包。实际 pipeline、版本化 Docker 发布和完整自动部署的证据继续在进度表追踪；配置存在不等于门禁已执行。
 
@@ -72,3 +72,5 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 流水线 [682485](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682485) 已被在线 Runner #5170 接收，但 Kubernetes 在执行脚本前访问 Docker Hub 超时。CI 因此默认使用 `STUDYROOM_CI_REGISTRY=m.daocloud.io/docker.io/library`；三个镜像保持原厂版本及原 SHA-256，未改用可变 latest。已从该缓存读取并核对相同 manifest；实际 Runner 复跑结果仍需核验。该值可按部署网络改为 `docker.io/library`，不是全机 Docker 配置。缓存机制依据 [DaoCloud 官方说明](https://github.com/DaoCloud/public-image-mirror)，缓存不可达时任务失败，不绕过内容校验。
 
 镜像缓存已使 [682503](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682503) 的任务开始运行，暴露两个独立问题：官方 Maven 容器将 `MAVEN_CONFIG` 用作目录，wrapper将其解释为命令行参数；CI显式清空该变量，缓存路径仍由 `MAVEN_OPTS` 指定。Node镜像安装Git时系统源的HTTP 80端口超时；CI仅将原官方APT源改用HTTPS，保留TLS与包签名校验，限制连接超时和重试。上述失败已保留，后续以真实任务结果判断。
+
+流水线682547的后端verify已通过；前端进一步暴露 slim Node 镜像没有系统CA，无法直接通过HTTPS安装CA包。CI先用该固定Node镜像内置的根证书建立临时APT信任文件，保持证书链和包签名校验，装好系统CA/Git后删除临时文件；相同镜像的本机容器复现实测通过，GitLab复跑仍以实际job为准。
