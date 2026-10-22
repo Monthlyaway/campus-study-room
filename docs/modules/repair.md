@@ -12,6 +12,8 @@
 4. 维修员提交完工说明，进入 `AWAITING_ACCEPTANCE`，封禁保持。报修人或有范围的物业管理员验收；实际维修人不能验收自己的工作。拒绝需说明原因，回到 `IN_REPAIR`，沿用原封禁和首次完工期限。
 5. 验收通过返回 `202 RELEASE_PENDING`。只有收到 core 的 `RELEASED` 确认才 `CLOSED`；其他工单的封禁保持。报修人可提交一次 1–5 整数评分。
 
+派单同时保存 `assignedToName` 姓名快照：取自当前已授权的维修候选查询，不再发起用户资料查询。列表和详情直接读取快照；人员后来改名不修改历史快照，重新派单会更新。扩展迁移 `V20261022160000` 增加可空列，旧工单保持空值并由前端回退显示编号。
+
 本人历史、取消、验收和评价遵守账号启用后的收尾权限例外；撤销创建角色不会隐藏已承诺业务的收尾操作。接口返回 `allowedActions`，前端据此显示按钮，服务端仍独立验证权限、状态、版本和归属。
 
 ## 一致性与恢复
@@ -68,3 +70,5 @@ python3 tests/integration/run_smtp_acceptance.py
 ```
 
 运行环境、精确断言与剩余部署边界见[补充证据](../evidence/repair-acceptance.md)。CI显式启用两个隔离数据库suite，并将公共HTTP套件连接到真实Mailpit；任何套件零测试或跳过都会失败。CI执行结果以真实流水线为准，本机通过不等同GitLab已通过。
+
+姓名快照的真实HTTP与既有数据升级证据见[姓名展示回归](../evidence/repair-assignment-name.md)，新测试 `repair_assignment_name_http.py` 由CI公共API套件自动收集。

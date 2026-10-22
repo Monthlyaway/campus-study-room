@@ -2152,6 +2152,14 @@
             ],
             "format": "uuid"
           },
+          "assignedToName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64,
+            "description": "派单时由授权维修候选接口提供的姓名快照；历史工单可为空，重新派单时更新。"
+          },
           "assignedBy": {
             "type": [
               "string",

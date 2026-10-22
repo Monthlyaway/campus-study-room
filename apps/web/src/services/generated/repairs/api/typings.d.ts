@@ -129,6 +129,8 @@ declare namespace RepairAPI {
     description: string;
     status: RepairStatus;
     assignedTo?: any;
+    /** 派单时由授权维修候选接口提供的姓名快照；历史工单可为空，重新派单时更新。 */
+    assignedToName?: any;
     assignedBy?: any;
     acceptanceRound?: number;
     lastWorkNote?: any;

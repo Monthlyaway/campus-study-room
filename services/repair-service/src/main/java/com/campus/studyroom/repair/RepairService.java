@@ -86,7 +86,8 @@ class RepairService {
         RepairOrder before=find(id);if(!access.read(before))throw RepairException.missing();
         Set<String> rights=access.rights(before);Long expected=expected(body);
         UUID assignee=action.equals("assign")?uuid(body,"assignedTo"):null;
-        if(action.equals("assign")){if(!rights.contains("repair:assign"))throw RepairException.forbidden();core.requireWorker(access.principal,before.roomId,assignee,access.requestId);}
+        String assigneeName;
+        if(action.equals("assign")){if(!rights.contains("repair:assign"))throw RepairException.forbidden();assigneeName=core.requireWorker(access.principal,before.roomId,assignee,access.requestId);}else assigneeName=null;
         String decision=Objects.toString(body.get("decision"),"");
         UUID currentActor=access.principal.userId();
         switch(action){
@@ -112,7 +113,7 @@ class RepairService {
             }
             switch(action){
                 case "assign"->{
-                    RepairPolicy.requireState(r.status,RepairStatus.SUBMITTED,RepairStatus.ASSIGNED);r.status=RepairStatus.ASSIGNED;r.assignedTo=assignee;r.assignedBy=actor;r.assignedAt=now;
+                    RepairPolicy.requireState(r.status,RepairStatus.SUBMITTED,RepairStatus.ASSIGNED);r.status=RepairStatus.ASSIGNED;r.assignedTo=assignee;r.assignedToName=assigneeName;r.assignedBy=actor;r.assignedAt=now;
                     if(r.firstAssignedAt==null){r.firstAssignedAt=now;r.workDueAt=RepairPolicy.workDeadline(now);deadline(r,"WORK_OVERDUE",0,r.workDueAt,now);}
                     note="派发维修任务";
                 }

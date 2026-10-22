@@ -7,7 +7,7 @@ final class RepairDtos {
     static Map<String,Object> fields(Object... pairs){Map<String,Object> result=new LinkedHashMap<>();for(int i=0;i<pairs.length;i+=2)result.put((String)pairs[i],pairs[i+1]);return result;}
     static Map<String,Object> order(RepairOrder r,List<String> actions){return fields(
         "id",r.id,"reporterId",r.reporterId,"roomId",r.roomId,"title",r.title,"description",r.description,"status",r.status,
-        "assignedTo",r.assignedTo,"assignedBy",r.assignedBy,"submittedAt",r.submittedAt,"firstAssignedAt",r.firstAssignedAt,
+        "assignedTo",r.assignedTo,"assignedToName",r.assignedToName,"assignedBy",r.assignedBy,"submittedAt",r.submittedAt,"firstAssignedAt",r.firstAssignedAt,
         "assignedAt",r.assignedAt,"workCompletedAt",r.workCompletedAt,"acceptedAt",r.acceptedAt,"closedAt",r.closedAt,
         "assignDueAt",r.assignDueAt,"workDueAt",r.workDueAt,"acceptDueAt",r.acceptDueAt,"acceptanceRound",r.acceptanceRound,
         "lastWorkNote",r.lastWorkNote,"resourceVersion",r.resourceVersion,"version",r.version,"createdAt",r.createdAt,"updatedAt",r.updatedAt,"allowedActions",actions);}

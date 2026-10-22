@@ -63,12 +63,13 @@ class CoreClient {
         return request("GET","/internal/v1/repair-workers?actorId="+p.userId()+"&authVersion="+p.authVersion()+"&roomId="+room+"&page="+page+"&size="+size,null,requestId);
     }
     @SuppressWarnings("unchecked")
-    void requireWorker(SessionPrincipal p, UUID room, UUID target, UUID requestId) {
+    String requireWorker(SessionPrincipal p, UUID room, UUID target, UUID requestId) {
         int page=1;
         while(true) {
             Map<String,Object> result = workers(p,room,page,100,requestId);
             List<Map<String,Object>> items=(List<Map<String,Object>>)result.getOrDefault("items",List.of());
-            if(items.stream().anyMatch(x->target.toString().equals(Objects.toString(x.get("userId"), ""))))return;
+            Optional<Map<String,Object>> match=items.stream().filter(x->target.toString().equals(Objects.toString(x.get("userId"), ""))).findFirst();
+            if(match.isPresent())return RepairPolicy.text(Objects.toString(match.get().get("displayName"),""),64,true,"维修人员姓名");
             long total=((Number)result.getOrDefault("total",items.size())).longValue();
             if((long)page*100>=total||items.isEmpty())break; page++;
         }

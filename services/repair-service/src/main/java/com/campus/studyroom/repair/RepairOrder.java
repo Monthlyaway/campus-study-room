@@ -14,6 +14,7 @@ class RepairOrder {
     @Column(length=2000) String description;
     @Enumerated(EnumType.STRING) RepairStatus status;
     UUID assignedTo;
+    @Column(length=64) String assignedToName;
     UUID assignedBy;
     Instant submittedAt;
     Instant firstAssignedAt;
