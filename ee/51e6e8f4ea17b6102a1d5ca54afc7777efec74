@@ -1,0 +1,36 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "ee51e6e8f4ea17b6102a1d5ca54afc7777efec74",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "tests/browser/README.md",
+      "new_path": "tests/browser/README.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "tests/browser/studyroom.spec.mjs",
+      "new_path": "tests/browser/studyroom.spec.mjs",
+      "additions": {
+        "human": 98
+      },
+      "deletions": {
+        "human": 8
+      }
+    }
+  ]
+}
