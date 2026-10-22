@@ -1,0 +1,179 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "a6648aae5f11958e25388935c172fda276cc42fe",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "contracts/openapi/README.md",
+      "additions": {
+        "human": 21
+      }
+    },
+    {
+      "new_path": "contracts/openapi/internal-core.yaml",
+      "additions": {
+        "human": 1025
+      }
+    },
+    {
+      "new_path": "docs/evidence/core/contracts.md",
+      "additions": {
+        "human": 27
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/ContractAssertions.java",
+      "additions": {
+        "human": 129
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CoreContractTest.java",
+      "additions": {
+        "human": 587
+      }
+    },
+    {
+      "new_path": "tests/integration/run_core_contract.py",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/administration.ts",
+      "new_path": "apps/web/src/services/generated/core/api/administration.ts",
+      "additions": {
+        "human": 51
+      },
+      "deletions": {
+        "human": 86
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/applications.ts",
+      "new_path": "apps/web/src/services/generated/core/api/applications.ts",
+      "additions": {
+        "human": 15
+      },
+      "deletions": {
+        "human": 17
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/auth.ts",
+      "new_path": "apps/web/src/services/generated/core/api/auth.ts",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 36
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/masterData.ts",
+      "new_path": "apps/web/src/services/generated/core/api/masterData.ts",
+      "additions": {
+        "human": 55
+      },
+      "deletions": {
+        "human": 62
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/reservations.ts",
+      "new_path": "apps/web/src/services/generated/core/api/reservations.ts",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 15
+      }
+    },
+    {
+      "old_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "new_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "additions": {
+        "human": 918
+      },
+      "deletions": {
+        "human": 58
+      }
+    },
+    {
+      "old_path": "contracts/openapi/core.yaml",
+      "new_path": "contracts/openapi/core.yaml",
+      "additions": {
+        "human": 6072
+      },
+      "deletions": {
+        "human": 1657
+      }
+    },
+    {
+      "old_path": "docs/modules/administration.md",
+      "new_path": "docs/modules/administration.md",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "additions": {
+        "human": 14
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/RoomRepository.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RoomRepository.java",
+      "additions": {
+        "human": 2
+      }
+    }
+  ]
+}
