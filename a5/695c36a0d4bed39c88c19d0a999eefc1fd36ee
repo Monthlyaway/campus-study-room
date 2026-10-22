@@ -1,0 +1,43 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "a5695c36a0d4bed39c88c19d0a999eefc1fd36ee",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": "apps/web/src/pages/Repairs.tsx",
+      "new_path": "apps/web/src/pages/Repairs.tsx",
+      "additions": {
+        "human": 29
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "tests/browser/studyroom.spec.mjs",
+      "new_path": "tests/browser/studyroom.spec.mjs",
+      "additions": {
+        "human": 17
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
