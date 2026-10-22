@@ -1,0 +1,94 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/acceptance-matrix.md",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CoreAcceptanceMatrixTest.java",
+      "additions": {
+        "human": 1131
+      }
+    },
+    {
+      "new_path": "tests/integration/core_roles_http.py",
+      "additions": {
+        "human": 64
+      }
+    },
+    {
+      "new_path": "tests/integration/run_core_acceptance.py",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "docs/evidence/core/acceptance.md",
+      "new_path": "docs/evidence/core/acceptance.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/modules/administration.md",
+      "new_path": "docs/modules/administration.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "scripts/ci-integration.py",
+      "new_path": "scripts/ci-integration.py",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApiErrors.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApiErrors.java",
+      "additions": {
+        "human": 15
+      }
+    }
+  ]
+}
