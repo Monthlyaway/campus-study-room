@@ -74,7 +74,7 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 - [模块与公共层归属](docs/adr/0001-module-and-shared-layer-ownership.md)
 - [实施分工](docs/team.md)、[进度](docs/progress.md)、[风险记录](docs/ethics-and-risks.md)
 - [精确依赖与镜像基线](docs/dependency-baseline.json)
-- [安装与运维](docs/modules/operations.md)、[离线安装包](docs/modules/portable-release.md)
+- [安装与运维](docs/modules/operations.md)、[Ubuntu 一键运行环境](docs/modules/bootstrap.md)、[离线安装包](docs/modules/portable-release.md)
 - [账号管理](docs/modules/administration.md)、[核心预约与审批](docs/modules/core.md)、[维修](docs/modules/repair.md)、[前端](docs/modules/web.md)
 - [请求关联与运行日志](docs/modules/observability.md)
 - [39 条 P0 需求追踪](docs/requirements-traceability.md)

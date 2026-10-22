@@ -1,0 +1,19 @@
+{
+  "environment": "test",
+  "connection": "ssh",
+  "host": "192.0.2.10",
+  "ssh_port": 22,
+  "ssh_user": "ubuntu",
+  "ssh_private_key_file": "/absolute/path/to/private-key",
+  "ssh_host_key": "REPLACE_WITH_VERIFIED_SSH_PUBLIC_HOST_KEY",
+  "sudo": true,
+  "deployment_user": "studyroom",
+  "state_directory": "/srv/campus-study-room/test",
+  "release_directory": "/srv/campus-study-room/releases",
+  "backup_directory": "/srv/campus-study-room/test/backups",
+  "project_name": "studyroom-test",
+  "bind_address": "127.0.0.1",
+  "web_port": 18082,
+  "mail_ui_port": 18027,
+  "public_base_url": "http://localhost:18082"
+}

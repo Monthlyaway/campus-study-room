@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-22",
+  "ubuntu": "24.04",
+  "ansibleCore": "2.21.5",
+  "docker": "28.5.2",
+  "compose": "2.40.3",
+  "dockerKeySha256": "1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570",
+  "packages": {
+    "docker-ce": "5:28.5.2-1~ubuntu.24.04~noble",
+    "docker-ce-cli": "5:28.5.2-1~ubuntu.24.04~noble",
+    "containerd.io": "2.1.5-1~ubuntu.24.04~noble",
+    "docker-buildx-plugin": "0.29.1-1~ubuntu.24.04~noble",
+    "docker-compose-plugin": "2.40.3-1~ubuntu.24.04~noble"
+  },
+  "sources": [
+    "https://docs.docker.com/engine/install/ubuntu/",
+    "https://download.docker.com/linux/ubuntu/dists/noble/stable/binary-arm64/Packages.gz",
+    "https://download.docker.com/linux/ubuntu/dists/noble/stable/binary-amd64/Packages.gz",
+    "https://download.docker.com/linux/ubuntu/gpg",
+    "https://pypi.org/pypi/ansible-core/2.21.5/json"
+  ]
+}
