@@ -56,3 +56,15 @@ python3 tests/integration/run_repair_faults.py
 单元测试检查收尾权限、取消状态、验收职责分离、评分边界、版本与重试策略。PostgreSQL 测试检查期限去重、8 线程并发扫描、返修期限和事务失败不泄漏 outbox。真实 HTTP 套件串联两个服务与数据库，检查 CSRF、对象不可枚举、幂等、完整维修/驳回/验收/评价、两个来源封禁叠加、维修取消预约和历史不复活。
 
 故障注入脚本仅用于本机原生开发进程：它暂时重启本 checkout 的 repair，让透明代理在 core 提交首个 BLOCK 后丢弃响应；验证原 commandId、requestId 和完整 payload 不变的重试，再恢复正常进程。HTTP 测试为每次运行建立独立学生和房间，避免与并行浏览器验收共享预约。实际结果见 [维修验收证据](../evidence/repair-validation-2026-10-22.md)，不以仅编译成功代表跨模块验收。
+
+## 负面矩阵与真实邮件补充
+
+2026-10-22新增5组真实公共API负面矩阵，覆盖范围、停用人员、重新派单原期限、自报自修禁止自验、文本/评分类型、封禁期取消及通知归属，全部通过。三期限另在独立repair数据库与可控Clock下通过真实core HTTP验证：截止边界、重复投递、9个角色收件对象、同步中禁止取消和正常业务清理。D-06使用真实SMTP421拒收与Mailpit验证8次失败后的持续重试、原记录人工重试、已读独立及M1三类实际邮件，未使用capture模式。
+
+```sh
+python3 tests/integration/run_repair_acceptance.py
+python3 tests/integration/run_repair_deadlines.py
+python3 tests/integration/run_smtp_acceptance.py
+```
+
+运行环境、精确断言与剩余部署边界见[补充证据](../evidence/repair-acceptance.md)。CI显式启用两个隔离数据库suite，并将公共HTTP套件连接到真实Mailpit；任何套件零测试或跳过都会失败。CI执行结果以真实流水线为准，本机通过不等同GitLab已通过。

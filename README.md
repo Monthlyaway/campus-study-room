@@ -77,6 +77,7 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 - [安装与运维](docs/modules/operations.md)、[Ubuntu 一键运行环境](docs/modules/bootstrap.md)、[离线安装包](docs/modules/portable-release.md)
 - [账号管理](docs/modules/administration.md)、[核心预约与审批](docs/modules/core.md)、[维修](docs/modules/repair.md)、[前端](docs/modules/web.md)
 - [请求关联与运行日志](docs/modules/observability.md)
+- [维修负面矩阵、三期限和真实 SMTP 验收](docs/evidence/repair-acceptance.md)
 - [39 条 P0 需求追踪](docs/requirements-traceability.md)
 
 前端采用 Sites skill 的本地设计指导并使用 Playwright 调试，不注册或发布 Site。独立 agent 必须实际试用前端并记录反馈。P1 自然语言业务 Agent 尚未启动，P0 优先。

@@ -1,0 +1,25 @@
+{
+  "executedAt": "2026-10-22T13:30:29.311752+00:00",
+  "transport": "real HTTP core localhost:8081 / repair localhost:8082 + real Mailpit localhost:18025",
+  "tests": 5,
+  "seconds": 309.835,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "testNames": [
+    "test_01_create_validation_department_and_visibility",
+    "test_02_assignment_scope_invalid_worker_and_cancel_terminal",
+    "test_03_reassignment_keeps_deadline_old_worker_loses_access",
+    "test_04_completion_acceptance_and_cancellation_keep_resource_block",
+    "test_05_worker_reporter_admin_cannot_self_accept_and_rating_is_once"
+  ],
+  "productionChanges": "none",
+  "fixtureIsolation": "unique synthetic users/departments/rooms via public APIs; no business SQL writes",
+  "inRepairRatingSupplement": {
+    "tests": 1,
+    "seconds": 119.478,
+    "failures": 0,
+    "executedAt": "2026-10-22T13:37:28.804842+00:00",
+    "case": "test_04_completion_acceptance_and_cancellation_keep_resource_block"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "executedAt": "2026-10-22T13:45:19Z",
+  "database": "studyroom_core_smtp",
+  "transport": "actual SMTP sockets: 421 unavailable peer, then local Mailpit SMTP port 11025; Mailpit API verifies body and recipient",
+  "timeControl": "Spring test-only Clock; production notification claim/sendMail/delivered unchanged",
+  "tests": 2,
+  "seconds": 19.119,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "testNames": [
+    "realSmtpEightFailuresContinueAndManualRetryDeliversOriginalReadNotification",
+    "allThreeM1ReminderKindsReachRealMailpitWithoutDuplicateBusinessRecords"
+  ]
+}
