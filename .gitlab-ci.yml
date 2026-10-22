@@ -43,12 +43,7 @@ frontend:
       files: [apps/web/pnpm-lock.yaml]
     paths: [apps/web/.pnpm-store/]
   before_script:
-    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
-    # The slim image has no OS trust store. Bootstrap HTTPS using Node's bundled roots.
-    - node -e "require('fs').writeFileSync('/tmp/studyroom-ci-ca.pem', require('tls').rootCertificates.join('\\n'))"
-    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
-    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
-    - rm /tmp/studyroom-ci-ca.pem
+    - ./scripts/ci-apt git ca-certificates
     - corepack enable
     - corepack prepare pnpm@10.34.7 --activate
     - cd apps/web
@@ -74,12 +69,17 @@ integration:
   services:
     - name: $STUDYROOM_CI_REGISTRY/postgres:18.6-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
       alias: postgres
+    - name: m.daocloud.io/docker.io/axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387
+      alias: mailpit
   variables:
     POSTGRES_DB: studyroom
     POSTGRES_USER: studyroom_bootstrap
     POSTGRES_PASSWORD: isolated-ci-service-only
     PGHOST: postgres
     PGPORT: '5432'
+    STUDYROOM_SMTP_HOST: mailpit
+    STUDYROOM_SMTP_PORT: '1025'
+    STUDYROOM_MAILPIT_URL: http://mailpit:8025
   resource_group: studyroom-test
   interruptible: false
   environment:
@@ -87,8 +87,7 @@ integration:
     action: start
     auto_stop_in: 1 day
   before_script:
-    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
-    - apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq && apt-get -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends python3 postgresql-client
+    - ./scripts/ci-apt python3 postgresql-client
   script:
     - python3 -m unittest discover -s tests/ops -v
     - python3 scripts/ci-integration.py
@@ -104,12 +103,7 @@ package:
   image: $STUDYROOM_CI_REGISTRY/node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
   needs: [backend, frontend, integration]
   before_script:
-    - for sources in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do if [ -f "$sources" ]; then sed -i "s|http://|https://|g" "$sources"; fi; done
-    # The slim image has no OS trust store. Bootstrap HTTPS using Node's bundled roots.
-    - node -e "require('fs').writeFileSync('/tmp/studyroom-ci-ca.pem', require('tls').rootCertificates.join('\\n'))"
-    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 update -qq
-    - apt-get -o Acquire::https::CaInfo=/tmp/studyroom-ci-ca.pem -o Acquire::Retries=3 -o Acquire::https::Timeout=30 install -y -qq --no-install-recommends git ca-certificates
-    - rm /tmp/studyroom-ci-ca.pem
+    - ./scripts/ci-apt git ca-certificates
   script:
     - mkdir -p output/release
     - git archive --format=tar.gz -o output/release/studyroom-source-$CI_COMMIT_SHORT_SHA.tar.gz "$CI_COMMIT_SHA"

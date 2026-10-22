@@ -74,3 +74,5 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 镜像缓存已使 [682503](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682503) 的任务开始运行，暴露两个独立问题：官方 Maven 容器将 `MAVEN_CONFIG` 用作目录，wrapper将其解释为命令行参数；CI显式清空该变量，缓存路径仍由 `MAVEN_OPTS` 指定。Node镜像安装Git时系统源的HTTP 80端口超时；CI仅将原官方APT源改用HTTPS，保留TLS与包签名校验，限制连接超时和重试。上述失败已保留，后续以真实任务结果判断。
 
 流水线682547的后端verify已通过；前端进一步暴露 slim Node 镜像没有系统CA，无法直接通过HTTPS安装CA包。CI先用该固定Node镜像内置的根证书建立临时APT信任文件，保持证书链和包签名校验，装好系统CA/Git后删除临时文件；相同镜像的本机容器复现实测通过，GitLab复跑仍以实际job为准。
+
+[682607](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682607)证实根证书引导通过，但Runner到Debian官方源443端口仍连接超时。`scripts/ci-apt`把临时CI容器的发行版源改为TUNA的HTTPS镜像，保持发行版签名/有效期和TLS校验，并让索引获取失败明确退出。依据[TUNA Debian](https://mirrors.tuna.tsinghua.edu.cn/help/debian/)与[Ubuntu](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)说明；该脚本不修改本机或部署服务器的系统源。固定Node镜像实测安装成功。
