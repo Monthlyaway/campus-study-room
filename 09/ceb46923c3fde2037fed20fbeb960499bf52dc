@@ -1,0 +1,143 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "09ceb46923c3fde2037fed20fbeb960499bf52dc",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/typed-inputs.md",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/ApplicationCancelRequest.java",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/ApplicationCreateRequest.java",
+      "additions": {
+        "human": 33
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/ApplicationDecisionRequest.java",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/JsonCommand.java",
+      "additions": {
+        "human": 87
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/ReservationActionRequest.java",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "modules/api-contracts/src/main/java/com/campus/studyroom/api/command/ReservationCreateRequest.java",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CoreInputBoundaryTest.java",
+      "additions": {
+        "human": 746
+      }
+    },
+    {
+      "new_path": "tests/integration/run_core_inputs.py",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "contracts/openapi/README.md",
+      "new_path": "contracts/openapi/README.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "additions": {
+        "human": 25
+      },
+      "deletions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "additions": {
+        "human": 36
+      },
+      "deletions": {
+        "human": 16
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 9
+      }
+    }
+  ]
+}
