@@ -33,6 +33,8 @@ class RepairService {
         this.orders=orders;this.histories=histories;this.acceptances=acceptances;this.ratings=ratings;this.outbox=outbox;this.deadlines=deadlines;this.audits=audits;
         this.idempotency=idempotency;this.core=core;this.json=json;this.clock=clock;this.tx=new TransactionTemplate(manager);this.entityManager=entityManager;
     }
+    // PostgreSQL timestamptz stores microseconds. Normalize before entities, JSON and deadlines share an event time.
+    Instant now(){return clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS);}
     RepairAccess access(SessionPrincipal principal,UUID requestId){return new RepairAccess(principal,requestId,core);}
     RepairOrder find(UUID id){return orders.findById(id).orElseThrow(RepairException::missing);}
     RepairOrder lock(UUID id){return orders.lock(id).orElseThrow(RepairException::missing);}
@@ -74,7 +76,7 @@ class RepairService {
         Map<String,Object> room=core.room(roomId,access.requestId);if(!Boolean.TRUE.equals(room.get("enabled")))throw new RepairException(422,"ROOM_DISABLED","教室已停用，无法新建报修");
         String cleanTitle=RepairPolicy.text(title,100,true,"标题"),cleanDescription=RepairPolicy.text(description,2000,true,"故障说明");
         return execute(key,"/api/v1/repairs",body,201,access,()->{
-            Instant now=clock.instant();RepairOrder order=new RepairOrder(access.principal.userId(),roomId,cleanTitle,cleanDescription,now);orders.saveAndFlush(order);
+            Instant now=now();RepairOrder order=new RepairOrder(access.principal.userId(),roomId,cleanTitle,cleanDescription,now);orders.saveAndFlush(order);
             history(order,null,"上报故障",null,null,access.principal.userId(),access.requestId,now);
             audit(order,null,"REPAIR_SUBMITTED","上报故障",access.principal.userId(),access.requestId,now,"USER");
             deadline(order,"ASSIGN_OVERDUE",0,order.assignDueAt,now);
@@ -103,7 +105,7 @@ class RepairService {
             RepairOrder r=lock(id);RepairPolicy.requireVersion(r.version,expected);
             // Authorization is fetched before the transaction; reject changed aggregate rather than use stale assignment.
             if(!Objects.equals(r.assignedTo,before.assignedTo)||!Objects.equals(r.reporterId,before.reporterId))throw RepairException.conflict("VERSION_CONFLICT","工单已更新，请刷新");
-            RepairStatus original=r.status;Instant now=clock.instant();UUID actor=access.principal.userId();String note=null;UUID previousAssignee=r.assignedTo;UUID historyId;
+            RepairStatus original=r.status;Instant now=now();UUID actor=access.principal.userId();String note=null;UUID previousAssignee=r.assignedTo;UUID historyId;
             List<String> actions=RepairAccess.actions(r,actor,rights,ratings.findByOrderId(r.id).isPresent());
             String needed=action.equals("acceptance")?(decision.equals("ACCEPT")?"accept":"reject"):action.equals("rating")?"rate":action;
             if(!actions.contains(needed)){
@@ -157,7 +159,7 @@ class RepairService {
         if(old.isPresent())return replay(old.get(),hash);
         try{return tx.execute(s->{
             IdempotencyRecord record=new IdempotencyRecord();record.id=UUID.randomUUID();record.actorType="USER";record.actorId=actor;record.method="POST";record.canonicalPath=path;record.key=key;
-            record.requestHash=hash;record.httpStatus=0;record.responseDataJson="{}";record.createdAt=clock.instant();record.expiresAt=record.createdAt.plus(Duration.ofHours(24));
+            record.requestHash=hash;record.httpStatus=0;record.responseDataJson="{}";record.createdAt=now();record.expiresAt=record.createdAt.plus(Duration.ofHours(24));
             entityManager.persist(record);entityManager.flush();
             Map<String,Object> result=action.get();record.httpStatus=status;record.responseDataJson=json.write(result);entityManager.flush();return new Result(status,result);
         });}catch(DataIntegrityViolationException ex){

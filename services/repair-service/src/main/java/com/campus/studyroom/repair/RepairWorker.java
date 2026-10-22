@@ -25,14 +25,14 @@ class RepairWorker {
         active.incrementAndGet();
         try {
             if(isPaused())return;
-            for(UUID id:service.deadlines.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;try{runDeadline(id);}catch(Exception ex){log.error("event=repair_deadline_failure taskId={} errorCode={}",id,errorCode(ex));}}
-            for(UUID id:service.outbox.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;try{deliver(id);}catch(Exception ex){log.error("event=repair_delivery_failure commandId={} errorCode={}",id,errorCode(ex));}}
+            for(UUID id:service.deadlines.due(service.now(),PageRequest.of(0,100))){if(isPaused())break;try{runDeadline(id);}catch(Exception ex){log.error("event=repair_deadline_failure taskId={} errorCode={}",id,errorCode(ex));}}
+            for(UUID id:service.outbox.due(service.now(),PageRequest.of(0,100))){if(isPaused())break;try{deliver(id);}catch(Exception ex){log.error("event=repair_delivery_failure commandId={} errorCode={}",id,errorCode(ex));}}
         } finally { active.decrementAndGet(); }
     }
     record Delivery(UUID id,UUID orderId,String type,String payload,UUID requestId,UUID leaseOwner){}
     void deliver(UUID id){
         Delivery delivery=service.tx.execute(status->{
-            OutboxCommand c=service.outbox.lock(id).orElse(null);Instant now=service.clock.instant();
+            OutboxCommand c=service.outbox.lock(id).orElse(null);Instant now=service.now();
             if(c==null||c.status.equals("DONE")||(c.status.equals("LEASED")&&c.leaseUntil!=null&&c.leaseUntil.isAfter(now))||c.nextAttemptAt.isAfter(now))return null;
             c.status="LEASED";c.leaseOwner=instanceId;c.leaseUntil=now.plusSeconds(120);c.lastAttemptAt=now;c.updatedAt=now;
             return new Delivery(c.commandId,c.orderId,c.commandType,c.payloadJson,c.requestId,instanceId);
@@ -46,7 +46,7 @@ class RepairWorker {
                 // Keep the same order -> outbox lock order as retry-sync.
                 RepairOrder order=service.lock(delivery.orderId);OutboxCommand c=service.outbox.lock(id).orElseThrow();
                 if(!c.status.equals("LEASED")||!delivery.leaseOwner.equals(c.leaseOwner))return;
-                Instant now=service.clock.instant();RepairStatus previous=order.status;boolean transitioned=false;
+                Instant now=service.now();RepairStatus previous=order.status;boolean transitioned=false;
                 if(c.commandType.equals("BLOCK")){
                     if(order.status!=RepairStatus.BLOCK_PENDING||order.resourceVersion!=1)throw RepairException.conflict("SYNC_STATE_CONFLICT","工单不再等待封禁确认");
                     order.status=RepairStatus.IN_REPAIR;transitioned=true;
@@ -61,7 +61,7 @@ class RepairWorker {
         }catch(Exception ex){
             service.tx.executeWithoutResult(status->{
                 OutboxCommand c=service.outbox.lock(id).orElseThrow();if(!delivery.leaseOwner.equals(c.leaseOwner)||c.status.equals("DONE"))return;
-                Instant now=service.clock.instant();c.attempts++;c.status="PENDING";c.leaseOwner=null;c.leaseUntil=null;c.lastErrorCode=errorCode(ex);c.nextAttemptAt=now.plusSeconds(RepairPolicy.retrySeconds(c.attempts));c.updatedAt=now;
+                Instant now=service.now();c.attempts++;c.status="PENDING";c.leaseOwner=null;c.leaseUntil=null;c.lastErrorCode=errorCode(ex);c.nextAttemptAt=now.plusSeconds(RepairPolicy.retrySeconds(c.attempts));c.updatedAt=now;
                 if(c.attempts>=8)log.error("event=repair_sync_attention commandId={} orderId={} attempts={} errorCode={}",c.commandId,c.orderId,c.attempts,c.lastErrorCode);
                 else log.warn("event=repair_sync_retry commandId={} requestId={} attempts={} errorCode={}",c.commandId,c.requestId,c.attempts,c.lastErrorCode);
             });
@@ -69,7 +69,7 @@ class RepairWorker {
     }
     void runDeadline(UUID taskId){
         service.tx.executeWithoutResult(status->{
-            DeadlineTask task=service.deadlines.lock(taskId).orElse(null);Instant now=service.clock.instant();
+            DeadlineTask task=service.deadlines.lock(taskId).orElse(null);Instant now=service.now();
             if(task==null||task.status.equals("DONE")||task.nextAttemptAt.isAfter(now))return;
             RepairOrder order=service.lock(task.sourceId);
             boolean fire=switch(task.taskType){
