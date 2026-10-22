@@ -1,0 +1,22 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "9f5fbab98e48d99f19389faa42922f7b441e0cb3",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/frontend-release-v4.md",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 8
+      }
+    }
+  ]
+}
