@@ -1,0 +1,25 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "14b9813d9f59676cb9b9618e4a3e3dd97406c102",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "tests/ops/test_release_compatibility.py",
+      "additions": {
+        "human": 40
+      }
+    },
+    {
+      "old_path": "tests/integration/release_compatibility.py",
+      "new_path": "tests/integration/release_compatibility.py",
+      "additions": {
+        "human": 19
+      },
+      "deletions": {
+        "human": 11
+      }
+    }
+  ]
+}
