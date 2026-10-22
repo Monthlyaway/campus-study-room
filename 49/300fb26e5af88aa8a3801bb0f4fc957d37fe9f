@@ -1,0 +1,216 @@
+tests/integration/core_http.py
+  s_8ca5a53b33de4c::t_be4f41a210ae48 18
+  s_8ca5a53b33de4c::t_dc4de0eabbf4ef 15-17
+  s_8ca5a53b33de4c::t_3ea565c90d6ecb 19-21
+contracts/openapi/core.yaml
+  s_8ca5a53b33de4c::t_9236e4bf995575 1-4411
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "49300fb26e5af88aa8a3801bb0f4fc957d37fe9f",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "contracts/openapi/core.yaml",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 4411
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/evidence/core/acceptance.md",
+      "additions": {
+        "human": 26
+      }
+    },
+    {
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 66
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AccessService.java",
+      "additions": {
+        "human": 127
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java",
+      "additions": {
+        "human": 561
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApiErrors.java",
+      "additions": {
+        "human": 40
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "additions": {
+        "human": 300
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/AuthController.java",
+      "additions": {
+        "human": 93
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingGuard.java",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/BookingService.java",
+      "additions": {
+        "human": 235
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CheckinCodes.java",
+      "additions": {
+        "human": 108
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java",
+      "additions": {
+        "human": 487
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/DomainPolicy.java",
+      "additions": {
+        "human": 57
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Events.java",
+      "additions": {
+        "human": 72
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Idempotency.java",
+      "additions": {
+        "human": 92
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/InternalController.java",
+      "additions": {
+        "human": 80
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Jobs.java",
+      "additions": {
+        "human": 89
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Notifications.java",
+      "additions": {
+        "human": 174
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Pages.java",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/QueryService.java",
+      "additions": {
+        "human": 169
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RateLimits.java",
+      "additions": {
+        "human": 77
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RequestCorrelationFilter.java",
+      "additions": {
+        "human": 36
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ResourceService.java",
+      "additions": {
+        "human": 225
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Room.java",
+      "additions": {
+        "human": 22
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/RoomRepository.java",
+      "additions": {
+        "human": 12
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java",
+      "additions": {
+        "human": 157
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/Store.java",
+      "additions": {
+        "human": 116
+      }
+    },
+    {
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/TaskExecutor.java",
+      "additions": {
+        "human": 49
+      }
+    },
+    {
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/DomainPolicyTest.java",
+      "additions": {
+        "human": 78
+      }
+    },
+    {
+      "new_path": "tests/integration/core_http.py",
+      "additions": {
+        "human": 154,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    }
+  ]
+}
