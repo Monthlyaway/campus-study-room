@@ -25,7 +25,7 @@ class EnvironmentLockTests(unittest.TestCase):
     def worker(self, state):
         process = subprocess.Popen([sys.executable, '-u', '-c', WORKER, str(ROOT / 'scripts/studyroom.py')],
                                    env={**os.environ, 'STUDYROOM_STATE_DIR': str(state)},
-                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         self.addCleanup(self.close, process)
         self.assertEqual(self.line(process), b'ready')
         return process
