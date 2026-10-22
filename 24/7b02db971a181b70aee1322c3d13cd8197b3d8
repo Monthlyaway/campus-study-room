@@ -1,0 +1,32 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "247b02db971a181b70aee1322c3d13cd8197b3d8",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "tests/ops/test_native_startup.py",
+      "additions": {
+        "human": 223
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "scripts/studyroom.py",
+      "new_path": "scripts/studyroom.py",
+      "additions": {
+        "human": 70
+      },
+      "deletions": {
+        "human": 27
+      }
+    }
+  ]
+}
