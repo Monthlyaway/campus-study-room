@@ -75,15 +75,24 @@ def assert_subset(actual, expected, label):
         raise RuntimeError(f"Compatibility assertion failed: {label}")
 
 
+EXPANDED_COLUMNS = {("core", "reservation", "operator_note"),
+                    ("repair", "repair_order", "assigned_to_name")}
+
+
+def expanded_column(column):
+    parts = tuple(column.split("."))
+    if parts not in EXPANDED_COLUMNS:
+        raise RuntimeError("Expanded column must be an explicitly supported nullable migration")
+    return parts
+
+
 def capture(environment, manifest_path, fixture_path, column):
     state, config = sandbox(environment)
     manifest = ops.verify_manifest(manifest_path, allow_older_schema=True)
     path = Path(fixture_path).resolve()
     if path.exists():
         raise RuntimeError("Fixture exists; use a new file for a new rehearsal")
-    parts = column.split(".")
-    if len(parts) != 3 or parts[:2] != ["core", "reservation"] or not re.fullmatch(r"[a-z][a-z0-9_]*", parts[2]):
-        raise RuntimeError("Expanded column must be core.reservation.<lowercase SQL identifier>")
+    parts = expanded_column(column)
     with ops.environment_lock(environment):
         versions_and_images(environment, manifest)
         if any((state / "control" / name).exists() for name in ("maintenance", "jobs-paused")):
@@ -124,7 +133,7 @@ def capture(environment, manifest_path, fixture_path, column):
                               {"path": f"/api/v1/repairs/{repair['id']}/cancel", "body": {"expectedVersion": repair["version"], "reason": "兼容演练验证旧版写入"}, "expected": {"id": repair["id"], "status": "CANCELLED"}},
                               {"actor": "applicant", "path": f"/api/v1/room-applications/{application['id']}/cancel",
                                "body": {"expectedVersion": application["version"]}, "expected": {"id": application["id"], "status": "CANCELLED"}}],
-                   "expandedColumn": {"schema": parts[0], "table": parts[1], "column": parts[2], "id": booking["id"], "value": "retained-" + uuid.uuid4().hex}}
+                   "expandedColumn": {"schema": parts[0], "table": parts[1], "column": parts[2], "id": (booking if parts[0] == "core" else repair)["id"], "value": "retained-" + uuid.uuid4().hex}}
         path.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
         with os.fdopen(descriptor, "w") as stream:
@@ -135,20 +144,19 @@ def capture(environment, manifest_path, fixture_path, column):
 
 def expanded_value(environment, fixture, initialize=False):
     column = fixture["expandedColumn"]
-    if column.get("schema") != "core" or column.get("table") != "reservation" or not re.fullmatch(r"[a-z][a-z0-9_]*", column.get("column", "")):
-        raise RuntimeError("Unexpected expanded-column probe")
+    schema, table, name = expanded_column(".".join(str(column.get(key, "")) for key in ("schema", "table", "column")))
     identifier = str(uuid.UUID(column["id"]))
     if not re.fullmatch(r"retained-[0-9a-f]{32}", column["value"]):
         raise RuntimeError("Unexpected expanded-column sentinel")
-    name, value = column["column"], column["value"]
+    value = column["value"]
     def query(sql):
         return ops.compose(environment, "exec", "-T", "postgres", "psql", "-X", "-v", "ON_ERROR_STOP=1", "-U", "studyroom_bootstrap", "-d", "studyroom", "-At", "-c", sql, capture=True).stdout.strip()
-    nullable = query(f"SELECT is_nullable FROM information_schema.columns WHERE table_schema='core' AND table_name='reservation' AND column_name='{name}'")
+    nullable = query(f"SELECT is_nullable FROM information_schema.columns WHERE table_schema='{schema}' AND table_name='{table}' AND column_name='{name}'")
     if nullable != "YES":
-        raise RuntimeError("Compatibility probe requires the newly added nullable reservation column")
+        raise RuntimeError("Compatibility probe requires the newly added nullable column")
     if initialize:
-        query(f"UPDATE core.reservation SET {name}='{value}' WHERE id='{identifier}'")
-    if query(f"SELECT {name} FROM core.reservation WHERE id='{identifier}'") != value:
+        query(f"UPDATE {schema}.{table} SET {name}='{value}' WHERE id='{identifier}'")
+    if query(f"SELECT {name} FROM {schema}.{table} WHERE id='{identifier}'") != value:
         raise RuntimeError("Expanded-column sentinel was lost or changed")
 
 
