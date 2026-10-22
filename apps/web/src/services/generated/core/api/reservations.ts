@@ -2,13 +2,13 @@
 /* eslint-disable */
 import { request } from "../../../api";
 
-/** Reservations GET /api/v1/reservations Returns only the authenticated user’s reservations. Date and state predicates apply before both total counting and pagination; order is startAt descending, then id. Invalid timestamps or a non-increasing range return HTTP 400. GET /api/v1/reservations */
+/** Reservations GET /api/v1/reservations Only the current user. Filters apply before count and pagination; ordered by startAt descending then id. Invalid timestamps or non-increasing date range return 400. GET /api/v1/reservations */
 export async function getApiV1Reservations(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.getApiV1ReservationsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/reservations", {
+  return request<CoreAPI.ReservationPage>("/api/v1/reservations", {
     method: "GET",
     params: {
       // page has a default value: 1
@@ -27,7 +27,7 @@ export async function postApiV1Reservations(
   body: CoreAPI.ReservationCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/reservations", {
+  return request<CoreAPI.Reservation>("/api/v1/reservations", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,15 +44,9 @@ export async function getApiV1ReservationsId(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/reservations/${param0}`, {
+  return request<CoreAPI.Reservation>(`/api/v1/reservations/${param0}`, {
     method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-      ...queryParams,
-    },
+    params: { ...queryParams },
     ...(options || {}),
   });
 }
@@ -65,7 +59,7 @@ export async function postApiV1ReservationsIdCancel(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/reservations/${param0}/cancel`, {
+  return request<CoreAPI.Reservation>(`/api/v1/reservations/${param0}/cancel`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -80,11 +74,11 @@ export async function postApiV1ReservationsIdCancel(
 export async function postApiV1ReservationsIdCheckIn(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.postApiV1ReservationsIdCheckInParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.CheckinCommand,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(
+  return request<CoreAPI.Reservation>(
     `/api/v1/reservations/${param0}/check-in`,
     {
       method: "POST",
@@ -104,7 +98,7 @@ export async function getApiV1Violations(
   params: CoreAPI.getApiV1ViolationsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/violations", {
+  return request<CoreAPI.ViolationPage>("/api/v1/violations", {
     method: "GET",
     params: {
       // page has a default value: 1

@@ -62,6 +62,7 @@ public class CoreController {
       int status,
       Supplier<Object> action) {
     var r = idem.execute(user(a), method, path, key, b, status, action);
+    if (r.status() == 204) return ResponseEntity.noContent().build();
     return ResponseEntity.status(r.status()).body(ApiResponse.of(r.data()));
   }
 
@@ -319,7 +320,7 @@ public class CoreController {
         "/users/" + id + "/reset-password",
         key,
         b,
-        200,
+        204,
         () -> admin.resetPassword(user(a), id, b));
   }
 

@@ -8,7 +8,7 @@ export async function getApiV1AuditEvents(
   params: CoreAPI.getApiV1AuditEventsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/audit-events", {
+  return request<CoreAPI.AuditEventPage>("/api/v1/audit-events", {
     method: "GET",
     params: {
       // page has a default value: 1
@@ -28,13 +28,14 @@ export async function getApiV1NotificationDeliveries(
   params: CoreAPI.getApiV1NotificationDeliveriesParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/notification-deliveries", {
+  return request<CoreAPI.NotificationPage>("/api/v1/notification-deliveries", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
       // size has a default value: 20
       size: "20",
+
       ...params,
     },
     ...(options || {}),
@@ -49,18 +50,15 @@ export async function postApiV1NotificationDeliveriesIdRetry(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(
-    `/api/v1/notification-deliveries/${param0}/retry`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      params: { ...queryParams },
-      data: body,
-      ...(options || {}),
-    }
-  );
+  return request<any>(`/api/v1/notification-deliveries/${param0}/retry`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    params: { ...queryParams },
+    data: body,
+    ...(options || {}),
+  });
 }
 
 /** Administration GET /api/v1/notifications GET /api/v1/notifications */
@@ -69,13 +67,14 @@ export async function getApiV1Notifications(
   params: CoreAPI.getApiV1NotificationsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/notifications", {
+  return request<CoreAPI.NotificationPage>("/api/v1/notifications", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
       // size has a default value: 20
       size: "20",
+
       ...params,
     },
     ...(options || {}),
@@ -90,7 +89,7 @@ export async function postApiV1NotificationsIdRead(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/notifications/${param0}/read`, {
+  return request<CoreAPI.Notification>(`/api/v1/notifications/${param0}/read`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -101,50 +100,28 @@ export async function postApiV1NotificationsIdRead(
   });
 }
 
-/** Administration GET /api/v1/permissions GET /api/v1/permissions */
-export async function getApiV1Permissions(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: CoreAPI.getApiV1PermissionsParams,
-  options?: { [key: string]: any }
-) {
-  return request<Record<string, any>>("/api/v1/permissions", {
+/** Administration GET /api/v1/permissions Fixed permission catalog, first page with size 100. GET /api/v1/permissions */
+export async function getApiV1Permissions(options?: { [key: string]: any }) {
+  return request<CoreAPI.PermissionPage>("/api/v1/permissions", {
     method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-      ...params,
-    },
     ...(options || {}),
   });
 }
 
-/** Administration GET /api/v1/roles GET /api/v1/roles */
-export async function getApiV1Roles(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: CoreAPI.getApiV1RolesParams,
-  options?: { [key: string]: any }
-) {
-  return request<Record<string, any>>("/api/v1/roles", {
+/** Administration GET /api/v1/roles Returns the first 100 enabled roles ordered by code; page and size are not accepted as filters. GET /api/v1/roles */
+export async function getApiV1Roles(options?: { [key: string]: any }) {
+  return request<CoreAPI.RoleWithPermissionsPage>("/api/v1/roles", {
     method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-      ...params,
-    },
     ...(options || {}),
   });
 }
 
 /** Administration POST /api/v1/roles POST /api/v1/roles */
 export async function postApiV1Roles(
-  body: Record<string, any>,
+  body: CoreAPI.RoleCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/roles", {
+  return request<CoreAPI.Role>("/api/v1/roles", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -162,7 +139,7 @@ export async function deleteApiV1RolesId(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/roles/${param0}`, {
+  return request<CoreAPI.RoleDisabled>(`/api/v1/roles/${param0}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -177,11 +154,11 @@ export async function deleteApiV1RolesId(
 export async function putApiV1RolesIdPermissions(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.putApiV1RolesIdPermissionsParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.RolePermissionsCommand,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/roles/${param0}/permissions`, {
+  return request<CoreAPI.Role>(`/api/v1/roles/${param0}/permissions`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -192,19 +169,15 @@ export async function putApiV1RolesIdPermissions(
   });
 }
 
-/** Administration GET /api/v1/statistics/usage GET /api/v1/statistics/usage */
+/** Administration GET /api/v1/statistics/usage Inclusive local date range in Asia/Shanghai, up to 31 days. Scope restrictions apply before aggregation. No individual ranking. GET /api/v1/statistics/usage */
 export async function getApiV1StatisticsUsage(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.getApiV1StatisticsUsageParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/statistics/usage", {
+  return request<CoreAPI.UsageStatistics>("/api/v1/statistics/usage", {
     method: "GET",
     params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
       ...params,
     },
     ...(options || {}),
@@ -212,30 +185,19 @@ export async function getApiV1StatisticsUsage(
 }
 
 /** Administration GET /api/v1/system-config GET /api/v1/system-config */
-export async function getApiV1SystemConfig(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: CoreAPI.getApiV1SystemConfigParams,
-  options?: { [key: string]: any }
-) {
-  return request<Record<string, any>>("/api/v1/system-config", {
+export async function getApiV1SystemConfig(options?: { [key: string]: any }) {
+  return request<CoreAPI.SystemConfig>("/api/v1/system-config", {
     method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-      ...params,
-    },
     ...(options || {}),
   });
 }
 
 /** Administration PATCH /api/v1/system-config PATCH /api/v1/system-config */
 export async function patchApiV1SystemConfig(
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.ConfigCommand,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/system-config", {
+  return request<CoreAPI.SystemConfig>("/api/v1/system-config", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -251,7 +213,7 @@ export async function getApiV1Users(
   params: CoreAPI.getApiV1UsersParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/users", {
+  return request<CoreAPI.ManagedUserPage>("/api/v1/users", {
     method: "GET",
     params: {
       // page has a default value: 1
@@ -266,10 +228,10 @@ export async function getApiV1Users(
 
 /** Administration POST /api/v1/users POST /api/v1/users */
 export async function postApiV1Users(
-  body: Record<string, any>,
+  body: CoreAPI.UserCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/users", {
+  return request<CoreAPI.User>("/api/v1/users", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -283,11 +245,11 @@ export async function postApiV1Users(
 export async function patchApiV1UsersId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1UsersIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.UserUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/users/${param0}`, {
+  return request<CoreAPI.User>(`/api/v1/users/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -302,11 +264,11 @@ export async function patchApiV1UsersId(
 export async function postApiV1UsersIdResetPassword(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.postApiV1UsersIdResetPasswordParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.PasswordResetCommand,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(
+  return request<CoreAPI.LegacyPasswordResetResult>(
     `/api/v1/users/${param0}/reset-password`,
     {
       method: "POST",
@@ -328,13 +290,16 @@ export async function putApiV1UsersIdRoleBindings(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/users/${param0}/role-bindings`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    params: { ...queryParams },
-    data: body,
-    ...(options || {}),
-  });
+  return request<CoreAPI.RoleBindingsResult>(
+    `/api/v1/users/${param0}/role-bindings`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      params: { ...queryParams },
+      data: body,
+      ...(options || {}),
+    }
+  );
 }

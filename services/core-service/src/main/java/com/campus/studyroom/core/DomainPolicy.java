@@ -46,7 +46,7 @@ public final class DomainPolicy {
   }
 
   public static void version(long actual, Object expected) {
-    if (!(expected instanceof Number n) || n.longValue() != actual)
+    if (expectedVersion(expected) != actual)
       throw ApiException.conflict("VERSION_CONFLICT", "数据已变化，请刷新后重试");
   }
 
@@ -56,8 +56,19 @@ public final class DomainPolicy {
   }
 
   public static void version(Map<String, Object> m, Object expected) {
-    if (!(expected instanceof Number n) || n.longValue() != Store.number(m, "version"))
-      throw ApiException.conflict("VERSION_CONFLICT", "数据已变化，请刷新后重试");
+    version(Store.number(m, "version"), expected);
+  }
+
+  static long expectedVersion(Object value) {
+    if (value instanceof Number n) {
+      try {
+        long version = new java.math.BigDecimal(n.toString()).longValueExact();
+        if (version >= 0) return version;
+      } catch (ArithmeticException | NumberFormatException ignored) {
+        // Never truncate fractions or overflow into a valid aggregate version.
+      }
+    }
+    throw new ApiException(400, "INVALID_VERSION", "版本号必须为非负整数");
   }
 
   public static void requireState(Map<String, Object> m, String... allowed) {

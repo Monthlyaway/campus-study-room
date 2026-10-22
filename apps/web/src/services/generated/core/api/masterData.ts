@@ -8,7 +8,7 @@ export async function getApiV1AvailabilityRooms(
   params: CoreAPI.getApiV1AvailabilityRoomsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/availability/rooms", {
+  return request<CoreAPI.AvailableRoomPage>("/api/v1/availability/rooms", {
     method: "GET",
     params: {
       // page has a default value: 1
@@ -28,7 +28,7 @@ export async function getApiV1AvailabilitySeats(
   params: CoreAPI.getApiV1AvailabilitySeatsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/availability/seats", {
+  return request<CoreAPI.AvailableSeatPage>("/api/v1/availability/seats", {
     method: "GET",
     params: {
       // page has a default value: 1
@@ -48,13 +48,13 @@ export async function getApiV1Buildings(
   params: CoreAPI.getApiV1BuildingsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/buildings", {
+  return request<CoreAPI.BuildingPage>("/api/v1/buildings", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
-      // size has a default value: 20
-      size: "20",
+      // size has a default value: 100
+      size: "100",
       ...params,
     },
     ...(options || {}),
@@ -63,10 +63,10 @@ export async function getApiV1Buildings(
 
 /** MasterData POST /api/v1/buildings POST /api/v1/buildings */
 export async function postApiV1Buildings(
-  body: Record<string, any>,
+  body: CoreAPI.BuildingCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/buildings", {
+  return request<CoreAPI.Building>("/api/v1/buildings", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -80,11 +80,11 @@ export async function postApiV1Buildings(
 export async function patchApiV1BuildingsId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1BuildingsIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.MasterUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/buildings/${param0}`, {
+  return request<CoreAPI.Building>(`/api/v1/buildings/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -101,13 +101,13 @@ export async function getApiV1Campuses(
   params: CoreAPI.getApiV1CampusesParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/campuses", {
+  return request<CoreAPI.CampusPage>("/api/v1/campuses", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
-      // size has a default value: 20
-      size: "20",
+      // size has a default value: 100
+      size: "100",
       ...params,
     },
     ...(options || {}),
@@ -116,10 +116,10 @@ export async function getApiV1Campuses(
 
 /** MasterData POST /api/v1/campuses POST /api/v1/campuses */
 export async function postApiV1Campuses(
-  body: Record<string, any>,
+  body: CoreAPI.MasterCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/campuses", {
+  return request<CoreAPI.Campus>("/api/v1/campuses", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -133,11 +133,11 @@ export async function postApiV1Campuses(
 export async function patchApiV1CampusesId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1CampusesIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.MasterUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/campuses/${param0}`, {
+  return request<CoreAPI.Campus>(`/api/v1/campuses/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -154,13 +154,13 @@ export async function getApiV1Departments(
   params: CoreAPI.getApiV1DepartmentsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/departments", {
+  return request<CoreAPI.DepartmentPage>("/api/v1/departments", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
-      // size has a default value: 20
-      size: "20",
+      // size has a default value: 100
+      size: "100",
       ...params,
     },
     ...(options || {}),
@@ -169,10 +169,10 @@ export async function getApiV1Departments(
 
 /** MasterData POST /api/v1/departments POST /api/v1/departments */
 export async function postApiV1Departments(
-  body: Record<string, any>,
+  body: CoreAPI.MasterCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/departments", {
+  return request<CoreAPI.Department>("/api/v1/departments", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -186,11 +186,11 @@ export async function postApiV1Departments(
 export async function patchApiV1DepartmentsId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1DepartmentsIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.MasterUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/departments/${param0}`, {
+  return request<CoreAPI.Department>(`/api/v1/departments/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -207,13 +207,14 @@ export async function getApiV1Rooms(
   params: CoreAPI.getApiV1RoomsParams,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/rooms", {
+  return request<CoreAPI.RoomSummaryPage>("/api/v1/rooms", {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
-      // size has a default value: 20
-      size: "20",
+      // size has a default value: 100
+      size: "100",
+
       ...params,
     },
     ...(options || {}),
@@ -222,10 +223,10 @@ export async function getApiV1Rooms(
 
 /** MasterData POST /api/v1/rooms POST /api/v1/rooms */
 export async function postApiV1Rooms(
-  body: Record<string, any>,
+  body: CoreAPI.RoomCreate,
   options?: { [key: string]: any }
 ) {
-  return request<Record<string, any>>("/api/v1/rooms", {
+  return request<CoreAPI.Room>("/api/v1/rooms", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -235,14 +236,14 @@ export async function postApiV1Rooms(
   });
 }
 
-/** 此处后端没有提供注释 GET /api/v1/rooms/${param0} */
+/** GET /api/v1/rooms/{id} GET /api/v1/rooms/${param0} */
 export async function getRoom(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.getRoomParams,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<any>(`/api/v1/rooms/${param0}`, {
+  return request<CoreAPI.RoomDetail>(`/api/v1/rooms/${param0}`, {
     method: "GET",
     params: { ...queryParams },
     ...(options || {}),
@@ -253,11 +254,11 @@ export async function getRoom(
 export async function patchApiV1RoomsId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1RoomsIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.MasterUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}`, {
+  return request<CoreAPI.Room>(`/api/v1/rooms/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -275,18 +276,16 @@ export async function getApiV1RoomsIdAvailability(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}/availability`, {
-    method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-
-      ...queryParams,
-    },
-    ...(options || {}),
-  });
+  return request<CoreAPI.RoomAvailability>(
+    `/api/v1/rooms/${param0}/availability`,
+    {
+      method: "GET",
+      params: {
+        ...queryParams,
+      },
+      ...(options || {}),
+    }
+  );
 }
 
 /** MasterData GET /api/v1/rooms/{id}/display-code GET /api/v1/rooms/${param0}/display-code */
@@ -296,15 +295,9 @@ export async function getApiV1RoomsIdDisplayCode(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}/display-code`, {
+  return request<CoreAPI.DisplayCode>(`/api/v1/rooms/${param0}/display-code`, {
     method: "GET",
-    params: {
-      // page has a default value: 1
-      page: "1",
-      // size has a default value: 20
-      size: "20",
-      ...queryParams,
-    },
+    params: { ...queryParams },
     ...(options || {}),
   });
 }
@@ -313,11 +306,11 @@ export async function getApiV1RoomsIdDisplayCode(
 export async function putApiV1RoomsIdOpeningRules(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.putApiV1RoomsIdOpeningRulesParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.OpeningRulesCommand,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}/opening-rules`, {
+  return request<CoreAPI.RoomDetail>(`/api/v1/rooms/${param0}/opening-rules`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -335,7 +328,7 @@ export async function getApiV1RoomsIdResourceClaims(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(
+  return request<CoreAPI.ResourceClaimPage>(
     `/api/v1/rooms/${param0}/resource-claims`,
     {
       method: "GET",
@@ -359,13 +352,13 @@ export async function getApiV1RoomsIdSeats(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}/seats`, {
+  return request<CoreAPI.SeatPage>(`/api/v1/rooms/${param0}/seats`, {
     method: "GET",
     params: {
       // page has a default value: 1
       page: "1",
-      // size has a default value: 20
-      size: "20",
+      // size has a default value: 100
+      size: "100",
       ...queryParams,
     },
     ...(options || {}),
@@ -376,11 +369,11 @@ export async function getApiV1RoomsIdSeats(
 export async function postApiV1RoomsIdSeats(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.postApiV1RoomsIdSeatsParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.SeatCreate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/rooms/${param0}/seats`, {
+  return request<CoreAPI.Seat>(`/api/v1/rooms/${param0}/seats`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -395,11 +388,11 @@ export async function postApiV1RoomsIdSeats(
 export async function patchApiV1SeatsId(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: CoreAPI.patchApiV1SeatsIdParams,
-  body: CoreAPI.VersionCommand,
+  body: CoreAPI.SeatUpdate,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<Record<string, any>>(`/api/v1/seats/${param0}`, {
+  return request<CoreAPI.Seat>(`/api/v1/seats/${param0}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

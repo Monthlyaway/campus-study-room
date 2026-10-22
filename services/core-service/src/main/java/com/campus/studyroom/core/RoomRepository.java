@@ -18,6 +18,7 @@ public interface RoomRepository extends JpaRepository<Room, UUID>, JpaSpecificat
 
   @Query(
       "select room from Room room where (:building is null or room.buildingId=:building) and"
+          + " (:filterDepartment is null or room.departmentId=:filterDepartment) and"
           + " (room.departmentId is null or room.departmentId=:department or exists (select s.id"
           + " from UserRoleEntity ur join RoleEntity role on role.id=ur.roleId join"
           + " RolePermissionEntity rp on rp.roleId=role.id join PermissionEntity p on"
@@ -30,6 +31,7 @@ public interface RoomRepository extends JpaRepository<Room, UUID>, JpaSpecificat
       @Param("user") UUID user,
       @Param("department") UUID department,
       @Param("building") UUID building,
+      @Param("filterDepartment") UUID filterDepartment,
       @Param("permissions") Collection<String> permissions,
       Pageable pageable);
 }

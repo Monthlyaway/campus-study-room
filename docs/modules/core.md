@@ -59,6 +59,7 @@ M3 BLOCK 创建本来源的整室封禁，取消未来 RESERVED、打断 CHECKED
 python3 tests/integration/core_http.py
 python3 tests/integration/run_core_persistence.py
 python3 tests/integration/run_core_acceptance.py
+python3 tests/integration/run_core_contract.py
 python3 tests/integration/core_roles_http.py
 python3 tests/integration/core_mutation.py
 ```
@@ -67,10 +68,10 @@ HTTP 验收要求真实服务和 PostgreSQL，使用隔离演示库，创建独�
 
 ## 当前验证边界
 
-接口覆盖不等于所有基线门禁通过。负载规模验收、完整SQL数量分析、生产SMTP、生产审批晋级、旧版镜像兼容演练分别由总体交付任务维护，不在本模块文档中宣称完成。接口契约的通用管理输入/响应 schema 还需随着完整契约验收细化；运行时行为以类型和真实HTTP验收共同约束。
+接口覆盖不等于所有基线门禁通过。负载规模验收、完整SQL数量分析、生产SMTP、生产审批晋级、旧版镜像兼容演练分别由总体交付任务维护，不在本模块文档中宣称完成。公开56操作与内部5操作已补具名请求/响应、错误与查询契约，见[契约说明](../../contracts/openapi/README.md)。实际HTTP契约断言验证主要业务与管理响应，不能据此宣称全部操作的完整行为矩阵已通过；Java请求DTO仍分阶段迁移。
 
 ### 持续重构状态
 
-第一轮原生SQL行为实现已作为历史提交保留。后续预约、申请、资源写入已迁移为 Spring Data JPA 聚合仓储，并通过6个HTTP及16个隔离PG用例，另有15个独立权限/时间/统计矩阵用例与1个跨服务动态角色用例；3项故意破坏约束的反证均被测试检测。可用性、审计与资源占用查询已使用数据库分页和条件过滤。账号管理说明见 `administration.md`，共享任务与通知已由对应负责人迁移实体仓储；完整 typed API schema 与总体容量验收仍需最终门禁确认。
+第一轮原生SQL行为实现已作为历史提交保留。后续预约、申请、资源写入已迁移为 Spring Data JPA 聚合仓储，并通过6个HTTP及16个隔离PG用例，另有15个独立权限/时间/统计矩阵用例与1个跨服务动态角色用例；3项故意破坏约束的反证均被测试检测。可用性、审计与资源占用查询已使用数据库分页和条件过滤。账号管理说明见 `administration.md`，共享任务与通知已由对应负责人迁移实体仓储；Java请求DTO整改与总体发布验收仍需最终门禁确认。
 
 框架产生的方法不支持、路由不存在等4xx保持其HTTP状态和标准响应头，不记作内部500；错误响应不回显框架异常中的请求输入。剩余需求矩阵的执行和固定统计数据口径见[矩阵证据](../evidence/core/acceptance-matrix.md)。

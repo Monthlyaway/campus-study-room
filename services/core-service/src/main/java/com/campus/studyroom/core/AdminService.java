@@ -161,6 +161,7 @@ public class AdminService {
                   u,
                   accounts.findById(u).orElseThrow(ApiException::notFound).departmentId,
                   optionalId(q.get("buildingId")),
+                  optionalId(q.get("departmentId")),
                   VISIBLE_PERMISSIONS,
                   p));
       case "seats" -> {
