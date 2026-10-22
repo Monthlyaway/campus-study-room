@@ -1,0 +1,31 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "d5b4f8423f088bae939310b408a721ab48fd7589",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/repair-timestamp-precision.json",
+      "additions": {
+        "human": 76
+      }
+    },
+    {
+      "new_path": "docs/evidence/repair-timestamp-precision.md",
+      "additions": {
+        "human": 32
+      }
+    },
+    {
+      "old_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java",
+      "new_path": "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java",
+      "additions": {
+        "human": 52
+      },
+      "deletions": {
+        "human": 52
+      }
+    }
+  ]
+}
