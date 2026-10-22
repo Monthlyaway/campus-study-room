@@ -1,0 +1,53 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "f89be2f200016f33f8e2461b9297d0a37692ecb3",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/release/scheduled-backup.json",
+      "additions": {
+        "human": 121
+      }
+    },
+    {
+      "new_path": "scripts/backup_schedule.py",
+      "additions": {
+        "human": 195
+      }
+    },
+    {
+      "new_path": "scripts/schedule-backup",
+      "additions": {
+        "human": 3
+      }
+    },
+    {
+      "new_path": "tests/ops/test_backup_schedule.py",
+      "additions": {
+        "human": 184
+      }
+    },
+    {
+      "old_path": "install.sh",
+      "new_path": "install.sh",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "scripts/studyroom.py",
+      "new_path": "scripts/studyroom.py",
+      "additions": {
+        "human": 32
+      },
+      "deletions": {
+        "human": 6
+      }
+    }
+  ]
+}
