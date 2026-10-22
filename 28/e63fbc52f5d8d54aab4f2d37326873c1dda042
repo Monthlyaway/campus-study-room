@@ -1,0 +1,69 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "28e63fbc52f5d8d54aab4f2d37326873c1dda042",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "docs/evidence/core/atomic-workflows.md",
+      "additions": {
+        "human": 25
+      }
+    },
+    {
+      "old_path": "docs/evidence/core/acceptance.md",
+      "new_path": "docs/evidence/core/acceptance.md",
+      "additions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 2
+      },
+      "deletions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 5
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "new_path": "services/core-service/src/main/java/com/campus/studyroom/core/ApplicationService.java",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "services/core-service/src/test/java/com/campus/studyroom/core/CorePersistenceTest.java",
+      "new_path": "services/core-service/src/test/java/com/campus/studyroom/core/CorePersistenceTest.java",
+      "additions": {
+        "human": 356
+      }
+    }
+  ]
+}
