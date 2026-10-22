@@ -9,6 +9,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 public class RepairApplication {
-    public static void main(String[] args) { SpringApplication.run(RepairApplication.class, args); }
-    @Bean Clock clock() { return Clock.systemUTC(); }
+  @Bean
+  com.campus.studyroom.security.BusinessRequestTracker businessRequestTracker() {
+    return new com.campus.studyroom.security.BusinessRequestTracker();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(RepairApplication.class, args);
+  }
+
+  @Bean
+  Clock clock() {
+    return Clock.systemUTC();
+  }
 }

@@ -45,6 +45,16 @@ public final class DomainPolicy {
     return s;
   }
 
+  public static void version(long actual, Object expected) {
+    if (!(expected instanceof Number n) || n.longValue() != actual)
+      throw ApiException.conflict("VERSION_CONFLICT", "数据已变化，请刷新后重试");
+  }
+
+  public static void requireState(String actual, String... allowed) {
+    if (!Arrays.asList(allowed).contains(actual))
+      throw ApiException.conflict("INVALID_STATE", "当前状态不允许此操作");
+  }
+
   public static void version(Map<String, Object> m, Object expected) {
     if (!(expected instanceof Number n) || n.longValue() != Store.number(m, "version"))
       throw ApiException.conflict("VERSION_CONFLICT", "数据已变化，请刷新后重试");

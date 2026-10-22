@@ -22,9 +22,12 @@ class RepairWorker {
     int activeCount(){return active.get();}
     @Scheduled(fixedDelayString="${studyroom.scan-interval-ms:30000}",initialDelayString="${studyroom.scan-initial-delay-ms:1000}")
     public void scan(){
-        if(isPaused())return;
-        for(UUID id:service.deadlines.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;active.incrementAndGet();try{runDeadline(id);}catch(Exception ex){log.error("event=repair_deadline_failure taskId={} errorCode={}",id,errorCode(ex));}finally{active.decrementAndGet();}}
-        for(UUID id:service.outbox.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;active.incrementAndGet();try{deliver(id);}catch(Exception ex){log.error("event=repair_delivery_failure commandId={} errorCode={}",id,errorCode(ex));}finally{active.decrementAndGet();}}
+        active.incrementAndGet();
+        try {
+            if(isPaused())return;
+            for(UUID id:service.deadlines.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;try{runDeadline(id);}catch(Exception ex){log.error("event=repair_deadline_failure taskId={} errorCode={}",id,errorCode(ex));}}
+            for(UUID id:service.outbox.due(service.clock.instant(),PageRequest.of(0,100))){if(isPaused())break;try{deliver(id);}catch(Exception ex){log.error("event=repair_delivery_failure commandId={} errorCode={}",id,errorCode(ex));}}
+        } finally { active.decrementAndGet(); }
     }
     record Delivery(UUID id,UUID orderId,String type,String payload,UUID requestId,UUID leaseOwner){}
     void deliver(UUID id){

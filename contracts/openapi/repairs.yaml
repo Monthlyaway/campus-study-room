@@ -3,7 +3,7 @@
   "info": {
     "title": "STUDYROOM repair-service API",
     "version": "0.1.0",
-    "description": "REQ-M3-01..08 / REQ-X-03. Every public write requires shared PJSESSION, CSRF and a UUID idempotency key. Pending resource operations remain pending until real core HTTP confirmation."
+    "description": "REQ-M3-01..08 / REQ-X-03. Every public write requires shared STUDYROOMSESSION, CSRF and a UUID idempotency key. Pending resource operations remain pending until real core HTTP confirmation."
   },
   "security": [
     {
@@ -1744,7 +1744,7 @@
       "sessionCookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "PJSESSION"
+        "name": "STUDYROOMSESSION"
       }
     },
     "schemas": {

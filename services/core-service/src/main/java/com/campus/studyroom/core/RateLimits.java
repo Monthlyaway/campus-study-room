@@ -1,6 +1,7 @@
 package com.campus.studyroom.core;
 
 import com.campus.studyroom.api.ApiException;
+import com.campus.studyroom.core.persistence.*;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -10,64 +11,62 @@ import org.springframework.transaction.annotation.*;
 public class RateLimits {
   final Store db;
   final Clock clock;
+  final RateLimitRepository records;
 
-  public RateLimits(Store d, Clock c) {
-    db = d;
-    clock = c;
+  public RateLimits(Store db, Clock clock, RateLimitRepository records) {
+    this.db = db;
+    this.clock = clock;
+    this.records = records;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void checkLogin(String key) {
-    var m = bucket(key);
-    if (m.get("blockedUntil") != null
-        && DomainPolicy.time(m.get("blockedUntil")).isAfter(clock.instant())) throw limited();
+    var r = bucket(key);
+    if (r.blockedUntil != null && r.blockedUntil.isAfter(clock.instant())) throw limited();
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void loginFailure(String key) {
-    var m = bucket(key);
-    List<String> times = times(m, 300);
+    var r = bucket(key);
+    var times = times(r, 300);
     times.add(clock.instant().toString());
-    if (times.size() > 5) times = times.subList(times.size() - 5, times.size());
-    db.update(
-        "update core.rate_limit_bucket set recent_attempts=cast(?1 as"
-            + " jsonb),blocked_until=?2,version=version+1 where bucket_key=?3",
-        Store.json(times),
-        times.size() >= 5 ? clock.instant().plusSeconds(300) : null,
-        key);
+    if (times.size() > 5) times = new ArrayList<>(times.subList(times.size() - 5, times.size()));
+    r.recentAttempts = times;
+    r.blockedUntil = times.size() >= 5 ? clock.instant().plusSeconds(300) : null;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void checkIn(UUID user) {
-    String key = "checkin:" + user;
-    var m = bucket(key);
-    List<String> times = times(m, 60);
+    var r = bucket("checkin:" + user);
+    var times = times(r, 60);
     if (times.size() >= 5) throw limited();
     times.add(clock.instant().toString());
-    db.update(
-        "update core.rate_limit_bucket set recent_attempts=cast(?1 as jsonb),version=version+1"
-            + " where bucket_key=?2",
-        Store.json(times),
-        key);
+    r.recentAttempts = times;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void clear(String key) {
-    db.update("delete from core.rate_limit_bucket where bucket_key=?1", key);
-  }
-
-  Map<String, Object> bucket(String key) {
     db.advisory(key);
-    db.update(
-        "insert into core.rate_limit_bucket(bucket_key) values(?1) on conflict do nothing", key);
-    return db.need("select * from core.rate_limit_bucket where bucket_key=?1 for update", key);
+    records.findById(key).ifPresent(records::delete);
   }
 
-  List<String> times(Map<String, Object> m, int seconds) {
-    List<String> result = new ArrayList<>();
-    for (Object x : (List<?>) m.get("recentAttempts"))
-      if (Instant.parse(x.toString()).isAfter(clock.instant().minusSeconds(seconds)))
-        result.add(x.toString());
+  RateLimitEntity bucket(String key) {
+    db.advisory(key);
+    return records
+        .findById(key)
+        .orElseGet(
+            () -> {
+              var r = new RateLimitEntity();
+              r.bucketKey = key;
+              r.recentAttempts = new ArrayList<>();
+              return records.save(r);
+            });
+  }
+
+  List<String> times(RateLimitEntity r, int seconds) {
+    var result = new ArrayList<String>();
+    for (String t : r.recentAttempts)
+      if (Instant.parse(t).isAfter(clock.instant().minusSeconds(seconds))) result.add(t);
     return result;
   }
 

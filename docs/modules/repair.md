@@ -40,7 +40,7 @@
 | `JOBS_PAUSED` | 启动时暂停任务的开关 |
 | `RELEASE_ID`、`GIT_COMMIT` | 版本响应 |
 
-私有 `GET /actuator/jobs` 返回 `{paused,active}`。发布器先创建暂停文件，再等待 active=0；Nginx 必须拒绝公网 `/actuator/*`。`/api/v1/repairs/version` 可查询维修服务实际版本。
+私有 `GET /actuator/jobs` 返回 `{paused,active,activeRequests}`。发布器先创建暂停文件，再等待后台扫描和业务请求都归零；扫描计数覆盖暂停检查与整个扫描，避免领取前的计数空档。Nginx 必须拒绝公网 `/actuator/*`。共享会话 cookie 为 `STUDYROOMSESSION`；`/api/v1/repairs/version` 可查询维修服务实际版本。
 
 ## 验证入口
 

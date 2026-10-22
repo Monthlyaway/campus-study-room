@@ -1,5 +1,6 @@
 package com.campus.studyroom.core;
 
+import com.campus.studyroom.core.persistence.AccountRepository;
 import com.campus.studyroom.security.SessionPrincipal;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -38,7 +39,7 @@ public class SecurityConfiguration {
   @Bean
   DefaultCookieSerializer cookie(@Value("${server.servlet.session.cookie.secure}") boolean secure) {
     var c = new DefaultCookieSerializer();
-    c.setCookieName("PJSESSION");
+    c.setCookieName("STUDYROOMSESSION");
     c.setCookiePath("/");
     c.setUseHttpOnlyCookie(true);
     c.setUseSecureCookie(secure);
@@ -47,17 +48,16 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  AuthenticationManager authenticationManager(Store db, PasswordEncoder encoder) {
+  AuthenticationManager authenticationManager(AccountRepository accounts, PasswordEncoder encoder) {
     UserDetailsService uds =
         username -> {
           var u =
-              db.one(
-                  "select * from core.app_user where username=?1",
-                  username.toLowerCase(Locale.ROOT));
-          if (u == null) throw new UsernameNotFoundException("Invalid credentials");
-          return User.withUsername(u.get("id").toString())
-              .password(u.get("passwordHash").toString())
-              .disabled(!Boolean.TRUE.equals(u.get("enabled")))
+              accounts
+                  .findByUsername(username.toLowerCase(Locale.ROOT))
+                  .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
+          return User.withUsername(u.id.toString())
+              .password(u.passwordHash)
+              .disabled(!u.enabled)
               .authorities("USER")
               .build();
         };
@@ -108,7 +108,8 @@ public class SecurityConfiguration {
                         "/api/v1/auth/csrf",
                         "/api/v1/auth/login",
                         "/api/v1/version",
-                        "/actuator/health/**")
+                        "/actuator/health/**",
+                        "/actuator/jobs")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

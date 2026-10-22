@@ -15,14 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheckinCodes {
   final Store db;
   final Clock clock;
+  final com.campus.studyroom.core.persistence.CheckinCodeRepository codes;
   final PasswordEncoder encoder;
   final byte[] key;
   final SecureRandom random = new SecureRandom();
 
   public CheckinCodes(
-      Store d, Clock c, PasswordEncoder e, @Value("${studyroom.checkin-key}") String k) {
+      Store d,
+      Clock c,
+      com.campus.studyroom.core.persistence.CheckinCodeRepository codes,
+      PasswordEncoder e,
+      @Value("${studyroom.checkin-key}") String k) {
     db = d;
     clock = c;
+    this.codes = codes;
     encoder = e;
     key = Base64.getDecoder().decode(k);
     if (key.length != 32)
@@ -33,48 +39,31 @@ public class CheckinCodes {
   public Map<String, Object> get(UUID room) {
     LocalDate day = clock.instant().atZone(DomainPolicy.ZONE).toLocalDate();
     db.advisory("code:" + room + ":" + day);
-    var r =
-        db.one(
-            "select * from core.room_checkin_code where room_id=?1 and local_date=?2", room, day);
+    var r = codes.findByRoomIdAndLocalDate(room, day).orElse(null);
     if (r == null) {
       String alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       StringBuilder s = new StringBuilder();
       for (int i = 0; i < 8; i++) s.append(alphabet.charAt(random.nextInt(alphabet.length())));
-      Instant end = day.plusDays(1).atStartOfDay(DomainPolicy.ZONE).toInstant();
-      db.update(
-          "insert into"
-              + " core.room_checkin_code(id,room_id,local_date,code_hash,code_ciphertext,expires_at)"
-              + " values(?1,?2,?3,?4,?5,?6)",
-          UUID.randomUUID(),
-          room,
-          day,
-          encoder.encode(s),
-          encrypt(s.toString()),
-          end);
-      r =
-          db.need(
-              "select * from core.room_checkin_code where room_id=?1 and local_date=?2", room, day);
+      r = new com.campus.studyroom.core.persistence.CheckinCodeEntity();
+      r.id = UUID.randomUUID();
+      r.roomId = room;
+      r.localDate = day;
+      r.codeHash = encoder.encode(s);
+      r.codeCiphertext = encrypt(s.toString());
+      r.expiresAt = day.plusDays(1).atStartOfDay(DomainPolicy.ZONE).toInstant();
+      codes.save(r);
     }
     return Map.of(
-        "localDate",
-        day.toString(),
-        "code",
-        decrypt(r.get("codeCiphertext").toString()),
-        "expiresAt",
-        r.get("expiresAt"));
+        "localDate", day.toString(), "code", decrypt(r.codeCiphertext), "expiresAt", r.expiresAt);
   }
 
   public boolean matches(UUID room, String code) {
     LocalDate day = clock.instant().atZone(DomainPolicy.ZONE).toLocalDate();
-    var r =
-        db.one(
-            "select code_hash from core.room_checkin_code where room_id=?1 and local_date=?2 and"
-                + " expires_at>?3",
-            room,
-            day,
-            clock.instant());
-    return r != null
-        && encoder.matches(code.trim().toUpperCase(Locale.ROOT), r.get("codeHash").toString());
+    return codes
+        .findByRoomIdAndLocalDate(room, day)
+        .filter(r -> r.expiresAt.isAfter(clock.instant()))
+        .map(r -> encoder.matches(code.trim().toUpperCase(Locale.ROOT), r.codeHash))
+        .orElse(false);
   }
 
   String encrypt(String s) {

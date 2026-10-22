@@ -24,7 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 class RepairSecurity {
     @Bean org.springframework.security.core.userdetails.UserDetailsService noLocalLogin(){return username->{throw new org.springframework.security.core.userdetails.UsernameNotFoundException("Authentication is provided by core-service");};}
     @Bean DefaultCookieSerializer cookieSerializer(@Value("${studyroom.cookie-secure:false}") boolean secure) {
-        DefaultCookieSerializer serializer=new DefaultCookieSerializer(); serializer.setCookieName("PJSESSION");
+        DefaultCookieSerializer serializer=new DefaultCookieSerializer(); serializer.setCookieName("STUDYROOMSESSION");
         serializer.setCookiePath("/"); serializer.setUseHttpOnlyCookie(true); serializer.setUseSecureCookie(secure); serializer.setSameSite("Lax"); return serializer;
     }
     @Bean SecurityFilterChain security(HttpSecurity http, CoreClient core, Clock clock, RepairJson json) throws Exception {

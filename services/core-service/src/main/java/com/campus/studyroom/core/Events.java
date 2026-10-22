@@ -1,35 +1,72 @@
 package com.campus.studyroom.core;
 
+import com.campus.studyroom.core.persistence.*;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class Events {
   final Store db;
   final Clock clock;
+  final AuditEventRepository audits;
+  final NotificationRepository notifications;
+  final ScheduledTaskRepository tasks;
 
-  public Events(Store d, Clock c) {
-    db = d;
-    clock = c;
+  public Events(
+      Store db,
+      Clock clock,
+      AuditEventRepository audits,
+      NotificationRepository notifications,
+      ScheduledTaskRepository tasks) {
+    this.db = db;
+    this.clock = clock;
+    this.audits = audits;
+    this.notifications = notifications;
+    this.tasks = tasks;
   }
 
   public void audit(
       UUID actor, String action, String type, UUID id, UUID room, Object before, Object after) {
-    db.update(
-        "insert into"
-            + " core.audit_event(id,actor_type,actor_id,action,object_type,object_id,room_id,source_type,source_id,before_json,after_json,request_id,created_at)"
-            + " values(?1,'USER',?2,?3,?4,?5,?6,?4,?5,cast(?7 as jsonb),cast(?8 as jsonb),?9,?10)",
-        UUID.randomUUID(),
-        actor,
-        action,
-        type,
-        id,
-        room,
-        Store.json(before),
-        Store.json(after),
-        com.campus.studyroom.api.RequestIds.current(),
-        clock.instant());
+    saveAudit("USER", actor, action, type, id, room, before, after);
+  }
+
+  public void systemAudit(
+      UUID actor, String action, String type, UUID id, UUID room, Object before, Object after) {
+    saveAudit("JOB", actor, action, type, id, room, before, after);
+  }
+
+  public void serviceAudit(
+      UUID actor, String action, String type, UUID id, UUID room, Object before, Object after) {
+    saveAudit("SERVICE", actor, action, type, id, room, before, after);
+  }
+
+  void saveAudit(
+      String actorType,
+      UUID actor,
+      String action,
+      String type,
+      UUID id,
+      UUID room,
+      Object before,
+      Object after) {
+    var a = new AuditEventEntity();
+    a.id = UUID.randomUUID();
+    a.actorType = actorType;
+    a.actorId = actor;
+    a.action = action;
+    a.objectType = type;
+    a.objectId = id;
+    a.roomId = room;
+    a.sourceType = type;
+    a.sourceId = id;
+    a.beforeJson = before == null ? null : Store.json(before);
+    a.afterJson = after == null ? null : Store.json(after);
+    a.requestId = com.campus.studyroom.api.RequestIds.current();
+    a.createdAt = clock.instant();
+    audits.save(a);
   }
 
   public void notify(
@@ -41,32 +78,38 @@ public class Events {
       String cycle,
       Map<String, Object> payload) {
     String key = source + ":" + id + ":" + event + ":" + cycle + ":" + recipient + ":EMAIL";
-    db.update(
-        "insert into"
-            + " core.notification(id,recipient_id,room_id,event_type,source_type,source_id,dedup_key,payload_json,due_at,next_attempt_at)"
-            + " values(?1,?2,?3,?4,?5,?6,?7,cast(?8 as jsonb),?9,?9) on conflict(dedup_key) do"
-            + " nothing",
-        UUID.randomUUID(),
-        recipient,
-        room,
-        event,
-        source,
-        id,
-        key,
-        Store.json(payload),
-        clock.instant());
+    db.advisory("notification:" + key);
+    if (notifications.existsByDedupKey(key)) return;
+    var n = new NotificationEntity();
+    n.id = UUID.randomUUID();
+    n.recipientId = recipient;
+    n.roomId = room;
+    n.eventType = event;
+    n.sourceType = source;
+    n.sourceId = id;
+    n.dedupKey = key;
+    n.payloadJson = Store.json(payload);
+    n.channel = "EMAIL";
+    n.status = "PENDING";
+    n.dueAt = clock.instant();
+    n.nextAttemptAt = n.dueAt;
+    n.createdAt = n.dueAt;
+    notifications.save(n);
   }
 
   public void task(String type, String source, UUID id, Instant due) {
-    db.update(
-        "insert into"
-            + " core.scheduled_task(id,task_type,source_type,source_id,dedup_key,due_at,next_attempt_at)"
-            + " values(?1,?2,?3,?4,?5,?6,?6) on conflict(dedup_key) do nothing",
-        UUID.randomUUID(),
-        type,
-        source,
-        id,
-        source + ":" + id + ":" + type + ":0",
-        due);
+    String key = source + ":" + id + ":" + type + ":0";
+    db.advisory("task:" + key);
+    if (tasks.existsByDedupKey(key)) return;
+    var t = new ScheduledTaskEntity();
+    t.id = UUID.randomUUID();
+    t.taskType = type;
+    t.sourceType = source;
+    t.sourceId = id;
+    t.dedupKey = key;
+    t.dueAt = due;
+    t.nextAttemptAt = due;
+    t.status = "PENDING";
+    tasks.save(t);
   }
 }

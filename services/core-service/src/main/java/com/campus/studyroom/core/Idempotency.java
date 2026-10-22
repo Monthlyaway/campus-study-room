@@ -13,10 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class Idempotency {
   final Store db;
   final Clock clock;
+  final com.campus.studyroom.core.persistence.IdempotencyRepository records;
 
-  public Idempotency(Store d, Clock c) {
+  public Idempotency(
+      Store d, Clock c, com.campus.studyroom.core.persistence.IdempotencyRepository records) {
     db = d;
     clock = c;
+    this.records = records;
   }
 
   public record Result(int status, Object data) {}
@@ -39,33 +42,29 @@ public class Idempotency {
     String hash = hash(body);
     db.advisory(actor + ":" + method + ":" + path + ":" + id);
     var old =
-        db.one(
-            "select * from core.idempotency_record where actor_id=?1 and method=?2 and"
-                + " canonical_path=?3 and key=?4",
-            actor,
-            method,
-            path,
-            id);
-    if (old != null) {
-      if (!hash.equals(old.get("requestHash")))
+        records.findByActorTypeAndActorIdAndMethodAndCanonicalPathAndKey(
+            "USER", actor, method, path, id);
+    if (old.isPresent()) {
+      var record = old.get();
+      if (!hash.equals(record.requestHash))
         throw ApiException.conflict("IDEMPOTENCY_KEY_REUSED", "同一请求编号不能用于不同内容");
-      return new Result(((Number) old.get("httpStatus")).intValue(), old.get("responseDataJson"));
+      return new Result(
+          record.httpStatus, Store.JSON.readValue(record.responseDataJson, Object.class));
     }
     Object data = action.get();
-    db.update(
-        "insert into"
-            + " core.idempotency_record(id,actor_type,actor_id,method,canonical_path,key,request_hash,http_status,response_data_json,created_at,expires_at)"
-            + " values(?1,'USER',?2,?3,?4,?5,?6,?7,cast(?8 as jsonb),?9,?10)",
-        UUID.randomUUID(),
-        actor,
-        method,
-        path,
-        id,
-        hash,
-        status,
-        Store.json(data),
-        clock.instant(),
-        clock.instant().plusSeconds(86400));
+    var record = new com.campus.studyroom.core.persistence.IdempotencyEntity();
+    record.id = UUID.randomUUID();
+    record.actorType = "USER";
+    record.actorId = actor;
+    record.method = method;
+    record.canonicalPath = path;
+    record.key = id;
+    record.requestHash = hash;
+    record.httpStatus = status;
+    record.responseDataJson = Store.json(data);
+    record.createdAt = clock.instant();
+    record.expiresAt = record.createdAt.plusSeconds(86400);
+    records.save(record);
     return new Result(status, data);
   }
 
