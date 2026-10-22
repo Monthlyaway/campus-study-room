@@ -1,0 +1,408 @@
+apps/web/tests/api.test.mjs
+  s_8ca5a53b33de4c::t_d9ff8cff3ffd48 1-13
+  s_8ca5a53b33de4c::t_4300ac151d6385 14-16
+apps/web/src/global.css
+  s_8ca5a53b33de4c::t_3994f6735c88d9 1-5
+  s_8ca5a53b33de4c::t_9482cf482851a7 6-8
+apps/web/src/services/types.ts
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-5
+  s_8ca5a53b33de4c::t_b19bc2ddaff956 6-8
+apps/web/scripts/generate.mjs
+  s_8ca5a53b33de4c::t_d9ff8cff3ffd48 1-16
+  s_8ca5a53b33de4c::t_24af1b6a4b5771 17-19
+apps/web/src/pages/Repairs.tsx
+  s_8ca5a53b33de4c::t_9f881e4d585dd5 1-25
+  s_8ca5a53b33de4c::t_ef0b9645ab42ba 26-28
+apps/web/src/pages/App.tsx
+  s_8ca5a53b33de4c::t_bed81c6f1ba687 28
+  s_8ca5a53b33de4c::t_add78bdc8f78d8 1-27,29-36
+  s_8ca5a53b33de4c::t_8aaa4f483ecb4f 37-39
+apps/web/src/pages/Display.tsx
+  s_8ca5a53b33de4c::t_add78bdc8f78d8 1-5
+  s_8ca5a53b33de4c::t_49da41e3b2d156 6-8
+apps/web/src/pages/Applications.tsx
+  s_8ca5a53b33de4c::t_9f881e4d585dd5 1-16
+  s_8ca5a53b33de4c::t_0f218eb2aab823 17-19
+apps/web/package.json
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-30
+  s_8ca5a53b33de4c::t_a915f490f82463 31-32
+apps/web/.umirc.ts
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-12
+  s_8ca5a53b33de4c::t_dab557a1ec89b8 13-15
+apps/web/src/pages/Admin.tsx
+  s_8ca5a53b33de4c::t_0c533acf0af1f6 1-15,17-29,31-34
+  s_8ca5a53b33de4c::t_bed81c6f1ba687 16,30
+  s_8ca5a53b33de4c::t_d8fc3762440af9 35-37
+apps/web/src/access.ts
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-4
+  s_8ca5a53b33de4c::t_32a7a130c9466e 5-7
+apps/web/src/services/session.tsx
+  s_8ca5a53b33de4c::t_7ed21a5a41e988 1-4
+  s_8ca5a53b33de4c::t_d62d64bd4c348a 5-7
+apps/web/tsconfig.json
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-20
+  s_8ca5a53b33de4c::t_ecb30994282d4d 21-22
+apps/web/public/favicon.svg
+  s_8ca5a53b33de4c::t_61c462716ebae7 1
+apps/web/src/services/api.ts
+  s_8ca5a53b33de4c::t_61c462716ebae7 1-43,45
+  s_8ca5a53b33de4c::t_66ad735a157cad 44
+  s_8ca5a53b33de4c::t_831c394f27fd42 46-48
+apps/web/src/pages/Reservations.tsx
+  s_8ca5a53b33de4c::t_0902a4ad36e3fd 1-7,9-11
+  s_8ca5a53b33de4c::t_bed81c6f1ba687 8
+  s_8ca5a53b33de4c::t_634862828f976f 12-14
+apps/web/src/components/business/common.tsx
+  s_8ca5a53b33de4c::t_bed81c6f1ba687 28,30,32
+  s_8ca5a53b33de4c::t_7ed21a5a41e988 1-27,29,31,34-35
+  s_8ca5a53b33de4c::t_1e4159f6010903 33
+  s_8ca5a53b33de4c::t_af5d49ab6fecbd 36-38
+apps/web/src/pages/Login.tsx
+  s_8ca5a53b33de4c::t_7ed21a5a41e988 1-9
+  s_8ca5a53b33de4c::t_03138d55c0f48e 10-12
+apps/web/src/pages/Notifications.tsx
+  s_8ca5a53b33de4c::t_add78bdc8f78d8 1-8
+  s_8ca5a53b33de4c::t_88feb22e9294c3 9-11
+apps/web/src/pages/Seats.tsx
+  s_8ca5a53b33de4c::t_1e4159f6010903 13,18
+  s_8ca5a53b33de4c::t_0902a4ad36e3fd 1-12,14-17,19
+  s_8ca5a53b33de4c::t_6fd291f79dc59b 20-22
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "8c507819c720552ee9096cee2e90b7d3d9e3bdf5",
+  "prompts": {},
+  "sessions": {
+    "s_8ca5a53b33de4c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1635b-d9b9-7aa3-be51-aee147d8a804",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Chunyu Yang <16914534+chunyu-yang@user.noreply.gitee.com>"
+    }
+  },
+  "changes": [
+    {
+      "new_path": "apps/web/.umirc.ts",
+      "additions": {
+        "human": 4,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 15
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/package.json",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 32
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/public/favicon.svg",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 1
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/scripts/generate.mjs",
+      "additions": {
+        "human": 11,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 19
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/access.ts",
+      "additions": {
+        "human": 67,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/components/business/common.tsx",
+      "additions": {
+        "human": 330,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 38
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/global.css",
+      "additions": {
+        "human": 1804,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 8
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Admin.tsx",
+      "additions": {
+        "human": 1402,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 37
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/App.tsx",
+      "additions": {
+        "human": 435,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 39
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Applications.tsx",
+      "additions": {
+        "human": 416,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 19
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Display.tsx",
+      "additions": {
+        "human": 25,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 8
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Login.tsx",
+      "additions": {
+        "human": 125,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 12
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Notifications.tsx",
+      "additions": {
+        "human": 204,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 11
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Repairs.tsx",
+      "additions": {
+        "human": 462,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 28
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Reservations.tsx",
+      "additions": {
+        "human": 296,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 14
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/pages/Seats.tsx",
+      "additions": {
+        "human": 361,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 22
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/api.ts",
+      "additions": {
+        "human": 77,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 48
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/administration.ts",
+      "additions": {
+        "human": 339
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/applications.ts",
+      "additions": {
+        "human": 101
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/auth.ts",
+      "additions": {
+        "human": 79
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/index.ts",
+      "additions": {
+        "human": 16
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/masterData.ts",
+      "additions": {
+        "human": 410
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/reservations.ts",
+      "additions": {
+        "human": 117
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/core/api/typings.d.ts",
+      "additions": {
+        "human": 322
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/repairs/api/index.ts",
+      "additions": {
+        "human": 8
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/repairs/api/repairs.ts",
+      "additions": {
+        "human": 252
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/generated/repairs/api/typings.d.ts",
+      "additions": {
+        "human": 217
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/session.tsx",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 7
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/services/types.ts",
+      "additions": {
+        "human": 33,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 8
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/src/typings.d.ts",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "apps/web/tests/api.test.mjs",
+      "additions": {
+        "human": 142,
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 16
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "apps/web/tsconfig.json",
+      "additions": {
+        "ai": [
+          {
+            "session_id": "s_8ca5a53b33de4c",
+            "lines": 22
+          }
+        ]
+      }
+    },
+    {
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 82
+      }
+    }
+  ]
+}
