@@ -22,3 +22,5 @@ __pycache__/
 *.tar
 *.tar.gz
 .mvn/wrapper/maven-wrapper.jar
+
+.playwright-cli/

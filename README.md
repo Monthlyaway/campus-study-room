@@ -1,4 +1,4 @@
-# 一席 · 校园自习室
+# 栖学 · 校园自习室
 
 响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
@@ -9,8 +9,8 @@
 需要 Docker Engine/Desktop、Compose v2、Python 3.10+。推荐至少 4 vCPU / 8 GiB。
 
 ```sh
-git clone git@code.agibot.com:yangchunyu/pj2.git
-cd pj2
+git clone git@code.agibot.com:yangchunyu/campus-study-room.git
+cd campus-study-room
 ./install.sh local
 ```
 
@@ -54,7 +54,7 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 
 ## GitLab、提交与发布
 
-[项目仓库](https://code.agibot.com/yangchunyu/pj2)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
+[项目仓库](https://code.agibot.com/yangchunyu/campus-study-room)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
 
 ```sh
 ./scripts/build-release r-YYYYMMDDTHHMMSS-commit

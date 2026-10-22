@@ -8,7 +8,7 @@
 
 ## 变更
 
-1. GitHub Actions 改为 GitLab CI/CD，仓库 `https://code.agibot.com/yangchunyu/pj2`，项目 ID 11753；PR 对应 Merge Request。以 `resource_group` 串行化环境任务，服务器锁覆盖非 CI 入口。
+1. GitHub Actions 改为 GitLab CI/CD，仓库 `https://code.agibot.com/yangchunyu/campus-study-room`，项目 ID 11753；PR 对应 Merge Request。以 `resource_group` 串行化环境任务，服务器锁覆盖非 CI 入口。
 2. 当前自主开发、提交和本地发版已有用户授权，不逐次等待原文里的人工提交确认；agent 独立评审不能记成人工签名。正式生产独立审批设计保留。
 3. 当前交付验证 local/dev/test 隔离环境、可迁移安装、不可变应用组合发布与回退、真实 PostgreSQL 和 HTTP、浏览器及本地邮件。正式公网域名/TLS、外部 SMTP 实际收信、正式服务器上线留待目标信息可用时验收，不伪称已通过。
 4. GitLab 实例页面明确显示容器镜像仓库未启用。安装/发布支持自备 OCI registry；本机使用本机私有 registry，发行可携带校验过的离线镜像包。不得假设 `CI_REGISTRY` 存在。
