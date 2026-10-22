@@ -66,3 +66,7 @@ CI 使用实例中在线的 `amd64` Runner（2026-10-22 已核对 #5170）；原
 已执行：独立 test Compose 首次安装；容器入口管理 2 项、预约/审批 5 项、维修 2 项真实 HTTP；Linux 0600 秘密读取启动；维护 503、任务排空、内部接口 404 和恢复 200；隔离数据库备份恢复；三个应用生产入口与 375px 浏览器试用。
 
 待形成完整发布证据：版本化组合升级与兼容回退、离线包独立安装、真实 GitLab pipeline 正反门禁、自动 test 升级与保留卷重建。未执行项不计为通过。
+
+### CI 镜像拉取诊断
+
+流水线 [682485](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/682485) 已被在线 Runner #5170 接收，但 Kubernetes 在执行脚本前访问 Docker Hub 超时。CI 因此默认使用 `STUDYROOM_CI_REGISTRY=m.daocloud.io/docker.io/library`；三个镜像保持原厂版本及原 SHA-256，未改用可变 latest。已从该缓存读取并核对相同 manifest；实际 Runner 复跑结果仍需核验。该值可按部署网络改为 `docker.io/library`，不是全机 Docker 配置。缓存机制依据 [DaoCloud 官方说明](https://github.com/DaoCloud/public-image-mirror)，缓存不可达时任务失败，不绕过内容校验。
