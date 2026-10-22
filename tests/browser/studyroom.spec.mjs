@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   actor, cancelOwned, confirm, drawer, enterPassword, finishRepair, login,
-  modal, noHorizontalOverflow, requireEnvironment, screenshot, selectFirst, unique, watchRuntime,
+  modal, noHorizontalOverflow, realApi, requireEnvironment, screenshot, selectFirst, unique, watchRuntime,
 } from './helpers.mjs';
 
 test.beforeAll(requireEnvironment);
@@ -25,8 +25,8 @@ test('login rejects a wrong password, preserves a real session and guards admini
   await screenshot(page, info, 'student-administration-denied');
 });
 
-test('M1 availability creates a reservation; a second real page causes a visible 409 and history remains usable at 375px', async ({ page, context }, info) => {
-  let id;
+test('M1 availability, real stale 409 and mobile history reuse create a new reservation', async ({ page, context }, info) => {
+  let id, repeatedId;
   try {
     await login(page, 'student');
     await page.goto('/seats');
@@ -46,11 +46,13 @@ test('M1 availability creates a reservation; a second real page causes a visible
     const second = await context.newPage();
     await second.goto(`/reservations?id=${id}`);
     await drawer(second).getByRole('button', { name: '取消预约', exact: true }).click();
-    await confirm(second, `/reservations/${id}/cancel`);
+    const cancelled = await confirm(second, `/reservations/${id}/cancel`);
     await second.close();
     await card.getByRole('button', { name: '取消预约', exact: true }).click();
     await confirm(page, `/reservations/${id}/cancel`, [409]);
-    await expect(modal(page).getByRole('button', { name: /^确\s*认$/ })).toBeDisabled();
+    const staleConfirm = modal(page).locator('.ant-modal-footer button.ant-btn-primary');
+    await expect(staleConfirm).toHaveText(/^确\s*认$/);
+    await expect(staleConfirm).toBeDisabled();
     await expect(modal(page).getByText('已刷新服务器数据，请返回后重新选择操作。')).toBeVisible();
     await screenshot(page, info, 'real-stale-version-conflict');
     await modal(page).getByRole('button', { name: '返回并重新选择' }).click();
@@ -63,14 +65,57 @@ test('M1 availability creates a reservation; a second real page causes a visible
     await expect(drawer(page).getByRole('button', { name: '立即签到' })).toHaveCount(0);
     await noHorizontalOverflow(page);
     await screenshot(page, info, 'mobile-reservation-history');
+
+    await drawer(page).getByRole('button', { name: '再次预约', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/seats\\?roomId=${record.roomId}&seatId=${record.seatId}`));
+    await expect(page.getByText('已带入上次使用的教室与座位', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('教室', { exact: true }).locator('..')).toContainText(record.roomName);
+    await expect(page.getByRole('button', { name: /^预约 .*号座位/ })).toHaveCount(0);
+    // History carries only the location. A new time must be searched and adjudicated again.
+    const startTime = page.locator('.time-filter > label').filter({ hasText: '开始时间' });
+    await expect(startTime.getByTitle('09:00', { exact: true })).toHaveText('09:00');
+    const timeInput = startTime.getByRole('combobox');
+    await timeInput.click();
+    // The mobile list is virtualized and opens upward; keyboard navigation scrolls it normally.
+    for (let hour = 9; hour < 13; hour++) await timeInput.press('ArrowDown');
+    await timeInput.press('Enter');
+    await expect(startTime.getByTitle('13:00', { exact: true })).toHaveText('13:00');
+    await timeInput.press('Escape');
+    const availability = page.waitForResponse((response) => new URL(response.url()).pathname === '/api/v1/availability/seats');
+    await page.getByRole('button', { name: '查找空间' }).click();
+    const availableResponse = await availability;
+    expect(availableResponse.status()).toBe(200);
+    const searched = new URL(availableResponse.url()).searchParams;
+    expect(searched.get('roomId')).toBe(record.roomId);
+    expect(searched.get('startAt')).toContain('T13:00:00+08:00');
+    const priorSeat = page.locator('button.seat.selected');
+    await expect(priorSeat).toHaveCount(1);
+    await expect(priorSeat).toContainText(record.seatCode);
+    await noHorizontalOverflow(page);
+    await screenshot(page, info, 'mobile-repeat-reservation-selection');
+    await priorSeat.click();
+    const repeated = await confirm(page, '/reservations', [201]);
+    repeatedId = repeated.id;
+    expect(repeatedId).toBeTruthy();
+    expect(repeatedId).not.toBe(id);
+    expect(repeated.seatId).toBe(record.seatId);
+    expect(repeated.status).toBe('RESERVED');
+    expect(repeated.startAt).not.toBe(record.startAt);
+    const original = await realApi(context, 'GET', `/reservations/${id}`);
+    for (const key of ['id', 'version', 'status', 'startAt', 'endAt', 'seatId', 'cancelReason'])
+      expect(original[key], `History reuse must preserve original ${key}`).toEqual(cancelled[key]);
+    const newCard = page.locator('.reservation-card').filter({ hasText: repeatedId.slice(0, 8).toUpperCase() });
+    await expect(newCard.getByText('待签到', { exact: true })).toBeVisible();
+    await screenshot(page, info, 'mobile-repeat-reservation-created');
   } finally {
+    await cancelOwned(context, 'reservations', repeatedId);
     await cancelOwned(context, 'reservations', id);
   }
 });
 
-test('M2 applicant submits, two different reviewers approve, applicant cancels from mobile', async ({ browser }, info) => {
+test('M2 independent approvals, mobile cancellation and rejection with a mandatory visible reason', async ({ browser }, info) => {
   const applicant = await actor(browser, 'applicant');
-  let department, space, id;
+  let department, space, id, rejectedId;
   const title = unique('two-level approval');
   try {
     await applicant.page.goto('/applications');
@@ -109,8 +154,53 @@ test('M2 applicant submits, two different reviewers approve, applicant cancels f
     await confirm(applicant.page, `/room-applications/${id}/cancel`);
     await expect(drawer(applicant.page).getByText('已取消', { exact: true }).first()).toBeVisible();
     await screenshot(applicant.page, info, 'mobile-application-cancelled');
+
+    await applicant.page.goto('/applications');
+    await applicant.page.getByRole('button', { name: '申请教室' }).click();
+    await drawer(applicant.page).getByRole('button', { name: '查找空间' }).click();
+    await drawer(applicant.page).getByRole('button', { name: '选择教室' }).first().click();
+    const rejectedTitle = unique('rejection history');
+    await modal(applicant.page).getByLabel('用途标题', { exact: true }).fill(rejectedTitle);
+    await modal(applicant.page).getByLabel('用途说明', { exact: true }).fill('真实浏览器验证拒绝理由必填、申请人历史可见及终态不可再次审批。');
+    rejectedId = (await confirm(applicant.page, '/room-applications', [201])).id;
+    expect(rejectedId).toBeTruthy();
+    await department.page.goto(`/applications?id=${rejectedId}`);
+    await drawer(department.page).getByRole('button', { name: /^驳\s*回$/ }).click();
+    const decisions = [];
+    const decisionListener = (request) => {
+      if (request.method() === 'POST' && new URL(request.url()).pathname === `/api/v1/room-applications/${rejectedId}/decisions`)
+        decisions.push(request);
+    };
+    department.page.on('request', decisionListener);
+    await modal(department.page).getByRole('button', { name: /^确\s*认$/ }).click();
+    await expect(modal(department.page).getByText('请填写此项', { exact: true })).toBeVisible();
+    expect(decisions, 'An empty rejection reason must not submit a decision').toHaveLength(0);
+    const reason = '活动用途尚不明确，请补充后重新提交；真实浏览器拒绝验收。';
+    await modal(department.page).getByLabel('驳回理由', { exact: true }).fill(reason);
+    const rejected = await confirm(department.page, `/room-applications/${rejectedId}/decisions`);
+    department.page.off('request', decisionListener);
+    expect(decisions).toHaveLength(1);
+    expect(rejected.status).toBe('REJECTED');
+    expect(rejected.allowedActions).not.toContain('approve');
+    expect(rejected.allowedActions).not.toContain('reject');
+    expect(rejected.actions).toEqual(expect.arrayContaining([expect.objectContaining({ decision: 'REJECT', comment: reason })]));
+    await department.page.reload();
+    await expect(drawer(department.page).getByText('未通过', { exact: true }).first()).toBeVisible();
+    await expect(drawer(department.page).getByRole('button', { name: '通过审批', exact: true })).toHaveCount(0);
+    await expect(drawer(department.page).getByRole('button', { name: /^驳\s*回$/ })).toHaveCount(0);
+    await screenshot(department.page, info, 'desktop-application-rejected');
+    await applicant.page.goto(`/applications?id=${rejectedId}`);
+    await expect(drawer(applicant.page).getByRole('heading', { name: rejectedTitle })).toBeVisible();
+    await expect(drawer(applicant.page).getByText('未通过', { exact: true }).first()).toBeVisible();
+    await expect(drawer(applicant.page).getByText(reason)).toBeVisible();
+    await expect(drawer(applicant.page).getByRole('button', { name: '撤销申请', exact: true })).toHaveCount(0);
+    await noHorizontalOverflow(applicant.page);
+    await screenshot(applicant.page, info, 'mobile-rejection-reason');
   } finally {
-    try { await cancelOwned(applicant.context, 'room-applications', id); }
+    try {
+      await cancelOwned(applicant.context, 'room-applications', rejectedId);
+      await cancelOwned(applicant.context, 'room-applications', id);
+    }
     finally { await Promise.all([applicant.context.close(), department?.context.close(), space?.context.close()]); }
   }
 });
