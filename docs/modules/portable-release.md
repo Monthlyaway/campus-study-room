@@ -82,3 +82,5 @@ python3 -m unittest discover -s tests/ops -p test_portable_release.py -v
 ```
 
 上述单测用模拟 Docker 检查发布与拒绝顺序；真实 Docker 导出、移除原 digest 引用后导入、独立目标状态目录启动和业务验收由发布演练记录补充。不能用单测通过替代实际离线安装验证。
+
+2026-10-22 已实际导出B并在独立项目、新源码目录、新秘密/卷上导入，五个运行镜像ID完全匹配，见[发布演练](../evidence/release/README.md)。本次同ARM64 daemon内隔离，未切断宿主网络；跨服务器/AMD64未实测。
