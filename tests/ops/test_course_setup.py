@@ -138,6 +138,74 @@ class CourseSetupTest(unittest.TestCase):
         self.assertEqual(before, len(self.api.writes))
         self.assertEqual(passwords, {a["username"]: a["password"] for a in repeated["accounts"]})
 
+    def interrupt_final_room_binding(self, *, before_commit=False):
+        original = self.api.call
+        def interrupted(method, path, body=None, key=None):
+            if method == "PUT" and path.endswith("/role-bindings"):
+                user = next(u for u in self.api.rows["/api/v1/users"] if u["id"] == path.split("/")[-2])
+                if (user["username"] == "course-room-admin"
+                        and body["bindings"][0]["scopes"][0]["scopeType"] == "ROOM"):
+                    if before_commit:
+                        raise RuntimeError("Test final scope request never sent")
+                    self.api.lose_next_update = True
+            return original(method, path, body, key)
+        with patch.object(self.api, "call", side_effect=interrupted):
+            with self.assertRaisesRegex(RuntimeError, "never sent" if before_commit else "lost"):
+                self.setup().execute()
+        setup = self.setup()
+        self.assertTrue(setup.journal["operations"]["bindings/room-admin/construction"]["done"])
+        self.assertFalse(setup.journal["operations"]["bindings/room-admin/final"]["done"])
+        return setup
+
+    def test_lost_final_scope_response_resumes_without_restoring_construction(self):
+        self.interrupt_final_room_binding()
+        before = len(self.api.writes)
+        path = self.setup().execute()
+        self.assertTrue(path.exists())
+        repeated = self.api.writes[before:]
+        user = next(u for u in self.api.rows["/api/v1/users"] if u["username"] == "course-room-admin")
+        self.assertFalse(any(p == "/api/v1/users/" + user["id"] + "/role-bindings" for _, p, _ in repeated))
+        expected = {r["id"] for r in self.api.rows["/api/v1/rooms"]}
+        self.assertEqual({s["roomId"] for s in user["roleBindings"][0]["scopes"]}, expected)
+        self.assertTrue(self.setup().journal["operations"]["bindings/room-admin/final"]["done"])
+        before = len(self.api.writes)
+        self.setup().execute()
+        self.assertEqual(len(self.api.writes), before)
+
+    def test_saved_unsent_final_scope_resumes_using_original_key_and_rooms(self):
+        setup = self.interrupt_final_room_binding(before_commit=True)
+        final = setup.journal["operations"]["bindings/room-admin/final"]
+        before = len(self.api.writes)
+        self.setup().execute()
+        self.assertIn(("PUT", final["path"], final["idempotencyKey"]), self.api.requests)
+        changes = [body for _, path, body in self.api.writes[before:] if path == final["path"]]
+        self.assertEqual(changes, [final["payload"]])
+        self.assertTrue(self.setup().journal["operations"]["bindings/room-admin/final"]["done"])
+
+    def test_final_scope_recovery_rejects_missing_or_changed_original_room_ids(self):
+        setup = self.interrupt_final_room_binding()
+        before = len(self.api.writes)
+        for replacement, message in ((None, "requires all original"), ("unowned-room", "differs from the original")):
+            with self.subTest(replacement=replacement):
+                setup.journal["resources"]["room/CS"]["id"] = replacement
+                setup.save()
+                with self.assertRaisesRegex(RuntimeError, message):
+                    self.setup().execute()
+                self.assertEqual(len(self.api.writes), before)
+                self.assertFalse(self.setup().journal["operations"]["bindings/room-admin/final"]["done"])
+
+    def test_lost_final_scope_response_then_manual_drift_remains_fail_closed(self):
+        self.interrupt_final_room_binding()
+        user = next(u for u in self.api.rows["/api/v1/users"] if u["username"] == "course-room-admin")
+        user["roleBindings"][0]["scopes"] = [{"scopeType": "ALL"}]
+        user["version"] += 1
+        before = len(self.api.writes)
+        with self.assertRaisesRegex(RuntimeError, "Current course configuration differs"):
+            self.setup().execute()
+        self.assertEqual(len(self.api.writes), before)
+        self.assertEqual(user["roleBindings"][0]["scopes"], [{"scopeType": "ALL"}])
+        self.assertFalse(self.setup().journal["operations"]["bindings/room-admin/final"]["done"])
+
     def test_committed_create_with_lost_response_is_adopted_only_from_journal(self):
         self.api.lose_next_create = True
         with self.assertRaisesRegex(RuntimeError, "lost"):
