@@ -247,7 +247,21 @@ class CourseSetup:
             }, field="username")
         # SYSTEM_ADMIN intentionally has no room:manage permission. A separate course
         # operator creates only the course resources, then loses its temporary broad scope.
-        if not self.journal["operations"].get("bindings/room-admin/final", {}).get("done"):
+        final = self.journal["operations"].get("bindings/room-admin/final")
+        if final is not None:
+            # Once narrowing has started, never restore the construction scope.
+            # A committed final PUT can lose its response before done is saved.
+            room_ids = [self.journal["resources"].get("room/" + code, {}).get("id")
+                        for code, _, _ in ROOMS]
+            if not all(room_ids) or len(set(room_ids)) != len(ROOMS):
+                raise RuntimeError("Final course scope requires all original room identities")
+            desired = [{"roleId": role_ids["ROOM_ADMIN"], "scopes": [
+                {"scopeType": "ROOM", "roomId": room_id} for room_id in room_ids]}]
+            if ("payload" in final
+                    and normalized(final["payload"].get("bindings", [])) != normalized(desired)):
+                raise RuntimeError("Saved final course scope differs from the original room identities")
+            self.binding("room-admin", desired)
+        else:
             self.binding("room-admin", [{"roleId": role_ids["ROOM_ADMIN"], "scopes": [
                 {"scopeType": "DEPARTMENT", "departmentId": departments[code]} for code in ("CS", "ART")
             ] + [{"scopeType": "SHARED"}]}], "construction")
