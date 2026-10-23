@@ -1,5 +1,9 @@
 # P0 需求、实现与验收追踪
 
+[当前进度](progress.md) · [证据索引](evidence/README.md) · [规格导读](reference/README.md)
+
+快速查找：[公共层](#d-公共层)、[M1](#m1-自习座位预约)、[M2](#m2-整室申请)、[M3](#m3-报修与验收)、[跨模块](#跨模块一致性)、[工程交付](#工程交付)。本表面向验收；使用系统请读[用户手册](user-guide/README.md)。
+
 更新时间：2026-10-23。V6本机浏览器、正式离线导入、同schema正式回退/恢复及源码绑定运输包均通过；feature683506完整五job PASS，MR !1已Fast-forward合main，annotated tag已指向同一S。main683689与tag683743完整五job均已PASS，[v0.1.0正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布；用户确定的本机与可迁移交付范围内39项P0均为VERIFIED。提交前限定审计见[报告](evidence/runtime-audit-final-v6.md)，GitLab最终事实见[发布记录](evidence/gitlab-release-v0.1.0.md)。本表逐条保留[PRD](../01_PRD.md)的**39个P0 REQ**，关联[技术方案](../02_Technical_Design.md)和[milestone](../03_Development_Milestones.md)；每项测试只证明其实际断言与运行条件。
 
 用户调整的交付边界见 [ADR 0002](adr/0002-delivery-and-gitlab.md)：GitLab 取代 GitHub Actions；用户授权自主提交和本地发版；正式公网/TLS、外部SMTP实际收信、正式服务器生产发布待后续目标信息。业务、权限、并发、数据保护要求不缩减。本表中的“部分验证”表示已有运行证据但尚欠该 TC 的具体子场景；“缺口”表示已经识别实现或交付不足；“待执行”不能视为通过。
