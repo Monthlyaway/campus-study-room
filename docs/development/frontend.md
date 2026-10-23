@@ -42,7 +42,12 @@ Umi 只注册 `/* → App`。真实分发在 App 的 `nav`、`homePath`、`switc
 
 ## 请求与状态
 
-```mermaid
+![前端请求链路](../architecture/images/frontend-request-flow.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：前端请求链路</summary>
+
+```text
 flowchart LR
   Query[页面 useData] --> API[api 同源传输]
   Action[弹窗 useAction] --> API
@@ -52,6 +57,8 @@ flowchart LR
   Proxy --> Core[core]
   Proxy --> Repair[repair]
 ```
+
+</details>
 
 开发代理先把 `/api/v1/repairs` 转到 8082，其余 `/api` 转到 8081。后端另有地址时才在启动进程环境设置 `REPAIR_PROXY_URL`、`CORE_PROXY_URL`，浏览器仍调用同源相对路径。
 
