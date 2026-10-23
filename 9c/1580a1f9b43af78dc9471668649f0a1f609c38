@@ -1,0 +1,45 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "9c1580a1f9b43af78dc9471668649f0a1f609c38",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/architecture/images/frontend-request-flow.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/architecture/images/README.md",
+      "new_path": "docs/architecture/images/README.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/development/frontend.md",
+      "new_path": "docs/development/frontend.md",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/reviews/documentation-2026-10-23.md",
+      "new_path": "docs/reviews/documentation-2026-10-23.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
