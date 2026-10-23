@@ -1,0 +1,178 @@
+{
+  "formatVersion": 1,
+  "startedAt": "2026-10-23T00:18:24.705101+00:00",
+  "completedAt": "2026-10-23T00:19:21.897619+00:00",
+  "result": "passed",
+  "releaseId": "r-20261023T001633-e95b025",
+  "commit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "platform": {
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  "project": "studyroom-portable-install",
+  "entryUrl": "http://localhost:19282",
+  "verificationMode": "Official portable import, exact archive source SHA256/full permission checks, actual running image IDs and public service versions, private complete row digests before/after maintenance-drained upgrade.",
+  "bundle": {
+    "directory": ".local/releases/r-20261023T001633-e95b025/portable",
+    "allFivePayloadChecksumsValid": true,
+    "sourceCommitMatches": true,
+    "artifactSha256": {
+      "manifest.json": "0808e170ccd518d11f7bf699a0c1b81e28f89d7baa8694c403f3c18b08452400",
+      "source.tar.gz": "72810fa0a4e25471e7a74b9475f61313632c236de606271a7813bf04ffcd52ae",
+      "images.tar": "33f13b0331840a4b25b6b1c84efc495b948f15c696a335b16866c526a7e14fe4"
+    },
+    "imageArchiveBytes": 417842688
+  },
+  "import": {
+    "entrypoint": "scripts/import-release test <bundle> --source-dir <fresh-source>",
+    "exitCode": 0,
+    "existingStateDirectory": ".local/portable-install",
+    "newSourceDirectoryWasAbsentBeforeImport": true,
+    "beforeSnapshotTakenAfterMaintenanceAndDrain": true,
+    "beforeSnapshotAt": "2026-10-23T00:18:26.740705+00:00",
+    "afterSnapshotAt": "2026-10-23T00:19:20.032066+00:00"
+  },
+  "extractedSource": {
+    "directory": ".local/portable-source-final-v5",
+    "containsGitDirectory": false,
+    "verifiedFileCount": 442,
+    "fileContentAndFullPermissionBitsMatch": true,
+    "mismatchPaths": [],
+    "unexpectedPaths": [],
+    "oldSourceDirectoriesRetained": [
+      ".local/portable-source",
+      ".local/portable-source-final",
+      ".local/portable-source-v4"
+    ],
+    "oldSourceFileCount": 1088,
+    "oldSourceFileContentAndModesUnchanged": true
+  },
+  "runningImages": {
+    "core": {
+      "expectedId": "sha256:1b27f383d9973040cea9c4626844d184a29aed1d3f8facd62b963c6b6fba018f",
+      "runningId": "sha256:1b27f383d9973040cea9c4626844d184a29aed1d3f8facd62b963c6b6fba018f",
+      "matches": true,
+      "running": true
+    },
+    "repair": {
+      "expectedId": "sha256:33cd405adff9dbf159fc325f64e971571b4603c40f3f85a4233ad376de29d224",
+      "runningId": "sha256:33cd405adff9dbf159fc325f64e971571b4603c40f3f85a4233ad376de29d224",
+      "matches": true,
+      "running": true
+    },
+    "web": {
+      "expectedId": "sha256:e9f773390a6c3898013edd65114af67e24f46507c88794e2b53caab21b301d1c",
+      "runningId": "sha256:e9f773390a6c3898013edd65114af67e24f46507c88794e2b53caab21b301d1c",
+      "matches": true,
+      "running": true
+    },
+    "postgres": {
+      "expectedId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "runningId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "matches": true,
+      "running": true
+    },
+    "mailpit": {
+      "expectedId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "runningId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "matches": true,
+      "running": true
+    }
+  },
+  "serviceVersions": {
+    "web": {
+      "commit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+      "releaseId": "r-20261023T001633-e95b025",
+      "matches": true
+    },
+    "core": {
+      "commit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+      "releaseId": "r-20261023T001633-e95b025",
+      "matches": true
+    },
+    "repair": {
+      "commit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+      "releaseId": "r-20261023T001633-e95b025",
+      "matches": true
+    }
+  },
+  "currentReleaseManifestMatches": true,
+  "secrets": {
+    "beforeFileCount": 7,
+    "afterFileCount": 7,
+    "fileNamesUnchanged": true,
+    "allFileHashesAndModesUnchanged": true,
+    "valuesOrHashesReported": false
+  },
+  "businessTables": {
+    "core.reservation": {
+      "beforeCount": 19,
+      "afterCount": 19,
+      "countUnchanged": true,
+      "completeRowDigestUnchanged": true,
+      "changedRowCount": 0
+    },
+    "core.room_application": {
+      "beforeCount": 16,
+      "afterCount": 16,
+      "countUnchanged": true,
+      "completeRowDigestUnchanged": true,
+      "changedRowCount": 0
+    },
+    "repair.repair_order": {
+      "beforeCount": 11,
+      "afterCount": 11,
+      "countUnchanged": true,
+      "completeRowDigestUnchanged": true,
+      "changedRowCount": 0
+    }
+  },
+  "databaseMigrationInventoryUnchanged": true,
+  "readOnlyQuery": {
+    "transactionReadOnly": true,
+    "isolation": "REPEATABLE READ",
+    "completeRowDigestMethod": "md5(coalesce(string_agg(md5(row_to_json(r)::text), '' ORDER BY id), ''))",
+    "rawRowsReported": false
+  },
+  "importLog": {
+    "path": "output/release-final-v5/import.log",
+    "sha256": "237c8c6e0fa36daea2e857d4514d24085db995cedb28d9b7b5fbc9902cce6ceb",
+    "lineCount": 64,
+    "deploymentSuccessMarker": true,
+    "offlineImportSuccessMarker": true,
+    "pullOrBuildIndicators": 0,
+    "knownSecretValueCount": 35,
+    "knownSecretEncodingVariants": 75,
+    "knownSecretMatches": 0
+  },
+  "remainingControlFlags": {
+    "maintenance": false,
+    "jobs-paused": false,
+    "pendingRelease": false
+  },
+  "limitations": [
+    "Existing isolated portable-install state was upgraded; this is preservation verification, not another empty-state installation.",
+    "Local Docker Desktop linux/arm64 only; remote amd64 deployment was not performed.",
+    "No network-disconnection experiment was performed; reviewed importer and absence of pull/build log indicators support portable-image reuse.",
+    "Final browser and GitLab gate results are recorded independently and are not implied by this import.",
+    "All earlier source, release, business rows and volumes were retained."
+  ],
+  "collector": {
+    "privateScript": ".local/verify-final-v5-import.py",
+    "sha256": "d1a76e1365d3fcc17fd2b7050d93abb76537c8d5a7846791e014ce74630f0991",
+    "kind": "one-run independent read-only verifier around authorized official import",
+    "productionSourcesModified": false
+  },
+  "buildAndExport": {
+    "worktree": "/Users/agiuser/Codes/campus-study-room-release",
+    "detachedCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+    "cleanCheckoutBeforeBuild": true,
+    "dockerContext": "desktop-linux",
+    "buildEntrypoint": "scripts/build-release r-20261023T001633-e95b025",
+    "buildExitCode": 0,
+    "buildLogSha256": "4645963d243400f8f542b6dd7cb19e560f173f67f6afe18c6f9fb8f25bbd6137",
+    "exportExitCode": 0,
+    "exportLogSha256": "866741673d133e5594e98e7e90df2f804ba3a3cbf1a8f9f22acbd631c3e7add9",
+    "productionAndBuildInputsIdenticalToR4": 242
+  }
+}

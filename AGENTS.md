@@ -6,6 +6,8 @@
 
 用户在 2026-10-22 明确授权自主实现、安装环境、分派 agents、commit 与发版，并指定 GitLab（`code.agibot.com/yangchunyu/campus-study-room`），不发布为 Site。按用户的可读命名要求，项目统一采用 campus-study-room（见 ADR 0003），并选择先完成本机与可迁移交付、使用本地邮件测试服务。详见 `docs/adr/0002-delivery-and-gitlab.md`。无需逐次申请代码提交许可。不得伪造人工审批或声称完成未执行的正式环境验收。
 
+用户已授权的专用Runner仅限本项目可信受保护引用，执行与保护边界见[注册启用记录](docs/evidence/gitlab-runner-registration.md)，不得扩展到其他项目或不受保护代码。
+
 ## 边界与所有权
 
 - `services/core-service`：D、M1、M2、唯一资源裁决方；房间锁和用户预约 guard。
