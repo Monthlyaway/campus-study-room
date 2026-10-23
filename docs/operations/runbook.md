@@ -189,17 +189,31 @@ test -f "${studyroom_backup%.dump}.json"
 
 ## 安装或检查每日备份调度
 
-在所选实例已经安装、调用账号拥有目标 Docker 访问权限时执行。先安装，再检查状态：
+在所选实例已经安装、调用账号拥有目标 Docker 访问权限时执行。首次安装调度时先 install，再检查状态；已有调度只检查 status。
+
+**v0.2.2 版本限制：**原包在 Linux 生成的 `WorkingDirectory` 引号会使 systemd 拒绝 unit。当前 codex-lb 的宿主 unit 已修正，日常 `run` / `status` 可用；不要用旧 v0.2.2 包重复 `install`。需要重新安装时，先采用包含本次修复且通过 PR 验证的源码或后续发行版本；保持原 v0.2.2 发布包与源码不可变。
 
 ```sh
 "$studyroom_source_dir/scripts/schedule-backup" install "$studyroom_env" --state-dir "$STUDYROOM_STATE_DIR"
 "$studyroom_source_dir/scripts/schedule-backup" status "$studyroom_env" --state-dir "$STUDYROOM_STATE_DIR"
 ```
 
-install 会启用任务，可能立即触发当日备份。macOS 为当前用户 LaunchAgent；Linux root 为系统 timer，普通用户为 user timer。macOS 退出登录、宿主关机或 Docker 停止时不会备份；Linux user timer 依赖会话/linger，脚本不修改 linger 或授予 Docker 权限。恢复可用后检查日志并手动补做当日检查：
+install 会启用任务，可能立即触发当日备份。macOS 为当前用户 LaunchAgent；Linux root 为系统 timer，普通用户为 user timer。macOS 退出登录、宿主关机或 Docker 停止时不会备份；Linux user timer 依赖会话/linger，脚本不修改 linger 或授予 Docker 权限。恢复可用后，按需要手动补做当日检查，结果输出到当前终端：
 
 ```sh
 "$studyroom_source_dir/scripts/schedule-backup" run "$studyroom_env" --state-dir "$STUDYROOM_STATE_DIR"
+```
+
+Linux 定时任务的日志在 systemd journal。普通用户安装时，将下面的占位值替换为 install 输出的 scheduler label（不含 `.timer` / `.service` 后缀）：
+
+```sh
+studyroom_backup_unit='com.campus-study-room.backup.<install输出的实例摘要>'
+journalctl --user -u "${studyroom_backup_unit}.service" -n 100 --no-pager
+```
+
+root 安装的是系统 timer，查日志时省略 `--user`，并使用有权限读取系统 journal 的账号。Linux 安装器虽创建 `backup-scheduler.log`，服务标准输出并未重定向到它，不能以这个空文件判断任务未运行。macOS LaunchAgent 的标准输出/错误才写入该文件：
+
+```sh
 tail -n 100 "$STUDYROOM_STATE_DIR/backup-scheduler.log"
 ```
 

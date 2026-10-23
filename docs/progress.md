@@ -2,7 +2,7 @@
 
 [文档首页](README.md) · [39项P0追踪](requirements-traceability.md) · [验收证据](evidence/README.md)
 
-当前最新状态：v0.2.1 全仓检查通过、浏览器 1/6 失败，publish/deploy 跳过；生产仍未部署。失败位置和修复验证边界见[本轮记录](evidence/github-production-v0.2.1.md)。
+当前最新状态：v0.2.2 正式发布并部署，11 个课程账号、独立桌面/375px 只读 UI、实际备份/隔离恢复的 42 表内容核对通过。部署后 12 次资源采样正常，窗口未覆盖 PR CI 负载；备份生成器修复及本轮文档交由 PR Actions 验证。实际结果与首次 unit 安装失败见[发布记录](evidence/github-production-v0.2.2.md)。
 
 更新时间：2026-10-23。下方 v0.1.0 与 MS0～MS6 表格记录原本机 / ARM64 可迁移交付：P0 的39项需求已验证，v0.1.0已发布，边界见[ADR 0002](adr/0002-delivery-and-gitlab.md)。后续 GitHub / codex-lb / Linux AMD64 的实际进度见本页末尾；不能把历史结果当作新生产环境验收。P1尚未启动。
 
@@ -72,3 +72,15 @@ GHCR 元数据兼容性修复在 [PR #2](https://github.com/Monthlyaway/campus-s
 v0.2.1 浏览器失败已在独立测试环境复现：桌面点击位置在缩至 375px 后成为屏幕外的退出动画原点，旧布局 helper 又可能在弹窗消失后等待动态定位器。修复将手机弹窗动画原点固定在中心，并在一次页面快照中读取布局；原选择器、1px 容差和 5 秒上限保留。
 
 新增逐帧回归在旧 CSS 上失败、修复候选上通过。基于未提交工作树构建的独立诊断镜像完成真实浏览器 6/6（124.465 秒）和隐私探针 1/1；另一名 agent 实际检查桌面与 375px，完全展开后关闭分别采样 18/20 帧，均无越界、无 JavaScript 错误。诊断镜像未覆盖原 v0.2.1，不作为正式 CI 或发布证明；开发目录的完整检查已按用户新指示中止，不计为完整通过；后续完整集成验收交由 PR/版本 Actions 执行。该避免重复检查的规则已写入 AGENTS.md 和贡献指南。生产仍未部署。
+
+## 2026-10-23 — v0.2.2 生产交付与验收（REQ-ENG-04/05/06/07/08）
+
+[PR #3](https://github.com/Monthlyaway/campus-study-room/pull/3) 的 [Actions 39952736484](https://github.com/Monthlyaway/campus-study-room/actions/runs/39952736484) 在 head `4d000a175a25cfbddb37e9005e4d9282591cf059` 完整通过：164 项 ops、7 套 HTTP / 18 项、9 套 PostgreSQL / 66 项、27 项期限收件人断言、响应丢失重放及 6 项真实浏览器（127.121 秒）。随后 rebase merge 到 `524134c7ad9b730538f535aa2245c7f8f8d611c0`，3 个逻辑提交、作者日期与源码树保留。
+
+正式 `v0.2.2` 的 [Actions 39955632806](https://github.com/Monthlyaway/campus-study-room/actions/runs/39955632806) attempt 1 的 verify、publish、deploy 均 success，完整检查及 6 项真实浏览器（127.263 秒）通过；稳定私有 [Release v0.2.2](https://github.com/Monthlyaway/campus-study-room/releases/tag/v0.2.2) 已发布。6 个发行资产 digest、3 个已测试 image ID 与发布组合一致，公网首页及三应用版本接口均 200，运行 SHA 为 `524134c7ad9b730538f535aa2245c7f8f8d611c0`。课程初始化完成 11 个账号实际登录验证及 3 房间 / 30 座位，不预造业务订单；凭据只在现有[账号文档](development/demo-accounts.md)维护。重复 main 运行 39955626968 在 check 阶段取消，上传因缺少产物失败，不计为通过。
+
+生产备份调度首次安装因生成的 `WorkingDirectory` 带引号被 systemd 判为 bad-setting，timer 未启动。只修正宿主 service 对应行后，user unit 校验通过，timer enabled/active waiting，Linger=yes；v0.2.2 不可变源码未改写，不应再用旧包重复安装调度。真实 systemd service 于 13:13:58Z 成功生成 `20261023T131356842634Z.dump`，归档 TOC 与完整解码均通过。正式 restore 创建隔离库 `studyroom_restore_20261023131409`，在线库未修改；12 用户、业务订单为 0，原 dump 与隔离库全部 42 表 COPY 行多重集一致、0 序列、无差异。生成器修复在真实 systemd 解析器旧实现上先出现 6 个失败子例，修复后两轮 11 项定向测试及独立代码复核通过。
+
+另一名 agent 在生产对学生/管理员 × 1440px/375px 的四个独立上下文完成只读试用：登录、刷新、查询、导航、双向路由权限及 Secure/HttpOnly/SameSite=Lax 均通过；手机管理员表格可内部横向滚动到右侧操作列。没有业务写入、JavaScript 或 5xx 错误，浏览器均已关闭。
+
+13:14:20.899763Z–13:19:50.924237Z 的 12 次资源采样中，四公开端点均 200/TLS0、三版本一致，5 个生产容器 healthy、重启和 OOM 为 0。该窗口未覆盖 PR CI，不扩展为同机完整 CI 容量结论。完整绑定、失败与修复、验证范围及私有证据位置见 [v0.2.2 发布记录](evidence/github-production-v0.2.2.md)。本次生成器修复和交付文档按[贡献指南](contributing.md)的 PR 流程验证，完整结论以对应 PR 的 Checks 为准，不在开发目录重复整套门禁。
