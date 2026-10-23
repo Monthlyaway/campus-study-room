@@ -1,0 +1,390 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "startedAt": "2026-10-23T02:30:41.807074+00:00",
+  "completedAt": "2026-10-23T02:32:18.037271+00:00",
+  "sandboxProject": "studyroom-compat-release",
+  "entryUrl": "http://localhost:19182",
+  "scope": "Same-schema official final -> V5 rollback -> final restore; no B rollback or performance rerun",
+  "fromRelease": "r-20261023T022529-1079900",
+  "toRelease": "r-20261023T001633-e95b025",
+  "restoredRelease": "r-20261023T022529-1079900",
+  "sourceCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+  "targetCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "fromManifestSha256": "2ce16a66c895e200a5bb8d62a8a152930596873536aecd62447d746554643016",
+  "toManifestSha256": "fe5cc1cd27f3f0bbb6bd9e2e5547943004efa971553d6b062566690e59166bfc",
+  "fromImages": {
+    "core": "sha256:3171b2061bfbe68e6f88dc049b6bbc079dd6372f144fff96f4546339ca84a767",
+    "repair": "sha256:638d9f8572935780d37a5903a7e543ab2569faab4609781468053b33a8171e9a",
+    "web": "sha256:3755bde3c48e6c5a01d6111848c6b40a070d53eca34e1a1b506941537b44dec6"
+  },
+  "toImages": {
+    "core": "sha256:1b27f383d9973040cea9c4626844d184a29aed1d3f8facd62b963c6b6fba018f",
+    "repair": "sha256:33cd405adff9dbf159fc325f64e971571b4603c40f3f85a4233ad376de29d224",
+    "web": "sha256:e9f773390a6c3898013edd65114af67e24f46507c88794e2b53caab21b301d1c"
+  },
+  "sameSchema": {
+    "migrationFilesEqual": true,
+    "migrationCount": 7,
+    "compatibilityFamilyEqual": true,
+    "postgresFlywayInventoryUnchanged": true,
+    "schemaOnlyDdlUnchanged": true,
+    "normalizedDdl": {
+      "sha256": "0ab12b5f0d0a66efb14ec22440377304a71ebe1550ac2ce61a7231ba95fab223",
+      "bytes": 51914,
+      "excludedPsqlGuardLines": 2,
+      "ownerAclCommentsExcluded": true
+    },
+    "ddlScope": "pg_dump --schema-only --no-owner --no-privileges --no-comments; only random psql restrict/unrestrict guard lines removed. Owner/ACL/comment equality is not claimed.",
+    "database": {
+      "postgresVersion": "180006",
+      "migrations": [
+        {
+          "schema": "core",
+          "installed_rank": 1,
+          "version": "20261022000100",
+          "description": "core schema",
+          "type": "SQL",
+          "script": "V20261022000100__core_schema.sql",
+          "checksum": -2040106863,
+          "success": true
+        },
+        {
+          "schema": "core",
+          "installed_rank": 2,
+          "version": "20261022130000",
+          "description": "self role scope",
+          "type": "SQL",
+          "script": "V20261022130000__self_role_scope.sql",
+          "checksum": -892298813,
+          "success": true
+        },
+        {
+          "schema": "core",
+          "installed_rank": 3,
+          "version": "20261022143000",
+          "description": "reservation history index",
+          "type": "SQL",
+          "script": "V20261022143000__reservation_history_index.sql",
+          "checksum": 1340263816,
+          "success": true
+        },
+        {
+          "schema": "core",
+          "installed_rank": 4,
+          "version": "20261022150000",
+          "description": "reservation operator note",
+          "type": "SQL",
+          "script": "V20261022150000__reservation_operator_note.sql",
+          "checksum": 383066205,
+          "success": true
+        },
+        {
+          "schema": "repair",
+          "installed_rank": 1,
+          "version": "20261022120000",
+          "description": "repair domain",
+          "type": "SQL",
+          "script": "V20261022120000__repair_domain.sql",
+          "checksum": 662384302,
+          "success": true
+        },
+        {
+          "schema": "repair",
+          "installed_rank": 2,
+          "version": "20261022160000",
+          "description": "assigned worker name snapshot",
+          "type": "SQL",
+          "script": "V20261022160000__assigned_worker_name_snapshot.sql",
+          "checksum": -1184161627,
+          "success": true
+        },
+        {
+          "schema": "session",
+          "installed_rank": 1,
+          "version": "20261022000000",
+          "description": "spring session",
+          "type": "SQL",
+          "script": "V20261022000000__spring_session.sql",
+          "checksum": -174758120,
+          "success": true
+        }
+      ]
+    },
+    "crossSchemaCompatibilityProofRequired": false
+  },
+  "priorAttempt": {
+    "result": "failed",
+    "privateDirectory": ".local/compatibility/final-v6-v5-20261023T022809Z-dab83582",
+    "phase": "capture-final-api-fixture",
+    "httpStatus": 409,
+    "formalDeployExitCode": 0,
+    "retainedStudentOverlappingReservationCount": 1,
+    "cause": "The reused capture helper selected the same fixed future interval as the retained V5 student reservation; the real cross-room overlap rule rejected creation.",
+    "resolution": "This new private collector selects a nonoverlapping interval from read-only actual retained reservations, then uses the same real public API lifecycle.",
+    "priorFailureEvidenceRetained": true,
+    "oldBusinessRecordsCancelledOrDeleted": false,
+    "initialAndRetryBaselineFullBusinessRowsEqual": true,
+    "initialAndRetryBaselineSchemaAndMigrationsEqual": true,
+    "partialMasterDataRetained": "The first attempt created an isolated room, its opening rules and a seat before the rejected reservation; these are retained. No reservation, application or repair was created by that failed attempt."
+  },
+  "fixture": {
+    "captureMethod": "Real public APIs on final create an isolated room/seat, student reservation and repair, applicant room application approved by two independent approvers",
+    "originalSessionCount": 2,
+    "businessRecordCount": 3,
+    "privateFixtureRetained": true,
+    "fixtureFileMode": "0600",
+    "fixtureFileUnchanged": true,
+    "cookiesOrSecretHashesReported": false,
+    "allBusinessActionsAfterFixture": "GET only; no cancellation or sentinel SQL update"
+  },
+  "beforeRollback": {
+    "at": "2026-10-23T02:31:14.680100+00:00",
+    "originalSessions": 2,
+    "studentCoreSession": true,
+    "applicantCoreSession": true,
+    "originalStudentRepairAccess": true,
+    "records": [
+      {
+        "kind": "reservations",
+        "status": "RESERVED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "repairs",
+        "status": "SUBMITTED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "room-applications",
+        "status": "APPROVED",
+        "version": 2,
+        "approvalActionCount": 2
+      }
+    ],
+    "images": {
+      "core": {
+        "id": "sha256:3171b2061bfbe68e6f88dc049b6bbc079dd6372f144fff96f4546339ca84a767",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "repair": {
+        "id": "sha256:638d9f8572935780d37a5903a7e543ab2569faab4609781468053b33a8171e9a",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "web": {
+        "id": "sha256:3755bde3c48e6c5a01d6111848c6b40a070d53eca34e1a1b506941537b44dec6",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      }
+    },
+    "threeVersionEndpointsMatchManifest": true,
+    "currentReleaseMatches": true,
+    "controlFlagsClear": true
+  },
+  "afterRollback": {
+    "at": "2026-10-23T02:31:46.661962+00:00",
+    "originalSessions": 2,
+    "studentCoreSession": true,
+    "applicantCoreSession": true,
+    "originalStudentRepairAccess": true,
+    "records": [
+      {
+        "kind": "reservations",
+        "status": "RESERVED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "repairs",
+        "status": "SUBMITTED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "room-applications",
+        "status": "APPROVED",
+        "version": 2,
+        "approvalActionCount": 2
+      }
+    ],
+    "images": {
+      "core": {
+        "id": "sha256:1b27f383d9973040cea9c4626844d184a29aed1d3f8facd62b963c6b6fba018f",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "repair": {
+        "id": "sha256:33cd405adff9dbf159fc325f64e971571b4603c40f3f85a4233ad376de29d224",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "web": {
+        "id": "sha256:e9f773390a6c3898013edd65114af67e24f46507c88794e2b53caab21b301d1c",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      }
+    },
+    "threeVersionEndpointsMatchManifest": true,
+    "currentReleaseMatches": true,
+    "controlFlagsClear": true
+  },
+  "afterRestore": {
+    "at": "2026-10-23T02:32:17.342559+00:00",
+    "originalSessions": 2,
+    "studentCoreSession": true,
+    "applicantCoreSession": true,
+    "originalStudentRepairAccess": true,
+    "records": [
+      {
+        "kind": "reservations",
+        "status": "RESERVED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "repairs",
+        "status": "SUBMITTED",
+        "version": 0,
+        "approvalActionCount": 0
+      },
+      {
+        "kind": "room-applications",
+        "status": "APPROVED",
+        "version": 2,
+        "approvalActionCount": 2
+      }
+    ],
+    "images": {
+      "core": {
+        "id": "sha256:3171b2061bfbe68e6f88dc049b6bbc079dd6372f144fff96f4546339ca84a767",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "repair": {
+        "id": "sha256:638d9f8572935780d37a5903a7e543ab2569faab4609781468053b33a8171e9a",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      },
+      "web": {
+        "id": "sha256:3755bde3c48e6c5a01d6111848c6b40a070d53eca34e1a1b506941537b44dec6",
+        "running": true,
+        "health": "healthy",
+        "project": "studyroom-compat-release"
+      }
+    },
+    "threeVersionEndpointsMatchManifest": true,
+    "currentReleaseMatches": true,
+    "controlFlagsClear": true
+  },
+  "businessTables": {
+    "core.reservation": {
+      "originalRowsBeforeFixture": 6,
+      "rowsBeforeRollback": 7,
+      "rowsAfterRollback": 7,
+      "rowsAfterFinalRestore": 7,
+      "fullRowDigestUnchangedAcrossRollbackAndRestore": true,
+      "priorRowsUnchanged": true
+    },
+    "core.room_application": {
+      "originalRowsBeforeFixture": 6,
+      "rowsBeforeRollback": 7,
+      "rowsAfterRollback": 7,
+      "rowsAfterFinalRestore": 7,
+      "fullRowDigestUnchangedAcrossRollbackAndRestore": true,
+      "priorRowsUnchanged": true
+    },
+    "repair.repair_order": {
+      "originalRowsBeforeFixture": 6,
+      "rowsBeforeRollback": 7,
+      "rowsAfterRollback": 7,
+      "rowsAfterFinalRestore": 7,
+      "fullRowDigestUnchangedAcrossRollbackAndRestore": true,
+      "priorRowsUnchanged": true
+    }
+  },
+  "retention": {
+    "oldPrivateFixtureCount": 6,
+    "oldCompatibilityProofCount": 5,
+    "oldFixtureProofAndSourceManifestFilesUnchanged": true,
+    "existingSecretFileCount": 7,
+    "secretHashesAndModesUnchanged": true,
+    "noVolumesDeleted": true,
+    "oldApplicationBNotStarted": true
+  },
+  "officialOperations": [
+    {
+      "stage": "deploy-final",
+      "exitCode": 0,
+      "durationSeconds": 27.348,
+      "log": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/deploy-final.log",
+      "at": "2026-10-23T02:31:10.203841+00:00"
+    },
+    {
+      "stage": "official-rollback-v5",
+      "exitCode": 0,
+      "durationSeconds": 29.996,
+      "log": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/official-rollback-v5.log",
+      "at": "2026-10-23T02:31:45.369240+00:00"
+    },
+    {
+      "stage": "restore-final",
+      "exitCode": 0,
+      "durationSeconds": 28.599,
+      "log": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/restore-final.log",
+      "at": "2026-10-23T02:32:15.946619+00:00"
+    }
+  ],
+  "operationLogPrivacy": {
+    "knownPrivateValueCount": 11,
+    "encodingVariantCount": 50,
+    "matches": 0,
+    "logs": {
+      "deploy-final": {
+        "privatePath": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/deploy-final.log",
+        "sha256": "ca416236e2dc6fb074cefe0f5854cdf007291bd001f84c32690dd13fcf7a2909",
+        "knownSecretMatches": 0
+      },
+      "official-rollback-v5": {
+        "privatePath": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/official-rollback-v5.log",
+        "sha256": "5cf0698d391663e58803117fe4f0cbca49535604be336b60cf29785c3ca1a454",
+        "knownSecretMatches": 0
+      },
+      "restore-final": {
+        "privatePath": ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/restore-final.log",
+        "sha256": "7bcf848a43526bbd22289384bcb2511f2339bde4c8580586aaa89a0ae3a43922",
+        "knownSecretMatches": 0
+      }
+    }
+  },
+  "checks": {
+    "actualRollbackCommand": true,
+    "actualFinalRestoreCommand": true,
+    "twoOriginalSessionsOnCore": true,
+    "originalStudentSessionOnRepair": true,
+    "threeBusinessRecordsAndVersionsUnchanged": true,
+    "approvalActionsUnchanged": true,
+    "fullRowsAcrossAllThreeTablesUnchanged": true,
+    "threeImageIdsAndVersionsAtEveryPhase": true,
+    "sameSchemaAndFlywayUnchanged": true,
+    "noPendingRelease": true,
+    "noMaintenanceOrPauseFlags": true
+  },
+  "limitations": [
+    "Only the isolated compatibility project on local ARM64 Docker Desktop was changed; portable-install19282 and CI VM were not accessed.",
+    "No cross-schema downgrade, old B application run, performance rerun or repeated E2E is included.",
+    "The three business fixtures are new synthetic acceptance data created through real APIs and remain in the isolated database.",
+    "Registration, GitLab CI and final tag status are tracked independently."
+  ]
+}

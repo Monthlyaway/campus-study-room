@@ -2,7 +2,7 @@
 
 前端位于 `apps/web/`，产品名为「栖学 · 校园自习室」。采用 React 19、Umi 4、TypeScript 5、Ant Design 6；安装版本以 `apps/web/package.json` 和 `pnpm-lock.yaml` 为准。静态产物由统一 Nginx 入口提供，不依赖外网字体或图片，不发布为 Sites。
 
-当前本机发布入口为 `http://localhost:19282`，R4 `r-20261022T170200-3012051`、完整提交 `3012051f06c601e6c22a03e50d9d307a3054d1d9`；Mailpit为 `http://localhost:19227`。这是正式离线导入后的独立验收实例，默认源码安装18080和开发8000入口分别管理。R4浏览器、导入、回退、完整性能及core/repair真实恢复均已通过；GitLab共享runner #5186因挂载权限不足未启动DinD，需要支持DinD的隔离环境。完整CI仍待解决，未合main/tag，整体交付未完成。
+当前本机发布入口为 `http://localhost:19282`，V6 `r-20261023T022529-1079900`、完整源码提交 `10799003cd38a28629dc5ea39835c8313b1e9d79`；Mailpit 为 `http://localhost:19227`。这是正式离线导入后的独立验收实例，默认源码安装 18080 和开发 8000 入口分别管理。[V6 真实浏览器验收](../evidence/frontend-release-final-v6.md)在桌面与 375px 手机上完成六个流程，6/6 通过、耗时 113.061 秒，隐私反证 1/1 通过；历史 R4 性能及恢复证据保留原运行版本。feature 流水线 683506 的五个 job 已全部通过，MR !1 已 Fast-forward 合入 main，同一源码的 annotated tag `v0.1.0` 已推送。main 流水线 683689 与 tag 流水线 683743 均完整五 job PASS，容器内真实浏览器各 6/6，通过时间分别约 1.8 分钟和 1.5 分钟；tag 隐私反证 957.42035ms 通过。[正式 Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布，见[GitLab 发布记录](../evidence/gitlab-release-v0.1.0.md)；提交前限定审计见[报告](../evidence/runtime-audit-final-v6.md)。后续纯文档提交与当前运行源码分别记录。
 
 ## 本地开发
 

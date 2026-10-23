@@ -1,0 +1,70 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-23T02:25:29.737691+00:00",
+  "baselineCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "additionalBaselineCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "candidateCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+  "releaseId": "r-20261023T022529-1079900",
+  "result": "passed",
+  "verifiedProductionAndBuildInputs": 242,
+  "scope": {
+    "prefixes": [
+      "apps/",
+      "services/",
+      "modules/",
+      "tools/",
+      "db/",
+      "infra/",
+      "scripts/",
+      "contracts/"
+    ],
+    "files": [
+      ".dockerignore",
+      ".mvn/wrapper/maven-wrapper.properties",
+      ".node-version",
+      "docs/dependency-baseline.json",
+      "install.sh",
+      "mvnw",
+      "pom.xml"
+    ]
+  },
+  "pathSetBytesAndGitModesUnchanged": true,
+  "changedInputPaths": [],
+  "comparisonResults": {
+    "R4": {
+      "baselineCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+      "candidateCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+      "baselineFileCount": 242,
+      "candidateFileCount": 242,
+      "addedPaths": [],
+      "removedPaths": [],
+      "changedBytePaths": [],
+      "changedGitModePaths": [],
+      "pathSetBytesAndGitModesEquivalent": true
+    },
+    "V5": {
+      "baselineCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+      "candidateCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+      "baselineFileCount": 242,
+      "candidateFileCount": 242,
+      "addedPaths": [],
+      "removedPaths": [],
+      "changedBytePaths": [],
+      "changedGitModePaths": [],
+      "pathSetBytesAndGitModesEquivalent": true
+    }
+  },
+  "inventorySha256": "a9292b5d5939712c64d257d02bb560c431ddc5a0db4ad9023d2fa04f1170fc75",
+  "preflightArtifact": "output/release-final-v6/production-input-preflight.json",
+  "preflightSha256": "fd33d5760a46a4fc4e72f86d5803b050f6874a9bf057784f1da1287891ce6738",
+  "limitations": [
+    "Production/build path bytes and Git modes match R4 and V5; this does not relabel their runtime/performance evidence as V6 tests.",
+    "The new release version metadata intentionally changes; matching production source does not imply identical OCI image IDs.",
+    "CI, test and operational documentation changes remain outside this production-input set and retain independent verification."
+  ],
+  "manifestSha256": "5141bc6e20a95f62411dd65cdae9e2b7c2d39f5e824fa4402c7709d0bf63a000",
+  "productionInputCount": 242,
+  "inventoryPath": "output/release-final-v6/equivalence.json",
+  "inventoryFileSha256": "e7620e8ca4cbbe011a2ec495ee7693f68d63b3ec5bfe72ea99cbe61dd87424ce",
+  "releaseWorktreeCleanAfterBuild": true
+}

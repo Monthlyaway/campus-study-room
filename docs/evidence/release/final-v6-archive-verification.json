@@ -1,0 +1,86 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "artifactStatus": "Prepared V6 distribution archive; this packaging report does not assert formal Git tag or Release publication",
+  "startedAt": "2026-10-23T02:32:53.816196+00:00",
+  "completedAt": "2026-10-23T02:33:01.434650+00:00",
+  "sourceRelease": "r-20261023T022529-1079900",
+  "sourceCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+  "platform": "linux/arm64",
+  "bundle": ".local/releases/r-20261023T022529-1079900/portable",
+  "archive": ".local/releases/v0.1.0/campus-study-room-v0.1.0-linux-arm64.tar.gz",
+  "checksumFile": ".local/releases/v0.1.0/campus-study-room-v0.1.0-linux-arm64.tar.gz.sha256",
+  "archiveCreated": true,
+  "archiveBytes": 414289744,
+  "archiveSha256": "7b143161a31778be71ebabc20a1dffbc8d744cda454335df1fa82b3f571be7ee",
+  "topLevelDirectory": "campus-study-room-v0.1.0-linux-arm64",
+  "entryCount": 7,
+  "regularFileCount": 6,
+  "payloadChecksumCount": 5,
+  "members": {
+    "INSTALL.md": {
+      "bytes": 1478,
+      "mode": "0o644",
+      "sha256": "cc50ef2fd359d3dabe36070236d58b0edaa63fd142106317652004dc72b69431",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": true
+    },
+    "SHA256SUMS": {
+      "bytes": 394,
+      "mode": "0o644",
+      "sha256": "42cf4b4785c632607fe71e1899d51f49983fe3f14e60b990b1a3d38c9e668fe0",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": null
+    },
+    "images.tar": {
+      "bytes": 417842688,
+      "mode": "0o600",
+      "sha256": "8abb9d9a07c40f823b92584268f07f19fdf58ea968ca25133e5333df31182cc5",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": true
+    },
+    "manifest.json": {
+      "bytes": 1934,
+      "mode": "0o644",
+      "sha256": "5141bc6e20a95f62411dd65cdae9e2b7c2d39f5e824fa4402c7709d0bf63a000",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": true
+    },
+    "portable.json": {
+      "bytes": 2269,
+      "mode": "0o644",
+      "sha256": "062781f3968e7cc968d00506ba1bda7d6f7e4042613655e3168865f677c5225a",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": true
+    },
+    "source.tar.gz": {
+      "bytes": 812145,
+      "mode": "0o644",
+      "sha256": "229242d0dd0d3b49e14e56c154dd2f005480220e8bbfec54e656ef273c0fd739",
+      "bundleBytesMatch": true,
+      "bundleModeMatch": true,
+      "payloadChecksumMatch": true
+    }
+  },
+  "checks": {
+    "onlySixPublicBundleFilesReadAsArchiveInput": true,
+    "exactEntrySet": true,
+    "noAbsoluteOrTraversalPaths": true,
+    "noSymlinkHardlinkDeviceOrOtherSpecialEntries": true,
+    "allSixFilesStreamedAndByteHashesMatched": true,
+    "allSixFileModesPreserved": true,
+    "allFivePayloadChecksumsMatched": true,
+    "bundleFileContentModesAndMtimeUnchanged": true,
+    "archiveChecksumFileMatched": true,
+    "topLevelDirectoryMode0755": true,
+    "installInstructionsPresentUnchanged": true,
+    "runtimeDataSecretsAndPrivateFilesExcluded": true,
+    "legacyV5RootArchiveAndChecksumRetainedMetadataUnchanged": true
+  },
+  "verificationMethod": "Stream tar.gz without extracting: require exactly one top-level directory and six regular files; hash every decompressed file and compare exact size/mode against source bundle; validate the five SHA256SUMS payload hashes; re-hash source bundle and compare mode/mtime after packaging. Archive bytes are independently hashed for the adjacent checksum file. Prior V5 root archive and checksum were only stat-inspected and were not overwritten."
+}

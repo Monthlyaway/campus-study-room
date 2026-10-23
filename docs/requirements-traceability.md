@@ -1,26 +1,28 @@
 # P0 需求、实现与验收追踪
 
-更新时间：2026-10-23（V5本机浏览器、正式离线导入、同schema回退/恢复及限定隐私审计已通过；完整性能/SQL与真实恢复保留R4运行身份。GitLab完整正门禁、main、tag/Release及最终源码绑定包仍待闭环）。本表逐条保留 [PRD](../01_PRD.md) 的 **39 个 P0 REQ**，并关联 [技术方案](../02_Technical_Design.md)、[milestone](../03_Development_Milestones.md)。测试通过只证明其实际断言；一个有关联的测试通过，不等于整条 TC 或阶段门禁通过。剩余工程门禁尚未闭合，**尚不能声明全部 P0 完成**。
+更新时间：2026-10-23。V6本机浏览器、正式离线导入、同schema正式回退/恢复及源码绑定运输包均通过；feature683506完整五job PASS，MR !1已Fast-forward合main，annotated tag已指向同一S。main683689与tag683743完整五job均已PASS，[v0.1.0正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布；用户确定的本机与可迁移交付范围内39项P0均为VERIFIED。提交前限定审计见[报告](evidence/runtime-audit-final-v6.md)，GitLab最终事实见[发布记录](evidence/gitlab-release-v0.1.0.md)。本表逐条保留[PRD](../01_PRD.md)的**39个P0 REQ**，关联[技术方案](../02_Technical_Design.md)和[milestone](../03_Development_Milestones.md)；每项测试只证明其实际断言与运行条件。
 
 用户调整的交付边界见 [ADR 0002](adr/0002-delivery-and-gitlab.md)：GitLab 取代 GitHub Actions；用户授权自主提交和本地发版；正式公网/TLS、外部SMTP实际收信、正式服务器生产发布待后续目标信息。业务、权限、并发、数据保护要求不缩减。本表中的“部分验证”表示已有运行证据但尚欠该 TC 的具体子场景；“缺口”表示已经识别实现或交付不足；“待执行”不能视为通过。
 
 ## 状态口径与当前候选
 
-39项由31条业务需求（D 7、M1 7、M2 5、M3 8、X 4）和8条工程需求组成。表中 `VERIFIED` 表示该行列明的TC行为已有实际证据；不将旧版通过自动绑定到新镜像。`IN_PROGRESS` 保留具体未完成项。31条业务需求已具备实际行为证据；M1真实停机补偿、M3重复报修加载竞态及派单时间精度均已验证。当前本机运行V5 `r-20261023T001633-e95b025`，源码为 `e95b025de6f03c393d8ad32063ed51b2cbf7babe`；V5浏览器、正式导入及回退/恢复均已通过。依据[242份生产及构建输入与R4一致](evidence/release/final-v5-production-equivalence.json)，完整性能/SQL和core/repair恢复继续引用R4原报告，不改标为V5实测，也不声称镜像ID相同。当前CI候选为 `11803dac1fe221d79fd14333c4801c6f76a922cb`，本次文档以其为修改基线；该源码HEAD、工作区后续文档和本机运行HEAD分别记录。原39项范围不扩大，最终MR、成功pipeline、tag/Release和源码绑定包仍待门禁闭合。
+39项由31条业务需求（D7、M1 7、M2 5、M3 8、X4）和8条工程需求组成。`VERIFIED`表示该行列明行为及对应交付门禁已有实际证据，不扩展其运行条件或冒充人工签字。当前V6为 `r-20261023T022529-1079900`，运行源码S为 `10799003cd38a28629dc5ea39835c8313b1e9d79`，对应main与tag；后续纯文档/证据HEAD另行记录，不为归档重建镜像。[242份生产/构建输入](evidence/release/final-v6-production-equivalence.json)与R4/V5一致，因此性能/SQL及core/repair恢复保留R4原标签，不冒称V6重跑或镜像ID相同。31条业务与8条工程证据保留各自实际范围，main/tag完整门禁及正式Release已闭合；提交前限定审计范围以报告为准。
 
 - B `66f2b92`：新隔离离线安装及真实浏览器6/6通过；随后补充375px历史再次预约、拒绝理由与终态页面通过。
 - R1 `14b9813`：首轮浏览器5/6；确认按钮实际可访问名称被残留loading图标污染。`3350d5b`显式设置稳定aria-label/aria-busy，独立代码审查确认未削弱业务校验，浏览器恢复精确角色定位。
 - R2 `3350d5b`：完整浏览器5/6，原R1预约/原Cookie在真实午夜后通过375px页面签到；后被同室维修转为INTERRUPTED，**不是自然COMPLETED证据**。第二次报修在教室加载中打开导致空options，真实1800ms延迟复现。
 - R3 `3c7a93c`：`a5695c3`等待房间加载，`3c7a93c`统一持久化微秒精度；[前端6/6及1800ms延迟回归](evidence/frontend-release.md)通过，0跳过/重试，真实失败报告隐私反证1/1通过。入口19282的三个服务版本相同。
-- GitLab682941/682949的firstAssignedAt严格一致性失败已用固定纳秒Clock+真实PG/HTTP复现。修复后[两个期限HTTP、四个PG回归](evidence/repair-timestamp-precision.md)通过，原Python断言不变；远端R3真实集成已通过；容器发布在runner初始化时失败，完整门禁尚未通过。
+- GitLab682941/682949的firstAssignedAt严格一致性失败已用固定纳秒Clock+真实PG/HTTP复现。修复后[两个期限HTTP、四个PG回归](evidence/repair-timestamp-precision.md)通过，原Python断言不变；远端R3真实集成已通过；容器发布在runner初始化时失败，该轮完整门禁未通过。
 - [R3→B兼容探针](evidence/release/final-compatibility.json)和[实际rollback](evidence/release/final-actual-rollback.json)均通过：三镜像、两原Cookie、三类业务和扩展schema保留。A/B/R3三个清单及R3五镜像包已留存。[R3实际导入核对](evidence/release/final-portable-import.json)通过，385份源码、5镜像、3版本一致，7份密钥与三类业务行摘要不变；目标无Git，导入没有pull/build。
 - [R3运行隐私审计](evidence/final-runtime-audit.md)：116份运行产物（含15份限定日志）和HTML内嵌ZIP，对181个已知实际值/727种形式0命中；收尾412份源码/新增文档以174个当时已知值/701种形式补扫0命中。原运行快照与源码补扫分开记录，远端GitLab日志、截止后的活动及R4运行不在该轮范围；旧源码审计保持原样。
 - R4 `3012051` / `r-20261022T170200-3012051`：已包含支持工具`4a83b6e`的CI/身份门禁/采集器与真实规模修正；[浏览器6/6](evidence/frontend-release-v4.md)和privacy1/1、[414源码/五镜像正式导入](evidence/release/v4-portable-import.json)、[两原会话/三业务兼容](evidence/release/v4-compatibility.json)及[正式回退](evidence/release/v4-actual-rollback.json)均实际通过。A/B/R3/R4四清单与R4五镜像arm64包保留；R3原证据未改名。
 - R4[完整性能/SQL/repair恢复](evidence/performance.md)与[core真实恢复](evidence/core/restart-recovery-v4.md)通过：62892请求，读p95 231.914ms/写390.488ms，5xx/传输/意外4xx为0；repair20任务20.393秒，core首12.860秒/全10任务14.057秒及65秒无重复。保留历史100002条，之后core合成夹具增至100003。[R4统一源码/运行审计](evidence/runtime-audit-v4.md)已完成，限定范围已知秘密0命中。
-- GitLab pipeline683030：backend4478860通过4分10秒、frontend4478861通过1分20秒、integration4478862通过15分56秒；112ops、18HTTP、9组真实PG、27期限收件人及已提交响应丢失重放均执行。**三job通过不等于pipeline通过**：共享Runner #5186的官方DinD entrypoint报挂载权限拒绝、无法挂载`/sys/kernel/security`，daemon未启动，需要支持DinD的隔离环境；container-release与完整正门禁未闭环。
+- GitLab pipeline683030：backend4478860通过4分10秒、frontend4478861通过1分20秒、integration4478862通过15分56秒；112ops、18HTTP、9组真实PG、27期限收件人及已提交响应丢失重放均执行。**三job通过不等于pipeline通过**：共享Runner #5186的官方DinD entrypoint报挂载权限拒绝、无法挂载`/sys/kernel/security`，daemon未启动，需要支持DinD的隔离环境；该轮container-release与完整正门禁未闭环。
 - V5 `e95b025`：正式离线入口核对[442份源码/五镜像/三版本](evidence/release/final-v5-portable-import.json)，原7份秘密及三类业务完整行保持；[浏览器6/6与privacy1/1](evidence/frontend-release-final-v5.md)通过，97.599秒，无跳过或重试。[V5→R4→V5正式回退/恢复](evidence/release/final-v5-r4-rollback.json)在独立兼容环境保留两原会话、三类业务完整行、schema与原秘密，最终恢复V5。该轮两版schema相同，原R4→B结构演进证据仍单独保留。
 - 用户已明确授权，专用[Runner5666实际注册启用](evidence/gitlab-runner-registration.md)，Protected/项目锁定/拒绝untagged，17.8.5/linux-arm64。真实诊断pipeline683461/job4481126通过43秒，双端Docker28.5.2、Compose2.40.3、TLS与嵌套只读checkout均通过；可选service-helper警告按原日志保留。诊断不等于完整应用流水线。
-- V5 [pipeline683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462)的backend/frontend/integration均PASS；integration4481129约15分10秒，122项ops、27个期限收件人断言及9份JUnit报告均执行/产出。container-release4481130在官方Alpine HTTPS CDN安装Python/Git时发生TLS EOF/超时，FAILED且未执行业务构建，package跳过。[CI-only HTTPS镜像修正](evidence/gitlab-alpine-mirror.md)保留五job、needs、TLS和包签名验证。候选 `11803dac` 的[pipeline683500](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683500)在本次更新时运行中；尚无完整通过结果，也不预先作为后续文档提交或最终发布提交的成功证据。
+- V5 [pipeline683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462)的backend/frontend/integration均PASS；integration4481129约15分10秒，122项ops、27个期限收件人断言及9份JUnit报告均执行/产出。container-release4481130在官方Alpine HTTPS CDN安装Python/Git时发生TLS EOF/超时，FAILED且未执行业务构建，package跳过。[CI-only HTTPS镜像修正](evidence/gitlab-alpine-mirror.md)保留五job、needs、TLS和包签名验证。后续11803dac曾启动[pipeline683500](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683500)验证修正；最终采用S的683506实际完整结果，旧pipeline不回填为成功。
+- V6 `10799003` / `r-20261023T022529-1079900`：[450源码/五镜像正式导入](evidence/release/final-v6-portable-import.json)、[浏览器6/6与privacy1/1](evidence/frontend-release-final-v6.md)、[V6→V5→V6正式回退](evidence/release/final-v6-v5-rollback.json)均通过。原7秘密和导入时21预约/18申请/13维修完整行保持；回退保留两原会话、三业务及结构/Flyway，首次夹具重叠409保留。运输包精确绑定S，414289744字节，SHA256 `7b143161a31778be71ebabc20a1dffbc8d744cda454335df1fa82b3f571be7ee`，位于 `.local/releases/v0.1.0/`，旧V5包不覆盖。
+- [feature683506](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683506)的backend/frontend/integration/container-release/package五job全部PASS；MR !1已Fast-forward合main至S，保留67提交、0 merge commit、未squash。`v0.1.0` annotated tag已推送并指向S；[main683689](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683689)与[tag683743](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683743)均完整五job PASS。两轮各执行66项数据库测试/124项ops及真实浏览器6/6，tag另记录隐私反证957.42035ms；[正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布并绑定同一S、manifest及运输包。
 - GitLab负面合并门禁：[MR !2](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/2)使用独立分支`ycy/ci-negative-gate`的故意失败JUnit提交`d6a4d29`，pipeline 682968已因预期测试失败，非Draft页面明确阻止合并，integration/container-release/package均跳过。已关闭测试MR，破坏提交不在交付分支历史中；见[负向门禁证据](evidence/gitlab-negative-gate.md)。
 
 [R4统一运行审计](evidence/runtime-audit-v4.md)覆盖97份冻结运行输入（含13份应用及过程日志）与30份源码增量，对184个已知私有值、741种形式匹配均为0；HTML内嵌ZIP已解码检查。应用日志快照截至2026-10-22 17:24:41 UTC，源码收尾范围与精确时刻见[机器结果](evidence/runtime-audit-v4.json)。远端GitLab日志、日志截止后的活动和后续文件改动均不在本次快照范围。
@@ -35,11 +37,11 @@
 - [维修实测](evidence/repair-validation-2026-10-22.md)：10个规则单测、4个隔离PG、2个真实HTTP、提交成功后响应丢失重试、独立手机试用。
 - [D 管理实测](modules/administration.md#迁移与验证)：9个隔离PG、2个真实HTTP、SELF范围和跨服务旧会话失效。
 - 共享层真实PG 7/7由根代理执行；断言见 [SharedPersistenceTest][shared-test]。真实SMTP失败恢复与三种提醒收信见[新增矩阵][repair-matrix]；进程恢复专项仍另验。
-- 主逻辑首轮提交：`34aef3c`（构建/迁移基础）、`49300fb`（D/M1/M2行为）、`1ec7ccb`（M3）、`8c50781`（前端）、`e68cedb`（前端细化）。JPA整改、日期修复、原子审批、容器基线、离线运维、结构化日志与GitLab CI均已分模块提交；发布tag/manifest由发版任务补齐；不把工作区冒充已发布版本。
+- 主逻辑首轮提交：`34aef3c`（构建/迁移基础）、`49300fb`（D/M1/M2行为）、`1ec7ccb`（M3）、`8c50781`（前端）、`e68cedb`（前端细化）。JPA整改、日期修复、原子审批、容器基线、离线运维、结构化日志与GitLab CI均已分模块提交；发布tag/manifest已绑定S，正式Release已创建；后续文档工作区不冒充新的运行镜像。
 
 ## D 公共层
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
 | REQ-D-01 / T10-01、T10-06 | VERIFIED | [认证][auth]、[安全][security]、[账号][admin] | [矩阵][matrix]实际HTTP验证退出后重放旧Cookie拒绝、禁用后旧会话与直接登录401、无新增订单；跨服务旧会话core/repair均401 | TC-D-01组合已验证；R4浏览器刷新会话及正式回退两原会话复核均通过 |
 | REQ-D-02 / T10-02、T50-01 | VERIFIED | [RBAC][access]、[角色管理][admin] | Admin PG验证同绑定权限/范围与SELF隔离；[双服务矩阵][matrix]新建仅统计权限动态角色→统计成功→真实维修派单拒绝且工单不变→撤销后两服务旧会话401、新登录统计403；关联用户角色删除409 | 动态角色完整TC已验证；R4浏览器已复验学生/管理员及维修角色边界，原动态角色矩阵保留其实际运行身份 |
@@ -51,7 +53,7 @@
 
 ## M1 自习座位预约
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
 | REQ-M1-01 / T20-01 | VERIFIED | [可用性SQL分页][availability]、[查询][queries] | Core PG过滤/分页total；[矩阵][matrix]混合插座/占用精确过滤、整室边界阻断、前一end可用；网格返回不可用原因且无用户/来源字段；真实浏览器选日期/座位 | TC-M1-01已验证；B原记录保留，R4真实浏览器已复验查询、选择与空结果 |
 | REQ-M1-02 / T20-01 | VERIFIED | [预约事务][booking]、[资源裁决][resource] | 20用户1成功19冲突、同人跨室互斥、首尾相接成功；[输入矩阵][typed]无时区/粒度/当前起点/零长度/14天边界真实HTTP及失败无数据；原Map幂等成功记录按原JSON重放，字段差异409 | TC-M1-02及指定输入/幂等风险已验证；R4性能窗口外同座20用户争抢仍为1成功19冲突 |
@@ -63,7 +65,7 @@
 
 ## M2 整室申请
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
 | REQ-M2-01 / T30-01、T30-04 | VERIFIED | [提交及步骤][application] | 独立浏览器提交；[矩阵][matrix]纯学生403→动态叠加申请人角色后旧会话失效→新登录创建成功，同键同编号，PENDING不占用，expires_at两个分支 | TC-M2-01与[输入矩阵][typed]的时区/整点/起点/零长度/14天边界均通过；实际页面提交及必填校验已验证，R4已复验提交、两级批准、撤销与拒绝页面链路 |
 | REQ-M2-02 / T30-02 | VERIFIED | [两级审批事务][application] | 第二级抢先403、冲突回滚、两人浏览器批准；[PG屏障与claim写后回滚](evidence/core/atomic-workflows.md)；[矩阵][matrix]申请人即使有权限也不可自批，同人不可两级且状态/动作数量保持合法 | 关键顺序/角色/并发TC已验证；R4发布组合两名独立审批人逐级批准通过 |
@@ -73,7 +75,7 @@
 
 ## M3 报修与验收
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
 | REQ-M3-01 / T40-01、T40-06 | VERIFIED | [维修服务][repair] | [真实HTTP矩阵][repair-matrix]空白/超长输入拒绝、100 emoji/2000字边界通过、跨院系403、他人/范围外详情404且列表不泄漏；原有幂等/手机/同室双来源链路 | 服务端输入/范围/双来源已验证；R3完整6流程及真实1800ms延迟定向回归通过，加载中入口busy/disabled、响应后3个实际选项，创建/取消成功，见[最终前端证据](evidence/frontend-release.md)；[R4六流程](evidence/frontend-release-v4.md)已重复验证同一慢网络主链 |
 | REQ-M3-02 / T40-02、T40-06 | VERIFIED | [派单与权限][repair] | [真实HTTP矩阵][repair-matrix]非维修角色/停用人员422、范围外404；重派历史保留且firstAssignedAt/workDueAt相同，旧维修人404、新维修人开始成功；已开始不能转派；各维修人收到对应一次ASSIGNED | 本地TC及固定纳秒反证已验证；3c7a93c修复持久化微秒精度，生命周期首次响应/PG回读/幂等重放严格一致，两个期限HTTP/四个PG回归通过，见[精度证据](evidence/repair-timestamp-precision.md)。远端完整门禁由ENG-05跟踪 |
@@ -86,7 +88,7 @@
 
 ## 跨模块一致性
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
 | REQ-X-01 / T10-04、T40-05、T40-07 | VERIFIED | [来源实体/资源][resource] | Core PG双来源与墓碑；repair真实HTTP双工单先后解除；来源限定mutation被检测 | TC-X-01双维修封禁先后解除、来源历史保留已验证；永久来源/墓碑、管理查询与M1/M2可用性使用同一裁决模型，关联REQ-D-07/X-03的来源及requestId实测 |
 | REQ-X-02 / T10-04、T30-02、T30-05 | VERIFIED | [统一房间锁][resource]、[审批事务][application] | 同座20线程；[M1/M2最终审批双线程屏障只1成功，以及POST_INSERT确认claim落库后PG约束失败的整笔回滚](evidence/core/atomic-workflows.md) | TC-X-02两项专项通过；pipeline683030真实集成job已通过，完整容器发布/合并门禁仍由ENG-05闭环 |
@@ -95,41 +97,39 @@
 
 ## 工程交付
 
-| REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
+| REQ / milestone | 状态 | 实现 | 已执行证据 | 验收结论与边界 |
 | --- | --- | --- | --- | --- |
-| REQ-ENG-01 / T00-01、T60-01 | IN_PROGRESS | [协作规则](../AGENTS.md)、[分工](team.md)、本表 | 分模块连续commit与agent实测记录；原规格与ADR已入库 | 逐REQ实现/TC/逻辑commit已有索引；[MR !1](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/1)尚待完整门禁。V5运行manifest与本机验收已归档，最终成功pipeline、main提交、tag/Release及最终包绑定待闭环。独立agent审核不冒充人工签字，用户授权边界不改 |
-| REQ-ENG-02 / T00-02、T50-02 | VERIFIED | [HTTP测试][core-http]、[PG测试][core-test]、[反证][mutation]、浏览器证据 | 真实PG与两个进程HTTP、3项变异均业务断言失败且恢复通过，独立桌面/手机 | 默认完整check与三项反证通过；R3历史保留，[R4浏览器6/6及privacy1/1](evidence/frontend-release-v4.md)通过。[R4性能/SQL](evidence/performance.md)62892请求/读p95 231.914ms/写390.488ms/零错误，repair20任务20.393秒；[core恢复](evidence/core/restart-recovery-v4.md)首12.860秒/全10任务14.057秒及65秒去重。完整远端部署门禁仍归ENG-05 |
-| REQ-ENG-03 / T00-04、T50-04 | VERIFIED | [迁移程序][migration]、[版本SQL](../db/migration) | 空库迁移/reference/demo、重复seed；新增SELF纠正迁移在原库后应用，未改原迁移 | [A/B及R3历史演练](evidence/release/README.md)保留；[R4→B正式回退](evidence/release/v4-actual-rollback.json)已核对operator_note扩展、两原会话、三业务及实际Flyway历史不变。R4清单与回退目标已绑定，tag仍由ENG-06闭环 |
+| REQ-ENG-01 / T00-01、T60-01 | VERIFIED | [协作规则](../AGENTS.md)、[分工](team.md)、本表 | 分模块连续commit与agent实测记录；原规格与ADR已入库 | 逐REQ实现/TC/逻辑commit已有索引；[MR !1](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/1)已按FF合入S，feature683506五job PASS，V6清单/源码包已绑定。main/tag完整门禁与正式Release均已完成；后续文档HEAD与运行源码S分开，不冒充人工签字 |
+| REQ-ENG-02 / T00-02、T50-02 | VERIFIED | [HTTP测试][core-http]、[PG测试][core-test]、[反证][mutation]、浏览器证据 | 真实PG与两个进程HTTP、3项变异均业务断言失败且恢复通过，独立桌面/手机 | 默认完整check与三项反证通过；R3/R4/V5历史保留，[V6浏览器6/6及privacy1/1](evidence/frontend-release-final-v6.md)通过。[R4性能/SQL](evidence/performance.md)62892请求/读p95 231.914ms/写390.488ms/零错误，repair20任务20.393秒；[core恢复](evidence/core/restart-recovery-v4.md)首12.860秒/全10任务14.057秒及65秒去重，原运行标签不改。main自动部署门禁归ENG-05 |
+| REQ-ENG-03 / T00-04、T50-04 | VERIFIED | [迁移程序][migration]、[版本SQL](../db/migration) | 空库迁移/reference/demo、重复seed；新增SELF纠正迁移在原库后应用，未改原迁移 | [A/B及R3历史演练](evidence/release/README.md)保留；[R4→B正式回退](evidence/release/v4-actual-rollback.json)已核对operator_note扩展、两原会话、三业务及实际Flyway历史不变。R4清单与回退目标已绑定，最终tag/Release对应ENG-06证据 |
 | REQ-ENG-04 / T00-03、T00-04、T50-05 | VERIFIED | [环境与发布脚本][ops]、[GitLab CI][ci] | local与隔离PG套件使用不同数据库；独立test Compose安装由根代理执行 | 独立test/portable/check项目使用分离源码/数据库/会话/卷和随机秘密；[默认check](evidence/core/default-check.md)确认原native进程不变。`8b8a3d3`统一12个legacy入口锁；`247b02d`使原生build/migrate/copy全生命周期按环境→workspace顺序持锁，真实无关PID拒绝和异常释放通过 |
-| REQ-ENG-05 / T00-05、T50-05 | IN_PROGRESS | [GitLab CI][ci]、[全仓检查](../scripts/check) | [默认完整check](evidence/core/default-check.md)实际exit0，18 HTTP/65 PG/27收件人及响应丢失重放；CI调用相同函数与清单 | **未闭环：** 专用[Runner5666已获授权并实际启用，真实TLS/checkout诊断通过](evidence/gitlab-runner-registration.md)。V5 pipeline683462的backend/frontend/integration已PASS，122ops、27收件人断言及9份JUnit报告已执行/产出；container-release4481130因Alpine HTTPS CDN安装失败而FAILED，业务构建未执行，package跳过。CI-only镜像修正后的11803dac/pipeline683500当前运行中，不预报成功。Fast-forward、不squash及成功门禁已配置，[负面MR !2](evidence/gitlab-negative-gate.md)阻断已验证；完整正门禁及main自动整套部署/E2E仍待完成。历史共享Runner失败保留，不混作当前结果 |
-| REQ-ENG-06 / T00-06、T50-04～06 | IN_PROGRESS | [发布/回退][ops]、[版本API][controller] | 不可变组合校验与错误manifest的ops单测；本地版本接口实现 | [A/B及R3历史机制演练](evidence/release/README.md)保留；R4结构兼容证明和正式回退通过。V5五镜像包正式导入及[V5→R4→V5正式回退/恢复](evidence/release/final-v5-r4-rollback.json)已通过，A/B/R3/R4/V5清单和组合留存。当前本机验收完成，拟发布运输包不等于正式发布；最终成功CI/main、tag/Release、最终源码与发行包绑定仍待闭环，正式prod按ADR延期 |
-| REQ-ENG-07 / T00-03、T60-02 | VERIFIED | [安装入口](../install.sh)、[部署脚本][ops] | 根代理已完成本机独立test Compose首次安装；前端生产入口独立复核 | [B新隔离安装](evidence/release/portable-install.json)、[R3历史导入](evidence/release/final-portable-import.json)及[R4正式导入](evidence/release/v4-portable-import.json)通过；R4核对414源码/完整权限、五镜像/三版本、原7秘密及业务行摘要保持，浏览器6/6。目标无Git/Java/Node；本机ARM64同daemon、复用既有状态条件明确，不冒称另一服务器/断网/全新空库 |
-| REQ-ENG-08 / T00-01、T50-01 | IN_PROGRESS | [安全][security]、[伦理记录](ethics-and-risks.md) | HTTP CSRF/越权拒绝、Cookie HttpOnly/SameSite配置，维修公平处理PG；非真实学生测试数据 | 签到码/权限/CSRF、聚合统计与[伦理记录](ethics-and-risks.md)已有证据；R3/R4原源码及运行审计保留各自范围。V5真实浏览器隐私反证1/1通过；[V5限定审计](evidence/runtime-audit-final-v5.md)128输入、129已知值/513形式为0命中；[提交前补扫](evidence/precommit-final-v5-supplement.json)另覆盖当时14源码/证据文件和7指定CI/归档产物，21输入0命中。PNG非OCR，未读取Runner token，较早独立token扫描不扩展到未来输入。最终CI/main/tag新增产物尚待有限收尾，当前行不预报完成；正式HTTPS按ADR延期 |
+| REQ-ENG-05 / T00-05、T50-05 | VERIFIED | [GitLab CI][ci]、[全仓检查](../scripts/check) | [默认完整check](evidence/core/default-check.md)实际exit0，18 HTTP/65 PG/27收件人及响应丢失重放；CI调用相同函数与清单 | [feature683506](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683506)在S上完整五job PASS，MR !1已FF合main；[main683689](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683689)与[tag683743](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683743)自动完整部署/E2E均通过，每轮66项数据库测试、124项ops、浏览器6/6，五job无跳过。专用Runner5666的项目/保护边界保持，[负面MR !2](evidence/gitlab-negative-gate.md)阻断已验证。历史共享Runner挂载与V5 Alpine依赖安装失败保留，不混作本轮结果 |
+| REQ-ENG-06 / T00-06、T50-04～06 | VERIFIED | [发布/回退][ops]、[版本API][controller] | 不可变组合校验与错误manifest的ops单测；本地版本接口实现 | A/B/R3/R4/V5历史机制证据保留；[V6正式导入](evidence/release/final-v6-portable-import.json)及[V6→V5→V6回退](evidence/release/final-v6-v5-rollback.json)通过，六套清单和组合留存。S对应feature全绿与FF main，annotated tag已推送；450源码/五镜像运输包已[完整核对](evidence/release/final-v6-archive-verification.json)。main/tag最终门禁通过，[正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布，prod按ADR保留边界 |
+| REQ-ENG-07 / T00-03、T60-02 | VERIFIED | [安装入口](../install.sh)、[部署脚本][ops] | 根代理已完成本机独立test Compose首次安装；前端生产入口独立复核 | B新隔离安装及R3/R4/V5导入历史保留；[V6正式导入](evidence/release/final-v6-portable-import.json)核对450源码内容/权限、五镜像/三版本、原7秘密及21/18/13业务完整行保持，浏览器6/6。目标无Git/Java/Node；本机ARM64同daemon、既有状态升级边界明确，不冒称异机/断网/另建空库；README已补两层归档校验、固定状态目录和准确环境参数 |
+| REQ-ENG-08 / T00-01、T50-01 | VERIFIED | [安全][security]、[伦理记录](ethics-and-risks.md) | HTTP CSRF/越权拒绝、Cookie HttpOnly/SameSite配置，维修公平处理PG；非真实学生测试数据 | 签到码/权限/CSRF、聚合统计与伦理记录已有证据；R3/R4/V5原审计保留范围。V6浏览器privacy1/1通过，61份原始产物对7运行秘密及HTML内嵌ZIP0命中；提交前限定审计见[V6报告](evidence/runtime-audit-final-v6.md)，main/tag/Release事实见[发布记录](evidence/gitlab-release-v0.1.0.md)，不扩展报告的范围与截止时刻。V5审计与补扫保持旧范围；正式HTTPS按ADR保留边界 |
 
 ## 无REQ编号但仍属于验收基线的项目
 
-| 基线 | 已知事实 | 当前证据 / 剩余项 |
+| 基线 | 已知事实 | 当前证据与边界 |
 | --- | --- | --- |
-| PRD§10 必备页面和错误反馈 | React/Umi页面及B/R3真实浏览器历史证据保留 | [R4完整6流程](evidence/frontend-release-v4.md)通过，0跳过/隐藏重试，真实慢网络、错误/空态/375px与报告隐私反证通过。R2跨升级签到准确标记后续INTERRUPTED；R4未重复实时签到，API边界保留真实HTTP矩阵证据 |
+| PRD§10 必备页面和错误反馈 | React/Umi页面及B/R3/R4/V5真实浏览器历史证据保留 | [V6完整6流程](evidence/frontend-release-final-v6.md)通过，0跳过/重试，真实加载、离线/错误/空态/375px及报告隐私反证通过。R2跨升级签到后INTERRUPTED仍按原版本记录，本轮不重复签到或额外慢网络专项 |
 | PRD§12 数据规模 | 数据库分页/聚合已整改，R3原规模结果保留 | R4实际1000账号/20房/1000座/100002 COMPLETED历史，负载前后完成数不变，总预约123061→130862；后续明确合成core夹具才增至100003。采用至少10万门槛，保留所有累计数据，不过滤或伪装为100000 |
 | PRD§12 性能 | R3原数值及运行标签差异如实保留 | R4共享4CPU/总8GiB限额，20会话、60秒预热+300秒80:20：62892请求，读p95 231.914ms、写390.488ms、5xx/传输/意外4xx0；同座1成功19冲突。三镜像及三版本一致，SQL房间1/20均13条、预约9/11条无逐行关系增长，见[性能证据](evidence/performance.md) |
 | PRD§12 定时与恢复 | Clock/数据库矩阵、R3通过及首次采集失败记录保留 | R4健康repair20期限最大41.171秒，停启20积压20.393秒；core同容器正常停启首12.860秒/全10任务14.057秒，3终态、零过期提醒、单通知/违约、65秒无重复及原行摘要不变。不冒称合成夹具为UI自然完成 |
 | PRD§12 容器持久化 | 命名volume与共享JDBC Session实现 | [保留卷重建](evidence/release/backup-and-recreate.json)确认三容器ID均改变、两原会话可用、三类订单及两侧审计完整行摘要不变；隔离备份恢复同样逐表匹配 |
 | 技术方案§1/§2.3/§6 契约 | 日常写入已JPA；[56公开+5内部具名schema与真实HTTP](evidence/core/contracts.md)；[关键M1/M2 typed命令及原hash重放][typed] | 保留已有Java Map投影不单独作为业务缺陷；关键输入已类型化，OpenAPI具名schema与实际HTTP检查约束边界。新增接口或变更时同步契约；默认完整check已实际纳入5例契约和6例输入边界，不再列为未执行 |
-| milestone G0～G6 | 多项实际实现/测试已完成，原milestone初始状态保留为规格 | 只有本表所有相应证据闭环后更新工作进度门禁，不能回填不存在的人工验收或历史pipeline |
+| milestone G0～G6 | 对应39项P0在本次交付范围内已闭合，原milestone初始状态保留为规格 | [工作进度](progress.md)的MS0～MS6为DONE、MS7为NOT_STARTED；实际证据按版本记录，不回填人工签字或历史pipeline |
 
-## 最终候选的有限闭环清单
+## 最终交付边界
 
-1. **本机V5验收已完成。** 运行源码e95b025及实际三镜像清单绑定，浏览器6/6、privacy1/1、442源码/五镜像导入及V5→R4→V5正式回退/恢复均来自本轮执行。R4完整性能/SQL和core/repair恢复保留原身份，有242份生产及构建输入等价依据；不因CI-only与文档变更重复要求性能验收，也不把旧结果改标为新镜像实测。
-2. **真实数据与历史边界保留。** R4负载保留100002条历史，core合成恢复后100003；原数据不删，原报告不回填。375px实时签到仍属于14b→R2跨版本链，后续INTERRUPTED不伪称COMPLETED。V5回退新增独立API夹具后只读核对，旧夹具和证明均保留。
-3. **GitLab正反门禁。** 专用Runner5666已授权启用并实际诊断通过。V5 pipeline683462三个先行job通过，container-release在Alpine安装阶段失败且未执行业务构建。11803dac的pipeline683500正在执行完整五job，镜像修正不改变门禁；需等待真实结果，不能用诊断、安装探针或三个job通过替代完整成功。后续提交必须绑定自己的结果，当前pipeline不提前称为最终成功。
-4. **main与tag/Release。** 完整同提交pipeline通过后按Fast-forward、不squash合main，核对web/core/repair整套test自动更新与关键E2E，再把最终tag、MR、pipeline、manifest及最终源码绑定包对应。当前尚未合main/tag或创建正式Release，拟发布文件名不代表已发布。
-5. **发行与范围。** A/B/R3/R4/V5清单及五镜像包按版本留存，超过至少三套组合要求；不得覆盖旧包。V5是本机ARM64实际安装与回退证据，不能冒称异机或AMD64验收。正式服务器、公网TLS、外部SMTP实际收信及正式prod独立批准按[ADR 0002](adr/0002-delivery-and-gitlab.md)留待目标信息；不伪造人工验收、课程成员或历史流程签字。
-6. **最终追踪与隐私收口。** 39条REQ已有实现/任务/行为测试索引；V5限定审计及21文件提交前补扫已完成。门禁闭合后补齐最终MR/commit、成功pipeline、tag/Release、manifest及包的精确关联，并对之后新收取的CI/main/tag产物做限定补扫。此处为旧审计后的状态更新，当前字节不冒称已被旧快照覆盖，ENG-01/05/06/08只按实际完成结果更新。
+1. **本机V6已验。** S的450源码/五镜像正式导入、浏览器6/6及privacy1/1、V6→V5→V6正式回退与运输包核对通过。242生产/构建输入与R4/V5一致，性能/SQL及恢复保留R4原标签；不扩展重复性能测试，也不假称旧结果为V6实测。
+2. **历史和数据保留。** R4负载100002历史、core合成恢复后100003；午夜签到属于14b→R2且后续INTERRUPTED。V6首次API夹具因旧预约重叠409的证据保留，选择真实空闲时段后通过，未删旧业务或弱化规则。
+3. **feature与main。** 683506在S上完整五job PASS，MR !1已FF合main，67提交/0 merge commit/未squash；main683689与tag683743的五job、自动整套部署及真实E2E均实际通过。Runner诊断和旧三个job通过不代替这轮完整证据，V5/共享Runner失败历史不改写。
+4. **tag与Release。** `v0.1.0` annotated tag已指向S，tag对象 `257c481e0432183ec059581179b95f0e93127f36`；main/tag完整门禁均通过，[正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布，精确绑定MR、pipeline、tag、manifest与已核对运输包；后续纯文档HEAD不改变运行S或触发新镜像构建。
+5. **发行范围。** A/B/R3/R4/V5/V6六套清单和五镜像组合按版本保留，旧包不覆盖；仅本机linux/arm64实际验收。正式服务器、公网TLS、外部SMTP及prod按[ADR 0002](adr/0002-delivery-and-gitlab.md)保留边界，不伪造签字或另一架构验收。
+6. **有限隐私与追踪。** 39条REQ不增删、均为VERIFIED。提交前限定审计见[V6报告](evidence/runtime-audit-final-v6.md)，以报告列明输入、已知值与截止时刻为准；旧审计不自动覆盖新增文件或后续活动。P0完成限于本次已授权交付范围，不意味着完成公网生产部署或未执行的跨架构验收。
 
-P1 `REQ-AGENT-01` 未启动，不计入以上39项，也不用于替代P0验收。
-
-ENG-05补充证据：`098d8a2`的受保护精确分支工作流与专用ARM64标签经当轮122项运维回归及[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)通过；其后用户已授权Runner5666注册启用，pipeline683461/job4481126真实诊断通过。11803dac的CI-only修正只替换Alpine HTTPS镜像前缀，124项ops及固定镜像实际安装探针通过，五个阻断job/needs/TLS/签名验证未变，见[安装失败与修正](evidence/gitlab-alpine-mirror.md)。当前pipeline683500仍在运行；本地配置/安装验证不替代完整GitLab门禁，也不为后续提交作通过证明。
+P1 `REQ-AGENT-01`未启动，不计入以上39项，也不用于替代P0验收。
 
 [auth]: ../services/core-service/src/main/java/com/campus/studyroom/core/AuthController.java
 [security]: ../services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java
