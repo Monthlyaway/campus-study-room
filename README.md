@@ -2,18 +2,18 @@
 
 响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
-**当前状态：最终 V5 本机验收已通过，整体交付尚未完成。** V5 的浏览器6流程、五镜像离线导入、正式回退与恢复均通过，[限定范围隐私审计](docs/evidence/runtime-audit-final-v5.md)为0命中。本机V5源码的 [GitLab pipeline 683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462) 已结束：后端、前端、集成通过，容器任务在从官方Alpine HTTPS CDN安装Python/Git时遭遇TLS EOF/超时而失败，尚未开始业务构建，打包任务跳过。完整流水线、main 合入、最终 tag 和正式 release 仍待完成。用户授权的[专用 ARM64 Runner #5666](docs/evidence/gitlab-runner-registration.md)仅绑定本项目及受保护引用。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
+**[v0.1.0 已正式发布](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)。** 本机验收及 feature、main、tag 三条完整 GitLab 流水线均已通过。当前运行源码为 `10799003cd38a28629dc5ea39835c8313b1e9d79`，`v0.1.0` annotated tag 指向同一提交。[MR !1](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/1)以 Fast-forward 合入 main，保留 67 个提交，无 merge commit、未 squash。[main 683689](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683689)与[tag 683743](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683743)均完成全部五个 job；本机[浏览器 6/6](docs/evidence/frontend-release-final-v6.md)、[450 份源码/五镜像导入](docs/evidence/release/final-v6-portable-import.json)和[正式回退](docs/evidence/release/final-v6-v5-rollback.json)均通过。详细结果见[验收索引](docs/progress.md)及[GitLab 发布记录](docs/evidence/gitlab-release-v0.1.0.md)；提交前限定审计见[报告](docs/evidence/runtime-audit-final-v6.md)。
 
-V5 的完整源码包含后续 CI、测试和文档修正；[242份生产及构建输入](docs/evidence/release/final-v5-production-equivalence.json)与R4的路径、字节和Git权限模式一致。因此保留R4完整性能、SQL及真实core/repair恢复的原版本证据，不把它们改标成V5重跑结果，也不声称两版镜像ID相同。R3、R4及更早失败记录分别保留。
+V6的[242份生产及构建输入](docs/evidence/release/final-v6-production-equivalence.json)与R4/V5的路径、字节和Git权限模式一致，因此R4性能、SQL及core/repair恢复继续保留原版本证据，不改标为V6实测，也不声称镜像ID相同。运行源码、镜像清单和包内源码固定为上述提交S；后续纯文档/证据提交的HEAD单独记录，无需为归档记录重建运行镜像。V5/R4和早期失败记录保留。
 
-## 本机当前 V5 入口
+## 本机当前 V6 入口
 
 - 应用：[http://localhost:19282](http://localhost:19282)
 - Mailpit：[http://localhost:19227](http://localhost:19227)
-- 发布号：`r-20261023T001633-e95b025`；完整源码：`e95b025de6f03c393d8ad32063ed51b2cbf7babe`
+- 发布号：`r-20261023T022529-1079900`；完整源码：`10799003cd38a28629dc5ea39835c8313b1e9d79`
 - 状态目录：`.local/portable-install/`；随机演示密码：`.local/portable-install/secrets/demo_password`（只存在本机，权限0600）
 
-这是当前V5验收实例；下述源码安装默认使用18080，既有18082测试实例与8000开发实例不代表当前V5。[V5前端证据](docs/evidence/frontend-release-final-v5.md)记录6/6通过及真实隐私反证；[R4前端证据](docs/evidence/frontend-release-v4.md)和[R3历史证据](docs/evidence/frontend-release.md)保留原结果及另行标明版本的跨升级午夜签到。
+这是当前V6验收实例；源码安装默认使用18080，既有18082测试实例与8000开发实例不代表当前V6。[V6前端证据](docs/evidence/frontend-release-final-v6.md)记录6/6通过、113.061秒及真实隐私反证；[V5](docs/evidence/frontend-release-final-v5.md)、[R4](docs/evidence/frontend-release-v4.md)和[R3历史](docs/evidence/frontend-release.md)保留原结果及另行标明版本的跨升级午夜签到。
 
 ## 本地安装入口
 
@@ -25,7 +25,7 @@ cd campus-study-room
 ./install.sh local
 ```
 
-该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。以下是新建源码安装的默认 local 端口；请与上方现有V5验收实例区分。
+该入口构建全部应用，初始化独立数据库账号，执行 Flyway 迁移、基线与本地演示种子，启动服务并等待健康检查。重复执行保留数据和已有密钥。已在本机独立 test 环境完成首次完整启动与预约、审批、维修 HTTP 回归。以下是新建源码安装的默认 local 端口；请与上方现有V6验收实例区分。
 
 - 应用：`http://localhost:18080`
 - 本地邮件收件箱：`http://localhost:18025`
@@ -128,11 +128,11 @@ cd "$studyroom_repo"
 
 本页19282现有实例实际使用`test`，原状态目录是 `/Users/agiuser/Codes/campus-study-room/.local/portable-install`；维护该实例须将 `STUDYROOM_STATE_DIR` 设为此目录，对`backup`、`deploy`、`import-release`、`rollback`使用`test`，保持其中已有项目名、19282/19227端口及秘密。`build-release`内部使用`local`构建配置，须在绑定该`test`状态目录之前另行构建；离线导入直接使用包内镜像，不运行构建。
 
-发布构建要求干净且已提交的 checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。[V5→R4→V5正式回退与恢复](docs/evidence/release/final-v5-r4-rollback.json)已在独立环境通过，原2个会话、3类业务及完整行摘要保持，未降级数据库。R4→B的[兼容演练](docs/evidence/release/v4-compatibility.json)及[正式回退](docs/evidence/release/v4-actual-rollback.json)、R3→B历史结果仍保留原身份，不与本次同schema演练混用。
+发布构建要求干净且已提交的checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。[V6→V5→V6正式回退](docs/evidence/release/final-v6-v5-rollback.json)已保留两原会话、三类业务完整行与原秘密；历史[V5→R4→V5](docs/evidence/release/final-v5-r4-rollback.json)、[R4→B兼容](docs/evidence/release/v4-compatibility.json)及[正式回退](docs/evidence/release/v4-actual-rollback.json)仍按各自版本保留。
 
-本机 `.local/releases/` 保留A、B、R3、R4、V5五份发布清单及历史包。当前五镜像包位于 `.local/releases/r-20261023T001633-e95b025/portable/`，包含三应用、PostgreSQL、Mailpit、指定提交源码与校验和；[正式导入核对](docs/evidence/release/final-v5-portable-import.json)确认442份源码内容及完整权限、五镜像和三版本一致，导入前原7份秘密及19预约/16申请/11报修的完整行摘要保持。这是导入时快照，后续浏览器验收仍会创建记录。R4的[414份源码导入结果](docs/evidence/release/v4-portable-import.json)另行保留。
+本机 `.local/releases/` 保留A/B/R3/R4/V5/V6六份发布清单及历史包。当前包在 `.local/releases/r-20261023T022529-1079900/portable/`；[正式导入核对](docs/evidence/release/final-v6-portable-import.json)确认450份源码内容/权限、五镜像及三版本一致，导入前原7份秘密和21预约/18申请/13维修完整行保持。这是导入时快照，后续浏览器仍创建记录；旧版导入结果不改写。
 
-单一运输归档为 `.local/releases/campus-study-room-v0.1.0-linux-arm64.tar.gz`，同目录附 `.sha256`，共414259208字节，SHA256为 `cc13877ab94d3394640a82508c42fc924acaa95a9b5226ebad3f71f2f84584f0`。当前包仅为linux/arm64；AMD64服务器需要对应平台构建，未实测远程或跨架构安装。`v0.1.0`保护规则已配置，但归档文件名不代表已创建tag或正式release；最终发布门禁仍待闭合。
+当前单一运输归档为 `.local/releases/v0.1.0/campus-study-room-v0.1.0-linux-arm64.tar.gz`，旁边为 `.tar.gz.sha256`，共414289744字节，SHA256为 `7b143161a31778be71ebabc20a1dffbc8d744cda454335df1fa82b3f571be7ee`，已[核对目录、逐文件内容/权限及校验和](docs/evidence/release/final-v6-archive-verification.json)。当前包仅支持linux/arm64；AMD64服务器需要对应平台构建，未实测异机安装。旧V5根目录归档保留，不能把它与本次子目录的新包混用。[正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)关联同一tag与源码S，保留两项tag制品链接，并记录本机manifest和运输包校验和。
 
 ## 文档
 

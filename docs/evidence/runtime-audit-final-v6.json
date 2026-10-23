@@ -1,0 +1,839 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "releaseId": "r-20261023T022529-1079900",
+  "releaseCandidateCommit": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+  "sourceHeadCommit": "af51f7f6e35417eb3d4ce541960486a1380eb8f7",
+  "scanStartedAt": "2026-10-23T03:46:22.262861+00:00",
+  "cutoffAt": "2026-10-23T03:46:25.748650+00:00",
+  "sourceScope": {
+    "baselineCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+    "fileCount": 25,
+    "mode": "Current bytes of tracked differences since V5 plus nonignored new working evidence; bounded scope, not a repository-history scan.",
+    "workingDocsIncluded": true,
+    "workingDocsAreNotClaimedToBeInHead": true,
+    "headUnchangedDuringScan": true,
+    "paths": [
+      ".gitlab-ci.yml",
+      "AGENTS.md",
+      "README.md",
+      "docs/evidence/frontend-release-final-v5.md",
+      "docs/evidence/frontend-release-final-v6.md",
+      "docs/evidence/gitlab-alpine-mirror.md",
+      "docs/evidence/gitlab-release-v0.1.0.md",
+      "docs/evidence/precommit-final-v5-supplement.json",
+      "docs/evidence/release/README.md",
+      "docs/evidence/release/final-v5-portable-import.json",
+      "docs/evidence/release/final-v5-production-equivalence.json",
+      "docs/evidence/release/final-v5-r4-rollback.json",
+      "docs/evidence/release/final-v6-archive-verification.json",
+      "docs/evidence/release/final-v6-portable-import.json",
+      "docs/evidence/release/final-v6-production-equivalence.json",
+      "docs/evidence/release/final-v6-v5-rollback.json",
+      "docs/evidence/runtime-audit-final-v5.json",
+      "docs/evidence/runtime-audit-final-v5.md",
+      "docs/modules/operations.md",
+      "docs/modules/portable-release.md",
+      "docs/modules/web.md",
+      "docs/progress.md",
+      "docs/requirements-traceability.md",
+      "tests/browser/REVIEW.md",
+      "tests/ops/test_ci_workflow.py"
+    ]
+  },
+  "artifactGroups": [
+    {
+      "name": "finalBrowser",
+      "fileCount": 63,
+      "bytes": 8921088,
+      "paths": [
+        "output/browser-release-final-v6/SHA256SUMS",
+        "output/browser-release-final-v6/command.json",
+        "output/browser-release-final-v6/command.log",
+        "output/browser-release-final-v6/html/data/1562279d23a89f6ece5fb0319b24781fe9972d7e.png",
+        "output/browser-release-final-v6/html/data/2b55deb3f74bebd6b2dede80cd298025da5220b3.png",
+        "output/browser-release-final-v6/html/data/2f4c55cc20282977f501511c171193937aa91a26.png",
+        "output/browser-release-final-v6/html/data/34d0927d35c7132b0f3bb8c77c5fd58ec7ac24a2.png",
+        "output/browser-release-final-v6/html/data/34d44bf1e6c8a6d5ef072d813032b6b03f241639.png",
+        "output/browser-release-final-v6/html/data/759f347a1e9e8e4da5d049990976f755ed9b465a.png",
+        "output/browser-release-final-v6/html/data/7951d70eb7328a3497b019b92d2a19fbe68c72b1.png",
+        "output/browser-release-final-v6/html/data/9923c4b9074f41c36343cda260d0bd1d346e6a77.png",
+        "output/browser-release-final-v6/html/data/9a8a4a19b09dea9e12787e761f436299262776e8.png",
+        "output/browser-release-final-v6/html/data/a015b384d514a660cf707864cb16b607432a72b4.png",
+        "output/browser-release-final-v6/html/data/a2972081c094337794144065d7eb655ee9d273e0.png",
+        "output/browser-release-final-v6/html/data/add503c0ea5fa93b77d54e5c850fa36609262d91.png",
+        "output/browser-release-final-v6/html/data/c19295ebc63b81bf5881f1b288e33efe196cbd30.png",
+        "output/browser-release-final-v6/html/data/d2f0fea0877417df697929f91b89d36400a7e381.png",
+        "output/browser-release-final-v6/html/data/d75e4f732d58f08666bf9b61d3e06800f9eec7ad.png",
+        "output/browser-release-final-v6/html/data/d86067590c054a5de27585ff4d9ab3a5d9f08958.png",
+        "output/browser-release-final-v6/html/data/e6017253163efc4b4e7ba2add9fd51424be77f76.png",
+        "output/browser-release-final-v6/html/data/ecffa59e4202a55270cf41482e7b59a76417255b.png",
+        "output/browser-release-final-v6/html/index.html",
+        "output/browser-release-final-v6/junit.xml",
+        "output/browser-release-final-v6/results.json",
+        "output/browser-release-final-v6/results/.last-run.json",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-available-seats-85fd8eb24ffe1d1fb081adb8e2f93677c6e39074.png",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-offline-error-bb6ef79b52c16989856c2a42d48b86b6cb6def95.png",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-real-missing-record-50ac424d57467ea7b7d28922a2478b1a0eb13ede.png",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-available-seats.png",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-offline-error.png",
+        "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-real-missing-record.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/desktop-reservation-created-8b11e7d4d27851b21adf6646e33add6919e3eb8a.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-created-4a09495f53bbecd813afaa550b0f2302f6a2577c.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-selection-1f5d0a9b3ae0ef4d06e501a5a4d35fcb2b2d4cce.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-reservation-history-0e14aaa09f4bb183de77ac3f69c59ed5b89bd2e2.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/real-stale-version-conflict-98c5452da7b80a91dac92a41804f074129d61353.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/desktop-reservation-created.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-created.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-selection.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-reservation-history.png",
+        "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/real-stale-version-conflict.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-application-rejected-d93545ea358539584c91758c5d1f08a8e04eb5c1.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-two-level-approved-d13198eb3e2c61a70c7584b12bbb76e14992ee9a.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-application-cancelled-a215895d89be4232d7be237f05f15fc00a018727.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-rejection-reason-69328adc162c6bb34b90424ed4a0c814e05f4afd.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-application-rejected.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-two-level-approved.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-application-cancelled.png",
+        "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-rejection-reason.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/desktop-repair-awaiting-acceptance-dbe6657706dbcf3579eae76162f63cd0b73c89d7.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-cancelled-04d1165e08957152627a7a1b9bc5ab7fb9d163f1.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-closed-5a910e4c747f01402bd67db138f7231e6f7bf14b.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-created-8ab968093444e8c887854bf8d42c0eda34b39332.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/desktop-repair-awaiting-acceptance.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-cancelled.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-closed.png",
+        "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-created.png",
+        "output/browser-release-final-v6/results/studyroom-administrator-ca-68c98-use-student-booking-actions/administrator-empty-search.png",
+        "output/browser-release-final-v6/results/studyroom-administrator-ca-68c98-use-student-booking-actions/attachments/administrator-empty-search-6582e4e6439f20cc9dfdf0909f0d81ba1b5c6267.png",
+        "output/browser-release-final-v6/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/attachments/student-administration-denied-65f381b4ae9a785d76b55ff8a6592719ca14e332.png",
+        "output/browser-release-final-v6/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/student-administration-denied.png",
+        "output/browser-release-final-v6/run-metadata.json",
+        "output/browser-release-final-v6/verification.json"
+      ]
+    },
+    {
+      "name": "finalBuildExportImport",
+      "fileCount": 10,
+      "bytes": 185422,
+      "paths": [
+        "output/release-final-v6/archive-verification.json",
+        "output/release-final-v6/build.log",
+        "output/release-final-v6/equivalence.json",
+        "output/release-final-v6/evidence-freeze.json",
+        "output/release-final-v6/export.log",
+        "output/release-final-v6/import.log",
+        "output/release-final-v6/production-input-preflight.json",
+        "output/release-final-v6/release-id",
+        "output/release-final-v6/requirements-completion-review.json",
+        "output/release-final-v6/source-git-verification.json"
+      ]
+    },
+    {
+      "name": "gitlabNewExplicit",
+      "fileCount": 38,
+      "bytes": 2146215,
+      "paths": [
+        "output/gitlab/alpine-code-pipeline-superseded.png",
+        "output/gitlab/alpine-mirror-ops-tests.log",
+        "output/gitlab/alpine-mirror-probe.json",
+        "output/gitlab/alpine-mirror-probe.log",
+        "output/gitlab/delivery-candidate-linearity.json",
+        "output/gitlab/delivery-feature-container-passed.png",
+        "output/gitlab/delivery-feature-container.txt",
+        "output/gitlab/delivery-feature-integration.txt",
+        "output/gitlab/delivery-feature-pipeline-passed.png",
+        "output/gitlab/delivery-feature-pipeline-passed.txt",
+        "output/gitlab/final-feature-container-alpine-failed.png",
+        "output/gitlab/final-feature-container-alpine-failed.txt",
+        "output/gitlab/final-feature-integration.txt",
+        "output/gitlab/installation-docs-review.json",
+        "output/gitlab/main-container-passed.txt",
+        "output/gitlab/main-container-retained.png",
+        "output/gitlab/main-fast-forward-verification.json",
+        "output/gitlab/main-integration-passed.txt",
+        "output/gitlab/main-integration-retained.png",
+        "output/gitlab/main-pipeline-passed.png",
+        "output/gitlab/main-pipeline-passed.txt",
+        "output/gitlab/mr-alpine-candidate.png",
+        "output/gitlab/mr-delivery-candidate-1079900.png",
+        "output/gitlab/mr1-fast-forward-merged.png",
+        "output/gitlab/mr1-fast-forward-merged.txt",
+        "output/gitlab/precommit-final-v5-supplement.json",
+        "output/gitlab/premerge-jira-transition-check.json",
+        "output/gitlab/tag-container-passed.txt",
+        "output/gitlab/tag-container-retained.png",
+        "output/gitlab/tag-integration-passed.txt",
+        "output/gitlab/tag-integration-retained.png",
+        "output/gitlab/tag-package-passed.txt",
+        "output/gitlab/tag-package-retained.png",
+        "output/gitlab/tag-pipeline-passed.png",
+        "output/gitlab/tag-pipeline-passed.txt",
+        "output/gitlab/v0.1.0-release-created.png",
+        "output/gitlab/v0.1.0-release-created.txt",
+        "output/gitlab/v0.1.0-tag-verification.json"
+      ]
+    },
+    {
+      "name": "finalCompatibilityOperationLogs",
+      "fileCount": 4,
+      "bytes": 14192,
+      "paths": [
+        ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/deploy-final.log",
+        ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/official-rollback-v5.log",
+        ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/restore-final.log",
+        ".local/compatibility/final-v6-v5-20261023T022809Z-dab83582/deploy-final.log"
+      ]
+    },
+    {
+      "name": "publishedReleaseNotes",
+      "fileCount": 1,
+      "bytes": 2588,
+      "paths": [
+        ".local/v0.1.0-release-notes.md"
+      ]
+    }
+  ],
+  "inventory": {
+    "uniqueFileCount": 141,
+    "totalBytes": 11555137,
+    "sha256": "bca4c28669f5bb795e43c29454c2adf7c6f1c4e44676c7db5fc81c6e1b3545f1",
+    "files": {
+      ".gitlab-ci.yml": {
+        "bytes": 5873,
+        "sha256": "5301bcabd094baa403abef4a4b6a17f18d7b0c02aa7e507d7abd18012253c9d9"
+      },
+      ".local/compatibility/final-v6-v5-20261023T022809Z-dab83582/deploy-final.log": {
+        "bytes": 4073,
+        "sha256": "edacb84f23c112753af45bb9aa8aa8019215302924aba3262a0f4412191a1ffa"
+      },
+      ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/deploy-final.log": {
+        "bytes": 3698,
+        "sha256": "ca416236e2dc6fb074cefe0f5854cdf007291bd001f84c32690dd13fcf7a2909"
+      },
+      ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/official-rollback-v5.log": {
+        "bytes": 2348,
+        "sha256": "5cf0698d391663e58803117fe4f0cbca49535604be336b60cf29785c3ca1a454"
+      },
+      ".local/compatibility/final-v6-v5-20261023T023041Z-95038901/restore-final.log": {
+        "bytes": 4073,
+        "sha256": "7bcf848a43526bbd22289384bcb2511f2339bde4c8580586aaa89a0ae3a43922"
+      },
+      ".local/v0.1.0-release-notes.md": {
+        "bytes": 2588,
+        "sha256": "c830cd887f92f94f92098d4ee661acd54c684c0f7af71a5ea1ee9496a129a36b"
+      },
+      "AGENTS.md": {
+        "bytes": 4161,
+        "sha256": "9e0cc7e68018792aba8d362134128a1b37b10774dd524d0f9cf57cc7cef8a5fc"
+      },
+      "README.md": {
+        "bytes": 14298,
+        "sha256": "0da75531e8fd40c6c64a364eaf366b743dd0c649513a879890788480cdfd00f4"
+      },
+      "docs/evidence/frontend-release-final-v5.md": {
+        "bytes": 5304,
+        "sha256": "c99541a7681016666207151d3b6fb690d101f09d9265ef7fa382e86bf86f05fe"
+      },
+      "docs/evidence/frontend-release-final-v6.md": {
+        "bytes": 4732,
+        "sha256": "0fcf9482ae79d93eef1b3282b8e451cdbc9badbee0568b27398a964fa28b140c"
+      },
+      "docs/evidence/gitlab-alpine-mirror.md": {
+        "bytes": 3352,
+        "sha256": "2fc1de506142ce99698e2594d3f6ab4678a5b514eb9ec48e1eb96de7efff082a"
+      },
+      "docs/evidence/gitlab-release-v0.1.0.md": {
+        "bytes": 6179,
+        "sha256": "afc8cbe083eda7f0a9136551f021e1a02f0c8872917f57f09e855c6bed936610"
+      },
+      "docs/evidence/precommit-final-v5-supplement.json": {
+        "bytes": 7341,
+        "sha256": "ebb3330721e72844893a5d9fe88f0d89569f8e8f783d461d2473bd4bdc91f72e"
+      },
+      "docs/evidence/release/README.md": {
+        "bytes": 15422,
+        "sha256": "5bfbdd2288ab49e57235b479555b4e9474376503fa5652c75327d0d623cabdf5"
+      },
+      "docs/evidence/release/final-v5-portable-import.json": {
+        "bytes": 6839,
+        "sha256": "6df83e75d6436bde7342d3605e5f5e30ddaa044236dca001f0b6f8dd07425a9c"
+      },
+      "docs/evidence/release/final-v5-production-equivalence.json": {
+        "bytes": 1320,
+        "sha256": "04c1725898169014af9ba51800e0565b6b538be308b87b32f599788cbc38af59"
+      },
+      "docs/evidence/release/final-v5-r4-rollback.json": {
+        "bytes": 12774,
+        "sha256": "74654fe060341ce5d24d267e3f2ac42dd00da4405e96b2a434fd9a8df9003a65"
+      },
+      "docs/evidence/release/final-v6-archive-verification.json": {
+        "bytes": 3604,
+        "sha256": "f1319b4ff80743dfc6acaf770e403e69307b86ce1f835170187c6ead6bfcce85"
+      },
+      "docs/evidence/release/final-v6-portable-import.json": {
+        "bytes": 7591,
+        "sha256": "453ae8c1c06de048df29555e8580fe73c50b9211fc90c232f5841a69375b066a"
+      },
+      "docs/evidence/release/final-v6-production-equivalence.json": {
+        "bytes": 2631,
+        "sha256": "0d36fc49c3b54d5ac14f77884ed634c6470071cff9736d307467d76899553f6d"
+      },
+      "docs/evidence/release/final-v6-v5-rollback.json": {
+        "bytes": 13855,
+        "sha256": "bca02bb146f45cc157da91722d20248ff31c2d639465caf1cb30d81f556ba607"
+      },
+      "docs/evidence/runtime-audit-final-v5.json": {
+        "bytes": 43662,
+        "sha256": "6a4db5da2535668bff5a6660838e65cd3d7327f0ab79c63951fd262b2e20213a"
+      },
+      "docs/evidence/runtime-audit-final-v5.md": {
+        "bytes": 2268,
+        "sha256": "26f9e3624fc37e3f31252664b2daa24356bf7c1b1a5e01c4f6b68afc5888c1d3"
+      },
+      "docs/modules/operations.md": {
+        "bytes": 17197,
+        "sha256": "f3525265a441c7263f107b46f5e955e6f8e52731898f5a4ecb9497c246d35631"
+      },
+      "docs/modules/portable-release.md": {
+        "bytes": 10467,
+        "sha256": "e04f254a5783d119a25d8c6d4b5eea8fb6e4f591172d7a253fa11cd4c69879dc"
+      },
+      "docs/modules/web.md": {
+        "bytes": 15107,
+        "sha256": "adcc3ea211830f3ffc163886c3a98905d4b86bea8fdf465630e1d28f16faa968"
+      },
+      "docs/progress.md": {
+        "bytes": 13670,
+        "sha256": "48db4c40dbcb8ac18fd1c59cb42aca0aca6dcb3a5f3bbcba70ee5ab783d53a3e"
+      },
+      "docs/requirements-traceability.md": {
+        "bytes": 38949,
+        "sha256": "9c9ab4ba05f393c8efdab01900bf1940e693e13b900ec235a1b11bf402f64263"
+      },
+      "output/browser-release-final-v6/SHA256SUMS": {
+        "bytes": 9771,
+        "sha256": "dc0c0dfc414e7372473692db49f10c3120ab4e3cf10a452ea184026ae4fa8db5"
+      },
+      "output/browser-release-final-v6/command.json": {
+        "bytes": 507,
+        "sha256": "18882c5a6db05e319c67f2d5452e3589ec76aa83cd1040cdb59721a6cc0abea9"
+      },
+      "output/browser-release-final-v6/command.log": {
+        "bytes": 1314,
+        "sha256": "a474de38015d6e2456b484ce9a74a2ec322c2228b42ee9f7b053488c7fba40c1"
+      },
+      "output/browser-release-final-v6/html/data/1562279d23a89f6ece5fb0319b24781fe9972d7e.png": {
+        "bytes": 178505,
+        "sha256": "6f81a18082e20c0ee390b5506cf3e3f7db5ece6325641a76b669aaf5398ba477"
+      },
+      "output/browser-release-final-v6/html/data/2b55deb3f74bebd6b2dede80cd298025da5220b3.png": {
+        "bytes": 176914,
+        "sha256": "cfa38647bcf314b6877180c3c8422615cac4797f218888d3d9d88352c8d0fe72"
+      },
+      "output/browser-release-final-v6/html/data/2f4c55cc20282977f501511c171193937aa91a26.png": {
+        "bytes": 194619,
+        "sha256": "b3b1ada784d1930bdca46cc622691f710e056e9c477ad96f84ba46fe7e8bc6ec"
+      },
+      "output/browser-release-final-v6/html/data/34d0927d35c7132b0f3bb8c77c5fd58ec7ac24a2.png": {
+        "bytes": 76525,
+        "sha256": "0f7ff59dccfd6938db4e5888c35acd613a5015c2e8e87ec359b4f523e9afc349"
+      },
+      "output/browser-release-final-v6/html/data/34d44bf1e6c8a6d5ef072d813032b6b03f241639.png": {
+        "bytes": 109901,
+        "sha256": "63d4de45076b92416ae02a2638ca47b68648055b8cde3b587c0318cea84279db"
+      },
+      "output/browser-release-final-v6/html/data/759f347a1e9e8e4da5d049990976f755ed9b465a.png": {
+        "bytes": 178874,
+        "sha256": "0adb6fb17fa02db3f1af81e0f13e50bbb10d88f7a1fc57f98f5799a316a9f7e7"
+      },
+      "output/browser-release-final-v6/html/data/7951d70eb7328a3497b019b92d2a19fbe68c72b1.png": {
+        "bytes": 21033,
+        "sha256": "a27f1893097fac8acf6a78c077424784aa8b626a2330587a275b71605c696b81"
+      },
+      "output/browser-release-final-v6/html/data/9923c4b9074f41c36343cda260d0bd1d346e6a77.png": {
+        "bytes": 118123,
+        "sha256": "c461677cfbbc806f800d24c395d1c96bcc1b5f03d502c2676c94e1926e346622"
+      },
+      "output/browser-release-final-v6/html/data/9a8a4a19b09dea9e12787e761f436299262776e8.png": {
+        "bytes": 43038,
+        "sha256": "b4216105f7d37badd943fc7d5dfe34a381ee7ad6f10f6af3ba6b1663ec4eb7ff"
+      },
+      "output/browser-release-final-v6/html/data/a015b384d514a660cf707864cb16b607432a72b4.png": {
+        "bytes": 145844,
+        "sha256": "a7daa50349e60e881f6f4a300570e2b485d203b345b9543a112a6402aa84030a"
+      },
+      "output/browser-release-final-v6/html/data/a2972081c094337794144065d7eb655ee9d273e0.png": {
+        "bytes": 227983,
+        "sha256": "3ccfddc96703fab20b5f75af774e4d19c5635db5ac547c05350a0309ab196989"
+      },
+      "output/browser-release-final-v6/html/data/add503c0ea5fa93b77d54e5c850fa36609262d91.png": {
+        "bytes": 348416,
+        "sha256": "eeb04773552c64d4840de00f9fcc46a696d817194c486a7020bee5c72a041e77"
+      },
+      "output/browser-release-final-v6/html/data/c19295ebc63b81bf5881f1b288e33efe196cbd30.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v6/html/data/d2f0fea0877417df697929f91b89d36400a7e381.png": {
+        "bytes": 312490,
+        "sha256": "edbf1da668d9d731af452cf5195f54474eea7472b2d455c1ab5e04a5c56136ef"
+      },
+      "output/browser-release-final-v6/html/data/d75e4f732d58f08666bf9b61d3e06800f9eec7ad.png": {
+        "bytes": 197750,
+        "sha256": "0d907a0ad0a6099b6a880582096cd90bce150023c4b4f186773b3872c74d06d2"
+      },
+      "output/browser-release-final-v6/html/data/d86067590c054a5de27585ff4d9ab3a5d9f08958.png": {
+        "bytes": 84625,
+        "sha256": "714ff3f6ab0d3028ceb1ce627ba731b58b734987d29f9f95904af8a190437f41"
+      },
+      "output/browser-release-final-v6/html/data/e6017253163efc4b4e7ba2add9fd51424be77f76.png": {
+        "bytes": 194574,
+        "sha256": "e91bf978ec85f88385dd5a2552c5d26e7b6cc692352c066ba77d15c3fb470b53"
+      },
+      "output/browser-release-final-v6/html/data/ecffa59e4202a55270cf41482e7b59a76417255b.png": {
+        "bytes": 74607,
+        "sha256": "9a7ca7fa9650d2c6d32fe6da32de34e671e43f39f2245d23e286cf1758d31d8d"
+      },
+      "output/browser-release-final-v6/html/index.html": {
+        "bytes": 551912,
+        "sha256": "087724fc62a66e2972d9fcd1d7654bd15af30da379b0ac3b57a086f4b7098767"
+      },
+      "output/browser-release-final-v6/junit.xml": {
+        "bytes": 4534,
+        "sha256": "64d6de501287b301238245f1629b33742b327b102bc8607bacf7ab54d26b68db"
+      },
+      "output/browser-release-final-v6/results.json": {
+        "bytes": 17140,
+        "sha256": "678c235bd0cecee002332d87b563f1fbe080c43b9ce93b8fd464678c6d2fd20f"
+      },
+      "output/browser-release-final-v6/results/.last-run.json": {
+        "bytes": 45,
+        "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-available-seats-85fd8eb24ffe1d1fb081adb8e2f93677c6e39074.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-offline-error-bb6ef79b52c16989856c2a42d48b86b6cb6def95.png": {
+        "bytes": 43038,
+        "sha256": "b4216105f7d37badd943fc7d5dfe34a381ee7ad6f10f6af3ba6b1663ec4eb7ff"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-real-missing-record-50ac424d57467ea7b7d28922a2478b1a0eb13ede.png": {
+        "bytes": 21033,
+        "sha256": "a27f1893097fac8acf6a78c077424784aa8b626a2330587a275b71605c696b81"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-available-seats.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-offline-error.png": {
+        "bytes": 43038,
+        "sha256": "b4216105f7d37badd943fc7d5dfe34a381ee7ad6f10f6af3ba6b1663ec4eb7ff"
+      },
+      "output/browser-release-final-v6/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-real-missing-record.png": {
+        "bytes": 21033,
+        "sha256": "a27f1893097fac8acf6a78c077424784aa8b626a2330587a275b71605c696b81"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/desktop-reservation-created-8b11e7d4d27851b21adf6646e33add6919e3eb8a.png": {
+        "bytes": 312490,
+        "sha256": "edbf1da668d9d731af452cf5195f54474eea7472b2d455c1ab5e04a5c56136ef"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-created-4a09495f53bbecd813afaa550b0f2302f6a2577c.png": {
+        "bytes": 227983,
+        "sha256": "3ccfddc96703fab20b5f75af774e4d19c5635db5ac547c05350a0309ab196989"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-selection-1f5d0a9b3ae0ef4d06e501a5a4d35fcb2b2d4cce.png": {
+        "bytes": 84625,
+        "sha256": "714ff3f6ab0d3028ceb1ce627ba731b58b734987d29f9f95904af8a190437f41"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-reservation-history-0e14aaa09f4bb183de77ac3f69c59ed5b89bd2e2.png": {
+        "bytes": 194619,
+        "sha256": "b3b1ada784d1930bdca46cc622691f710e056e9c477ad96f84ba46fe7e8bc6ec"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/real-stale-version-conflict-98c5452da7b80a91dac92a41804f074129d61353.png": {
+        "bytes": 348416,
+        "sha256": "eeb04773552c64d4840de00f9fcc46a696d817194c486a7020bee5c72a041e77"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/desktop-reservation-created.png": {
+        "bytes": 312490,
+        "sha256": "edbf1da668d9d731af452cf5195f54474eea7472b2d455c1ab5e04a5c56136ef"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-created.png": {
+        "bytes": 227983,
+        "sha256": "3ccfddc96703fab20b5f75af774e4d19c5635db5ac547c05350a0309ab196989"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-selection.png": {
+        "bytes": 84625,
+        "sha256": "714ff3f6ab0d3028ceb1ce627ba731b58b734987d29f9f95904af8a190437f41"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-reservation-history.png": {
+        "bytes": 194619,
+        "sha256": "b3b1ada784d1930bdca46cc622691f710e056e9c477ad96f84ba46fe7e8bc6ec"
+      },
+      "output/browser-release-final-v6/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/real-stale-version-conflict.png": {
+        "bytes": 348416,
+        "sha256": "eeb04773552c64d4840de00f9fcc46a696d817194c486a7020bee5c72a041e77"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-application-rejected-d93545ea358539584c91758c5d1f08a8e04eb5c1.png": {
+        "bytes": 109901,
+        "sha256": "63d4de45076b92416ae02a2638ca47b68648055b8cde3b587c0318cea84279db"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-two-level-approved-d13198eb3e2c61a70c7584b12bbb76e14992ee9a.png": {
+        "bytes": 118123,
+        "sha256": "c461677cfbbc806f800d24c395d1c96bcc1b5f03d502c2676c94e1926e346622"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-application-cancelled-a215895d89be4232d7be237f05f15fc00a018727.png": {
+        "bytes": 197750,
+        "sha256": "0d907a0ad0a6099b6a880582096cd90bce150023c4b4f186773b3872c74d06d2"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-rejection-reason-69328adc162c6bb34b90424ed4a0c814e05f4afd.png": {
+        "bytes": 194574,
+        "sha256": "e91bf978ec85f88385dd5a2552c5d26e7b6cc692352c066ba77d15c3fb470b53"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-application-rejected.png": {
+        "bytes": 109901,
+        "sha256": "63d4de45076b92416ae02a2638ca47b68648055b8cde3b587c0318cea84279db"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-two-level-approved.png": {
+        "bytes": 118123,
+        "sha256": "c461677cfbbc806f800d24c395d1c96bcc1b5f03d502c2676c94e1926e346622"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-application-cancelled.png": {
+        "bytes": 197750,
+        "sha256": "0d907a0ad0a6099b6a880582096cd90bce150023c4b4f186773b3872c74d06d2"
+      },
+      "output/browser-release-final-v6/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-rejection-reason.png": {
+        "bytes": 194574,
+        "sha256": "e91bf978ec85f88385dd5a2552c5d26e7b6cc692352c066ba77d15c3fb470b53"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/desktop-repair-awaiting-acceptance-dbe6657706dbcf3579eae76162f63cd0b73c89d7.png": {
+        "bytes": 145844,
+        "sha256": "a7daa50349e60e881f6f4a300570e2b485d203b345b9543a112a6402aa84030a"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-cancelled-04d1165e08957152627a7a1b9bc5ab7fb9d163f1.png": {
+        "bytes": 176914,
+        "sha256": "cfa38647bcf314b6877180c3c8422615cac4797f218888d3d9d88352c8d0fe72"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-closed-5a910e4c747f01402bd67db138f7231e6f7bf14b.png": {
+        "bytes": 178505,
+        "sha256": "6f81a18082e20c0ee390b5506cf3e3f7db5ece6325641a76b669aaf5398ba477"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-created-8ab968093444e8c887854bf8d42c0eda34b39332.png": {
+        "bytes": 178874,
+        "sha256": "0adb6fb17fa02db3f1af81e0f13e50bbb10d88f7a1fc57f98f5799a316a9f7e7"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/desktop-repair-awaiting-acceptance.png": {
+        "bytes": 145844,
+        "sha256": "a7daa50349e60e881f6f4a300570e2b485d203b345b9543a112a6402aa84030a"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-cancelled.png": {
+        "bytes": 176914,
+        "sha256": "cfa38647bcf314b6877180c3c8422615cac4797f218888d3d9d88352c8d0fe72"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-closed.png": {
+        "bytes": 178505,
+        "sha256": "6f81a18082e20c0ee390b5506cf3e3f7db5ece6325641a76b669aaf5398ba477"
+      },
+      "output/browser-release-final-v6/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-created.png": {
+        "bytes": 178874,
+        "sha256": "0adb6fb17fa02db3f1af81e0f13e50bbb10d88f7a1fc57f98f5799a316a9f7e7"
+      },
+      "output/browser-release-final-v6/results/studyroom-administrator-ca-68c98-use-student-booking-actions/administrator-empty-search.png": {
+        "bytes": 76525,
+        "sha256": "0f7ff59dccfd6938db4e5888c35acd613a5015c2e8e87ec359b4f523e9afc349"
+      },
+      "output/browser-release-final-v6/results/studyroom-administrator-ca-68c98-use-student-booking-actions/attachments/administrator-empty-search-6582e4e6439f20cc9dfdf0909f0d81ba1b5c6267.png": {
+        "bytes": 76525,
+        "sha256": "0f7ff59dccfd6938db4e5888c35acd613a5015c2e8e87ec359b4f523e9afc349"
+      },
+      "output/browser-release-final-v6/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/attachments/student-administration-denied-65f381b4ae9a785d76b55ff8a6592719ca14e332.png": {
+        "bytes": 74607,
+        "sha256": "9a7ca7fa9650d2c6d32fe6da32de34e671e43f39f2245d23e286cf1758d31d8d"
+      },
+      "output/browser-release-final-v6/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/student-administration-denied.png": {
+        "bytes": 74607,
+        "sha256": "9a7ca7fa9650d2c6d32fe6da32de34e671e43f39f2245d23e286cf1758d31d8d"
+      },
+      "output/browser-release-final-v6/run-metadata.json": {
+        "bytes": 759,
+        "sha256": "90a3e63e799e01b669e53b36f3d1b95451da6d5ed74d5707393dd6932919adb9"
+      },
+      "output/browser-release-final-v6/verification.json": {
+        "bytes": 2753,
+        "sha256": "fb258cabe78ea79ad635dc213abf96d99ef01a7a6c6722b9be41ac06a01420ca"
+      },
+      "output/gitlab/alpine-code-pipeline-superseded.png": {
+        "bytes": 63822,
+        "sha256": "6409af03d8659e8ab9b9629b937ac8fcedd52f437b80dd0535cf01e79a85b9c0"
+      },
+      "output/gitlab/alpine-mirror-ops-tests.log": {
+        "bytes": 21983,
+        "sha256": "42a7c68245483336130377bb0efde8eb8e0791a2baf61183ba9de3b0d154cc30"
+      },
+      "output/gitlab/alpine-mirror-probe.json": {
+        "bytes": 1675,
+        "sha256": "3bff6b6f69f7b2673a05a8e9eb5d6d400e0fd78b4dbf15c1cd432efb8f976e1d"
+      },
+      "output/gitlab/alpine-mirror-probe.log": {
+        "bytes": 1107,
+        "sha256": "4bece3940ab7a90f17ad2d6ec170d4b3c74e1eccdb326c25a42e36e9dd0c2452"
+      },
+      "output/gitlab/delivery-candidate-linearity.json": {
+        "bytes": 274,
+        "sha256": "5fad02789b1e0e80bae56b55c6654e24fab93ff7713db58b579de1f61314e66e"
+      },
+      "output/gitlab/delivery-feature-container-passed.png": {
+        "bytes": 122909,
+        "sha256": "f6c84474240418089c42633434db1df56e099457127e087bcfbb7a6d3307eff5"
+      },
+      "output/gitlab/delivery-feature-container.txt": {
+        "bytes": 128722,
+        "sha256": "c3cdfac9dc9cabd4264c918a7fed0a3bb6ce2e4bb4b28b56b4c2b659338a1c83"
+      },
+      "output/gitlab/delivery-feature-integration.txt": {
+        "bytes": 38267,
+        "sha256": "1ed3d36f58fd56764173cd8bbf43cfa0f4a055e619549373817bd2ff8955fbf8"
+      },
+      "output/gitlab/delivery-feature-pipeline-passed.png": {
+        "bytes": 65047,
+        "sha256": "3ea0f1bf0b0b3a78ff103b110b4394db8321f60b53c1eea425f211900dc9e1dd"
+      },
+      "output/gitlab/delivery-feature-pipeline-passed.txt": {
+        "bytes": 474,
+        "sha256": "3a6775f7bb51a6622aadc4b01bdb78a2b85e42ee0ad4e578366d07ebc98925bb"
+      },
+      "output/gitlab/final-feature-container-alpine-failed.png": {
+        "bytes": 116450,
+        "sha256": "4e94b92103721a3403876e5113e5eee1294238723e99f73d34ce7119dd94efd3"
+      },
+      "output/gitlab/final-feature-container-alpine-failed.txt": {
+        "bytes": 5305,
+        "sha256": "ae1db9006f7dfd29b1fd480fa9d5ef92e389f47cbd786efd2fff8104d18c97fd"
+      },
+      "output/gitlab/final-feature-integration.txt": {
+        "bytes": 36540,
+        "sha256": "50d894105087e2587e8ebf066cab3e954b27953ef8f9b6b729266dfe8e693b00"
+      },
+      "output/gitlab/installation-docs-review.json": {
+        "bytes": 4471,
+        "sha256": "e8d2423d6ea32b878d8016fb705aad376d4b6c57c2a1a337c88bae863d43d017"
+      },
+      "output/gitlab/main-container-passed.txt": {
+        "bytes": 130946,
+        "sha256": "c7cf774e1739e6cfc6089bf825e598ae04a4de8b1a8eb74727245f81cf1c93ad"
+      },
+      "output/gitlab/main-container-retained.png": {
+        "bytes": 121074,
+        "sha256": "592f41aef97bfcd91ac66ac246e6522c272f3cedd4b85d9d9ae5c78dc25c8081"
+      },
+      "output/gitlab/main-fast-forward-verification.json": {
+        "bytes": 380,
+        "sha256": "7ea4447e3c6b3140b8ad72ec41f3e2d860d688f88a9a9ac5c662c8a6e041f4d3"
+      },
+      "output/gitlab/main-integration-passed.txt": {
+        "bytes": 38444,
+        "sha256": "bf5c53d4f7f95e58140e2946e926a2e24c8fb3522a0a4ba0cb7afd5ddf37601d"
+      },
+      "output/gitlab/main-integration-retained.png": {
+        "bytes": 118173,
+        "sha256": "9fc21ed5c4555575dd84cb24ddc1ba54aff9ab4412387e50822fed0c058de8f2"
+      },
+      "output/gitlab/main-pipeline-passed.png": {
+        "bytes": 61353,
+        "sha256": "7ccea2a7dd8f376c0531c2770780e68bb7e8a75557a46c72a800ce312db7250c"
+      },
+      "output/gitlab/main-pipeline-passed.txt": {
+        "bytes": 405,
+        "sha256": "efc87ee764770bd373d737ec2827f1b7048276f92acb4d76b318bdf9e27c57ca"
+      },
+      "output/gitlab/mr-alpine-candidate.png": {
+        "bytes": 142380,
+        "sha256": "7323ee65ab547eea8f193731cb53d34f91c7a7c38c82a847fe4a934b876235f4"
+      },
+      "output/gitlab/mr-delivery-candidate-1079900.png": {
+        "bytes": 147138,
+        "sha256": "c099364572bd2eece973241b1f0070412f93757388d4b47eb739df5991576b12"
+      },
+      "output/gitlab/mr1-fast-forward-merged.png": {
+        "bytes": 88600,
+        "sha256": "b7e5ef2ac0975924f89a1945bd8cd47c23dba2faac2860bbdaeddd50227edd57"
+      },
+      "output/gitlab/mr1-fast-forward-merged.txt": {
+        "bytes": 6396,
+        "sha256": "68c8b6ea49bd69df0f3562fdc4fd5d3ba8811884a643b9f7df6907b39571e993"
+      },
+      "output/gitlab/precommit-final-v5-supplement.json": {
+        "bytes": 7341,
+        "sha256": "ebb3330721e72844893a5d9fe88f0d89569f8e8f783d461d2473bd4bdc91f72e"
+      },
+      "output/gitlab/premerge-jira-transition-check.json": {
+        "bytes": 380,
+        "sha256": "cdb9057e1b91c0d0a63f03ca717cc595911c276decef5bd6ae809d8ccec45948"
+      },
+      "output/gitlab/tag-container-passed.txt": {
+        "bytes": 126386,
+        "sha256": "20d166bb7ca6b0df11a74eba061ec37869ac0656813eeebb7a78100097d9148f"
+      },
+      "output/gitlab/tag-container-retained.png": {
+        "bytes": 121575,
+        "sha256": "8fbe9084376d0b6969cc797658a0226b469334d5c55098920f6aba91f644c9f0"
+      },
+      "output/gitlab/tag-integration-passed.txt": {
+        "bytes": 45431,
+        "sha256": "932291a12b0e5b30321d1f2f15d549c74d44d247b4042c5d8a35d74a05949acb"
+      },
+      "output/gitlab/tag-integration-retained.png": {
+        "bytes": 117367,
+        "sha256": "3de8d180d92145cdb5faa87592a65799ca6adffab7b22c7288f61f3664441a66"
+      },
+      "output/gitlab/tag-package-passed.txt": {
+        "bytes": 12198,
+        "sha256": "8760d59bc9b1a6b4491b5ca1e301417e0f452b35b7369dc7b226c3fd47610776"
+      },
+      "output/gitlab/tag-package-retained.png": {
+        "bytes": 116185,
+        "sha256": "538ad0f2f73cac501b3f924741064eb39832313b31e386996721375316de1d98"
+      },
+      "output/gitlab/tag-pipeline-passed.png": {
+        "bytes": 61214,
+        "sha256": "836b1de9e49d94ef96aaa5a62275216e8785c54a63a4ad464bd616e1befe8f30"
+      },
+      "output/gitlab/tag-pipeline-passed.txt": {
+        "bytes": 401,
+        "sha256": "b8017ef6eb5ad07df59811f968c28daee0ff904a8bb048c5c3a9ed41bbcd026b"
+      },
+      "output/gitlab/v0.1.0-release-created.png": {
+        "bytes": 71843,
+        "sha256": "fd05ad17b55bfd546f53562261dce6f151b59dee86213831d0ab5fe16029532c"
+      },
+      "output/gitlab/v0.1.0-release-created.txt": {
+        "bytes": 2921,
+        "sha256": "72968660a9755e0be6547d8357e2f174ce205cbb4322119242a3e18ab63cc4b8"
+      },
+      "output/gitlab/v0.1.0-tag-verification.json": {
+        "bytes": 638,
+        "sha256": "2448ed559a886a87bdc21b872122b03bd79321409a7d67ea2c7abc83505b75b0"
+      },
+      "output/release-final-v6/archive-verification.json": {
+        "bytes": 3604,
+        "sha256": "f1319b4ff80743dfc6acaf770e403e69307b86ce1f835170187c6ead6bfcce85"
+      },
+      "output/release-final-v6/build.log": {
+        "bytes": 9303,
+        "sha256": "a7a0e237b3e20b7beaa5d3cc3ab2b80aa75e17ef2a660674f81c1dd52d103f54"
+      },
+      "output/release-final-v6/equivalence.json": {
+        "bytes": 42483,
+        "sha256": "e7620e8ca4cbbe011a2ec495ee7693f68d63b3ec5bfe72ea99cbe61dd87424ce"
+      },
+      "output/release-final-v6/evidence-freeze.json": {
+        "bytes": 771,
+        "sha256": "ac68f83328bbc9aa467fb3839c1b64b4c18e7e601f0599d24dae8febd11d3fc0"
+      },
+      "output/release-final-v6/export.log": {
+        "bytes": 90,
+        "sha256": "a94b61ab94260e998e98694a6aac16dfd3ff7bea9c949f63c0f0eb2e69fcfca7"
+      },
+      "output/release-final-v6/import.log": {
+        "bytes": 4450,
+        "sha256": "bb7acb524f7bc22ab937537bda374b6f07b64086eec9adb61027f7f0bf35f8e5"
+      },
+      "output/release-final-v6/production-input-preflight.json": {
+        "bytes": 69624,
+        "sha256": "fd33d5760a46a4fc4e72f86d5803b050f6874a9bf057784f1da1287891ce6738"
+      },
+      "output/release-final-v6/release-id": {
+        "bytes": 26,
+        "sha256": "8146e64a3f588651a3c38ec6dcdf2e73aa7db460c0248129af5c192991d8b0c8"
+      },
+      "output/release-final-v6/requirements-completion-review.json": {
+        "bytes": 54694,
+        "sha256": "10cd107fb5e57e444d40e76e8090df89ca4b4b31baf01bb306d222465f6ab861"
+      },
+      "output/release-final-v6/source-git-verification.json": {
+        "bytes": 377,
+        "sha256": "07396a574e1bdb2a2aff480a8a324d4f14b245554ef1bf0f8e8795988de141f6"
+      },
+      "tests/browser/REVIEW.md": {
+        "bytes": 14903,
+        "sha256": "fc5b479229e0f53fb941ce26f29d7798e0935747250ea460e37e58c4a0a8aa94"
+      },
+      "tests/ops/test_ci_workflow.py": {
+        "bytes": 14133,
+        "sha256": "ac3d860fb1826e00002b051e2018d3a83b67cfa842305bb421b2909e6b9db76d"
+      }
+    },
+    "filesChangedDuringScan": []
+  },
+  "knownValueScan": {
+    "privateSourceCount": 45,
+    "sourceKinds": {
+      "local-secret-file": 35,
+      "private-fixture-cookie": 9,
+      "private-previous-fault-known-values": 1
+    },
+    "knownValueCount": 135,
+    "encodingVariantCount": 539,
+    "matchingPaths": [],
+    "secretValuesOrTheirHashesEmitted": false,
+    "credentialValuesReadOnlyInProcessMemory": true,
+    "newV6CompatibilityCookiesIncluded": true,
+    "browserV6SessionCookiesPersisted": false,
+    "forms": [
+      "raw UTF-8",
+      "standard and URL-safe Base64 with/without padding",
+      "lower/upper hexadecimal",
+      "URL and form encoding",
+      "JSON escape",
+      "HTML escape",
+      "printable decoded cookie/session values"
+    ]
+  },
+  "archiveScan": {
+    "archiveCount": 1,
+    "memberCount": 2,
+    "archives": [
+      {
+        "source": "output/browser-release-final-v6/html/index.html#embedded-zip-1",
+        "memberCount": 2
+      }
+    ],
+    "unreadableArchives": [],
+    "allDecodedMembersMatchedAgainstKnownValues": true
+  },
+  "runnerTokenBoundary": {
+    "tokenReadByThisAuditor": false,
+    "vmAccessByThisAuditor": false,
+    "referencedReport": null,
+    "referencedReportReadOnly": false,
+    "limitation": "Runner token remains in the dedicated VM. Any separately referenced root-agent guest report covers only its own paths and cutoff; this audit does not extend its coverage."
+  },
+  "freezeCoordination": {
+    "frontendBrowserAndEvidenceFrozen": true,
+    "coreCompatibilityAndArchiveFrozen": true,
+    "frontendSixFinalDocumentsFrozen": true,
+    "rootGitlabReleaseDocumentFrozen": true,
+    "rootExplicitGitlabInputsFrozen": true,
+    "publishedReleaseNotesFrozen": true,
+    "sourceHeadAtFreeze": "af51f7f6e35417eb3d4ce541960486a1380eb8f7",
+    "runnerTokenScannerRunsSeparatelyInGuestAfterThisInventoryFreezes": true
+  },
+  "selfReportCheck": {
+    "paths": [
+      "docs/evidence/runtime-audit-final-v6.json",
+      "docs/evidence/runtime-audit-final-v6.md"
+    ],
+    "knownSecretMatches": 0
+  },
+  "limitations": [
+    "Known-value matching cannot prove absence of unknown secrets.",
+    "Screenshots receive raw-byte matching, not OCR; frontend visual inspection is independent.",
+    "Browser session cookies existed only in browser process memory and were not persisted; they cannot be retrospectively included in this exact-value scan.",
+    "No new browser, CI, performance, deployment, rollback or container-log collection was performed for this audit.",
+    "No Runner token, VM filesystem or VM configuration was read by this auditor.",
+    "GitLab main/tag/job evidence collected after this cutoff needs an independently scoped closing supplement.",
+    "Old V5 and earlier audits and all failure evidence remain unchanged.",
+    "Public file SHA256 values bind artifact bytes, never private values or credential fixtures."
+  ]
+}
