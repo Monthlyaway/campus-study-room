@@ -2,7 +2,7 @@
 
 [文档首页](README.md) · [39项P0追踪](requirements-traceability.md) · [验收证据](evidence/README.md)
 
-更新时间：2026-10-23。在用户确定的本机与可迁移交付范围内，P0 的39项需求均已验证，MS0～MS6完成；v0.1.0已发布。正式服务器、域名/TLS、外部SMTP及AMD64安装未验收，P1尚未启动。边界见[ADR 0002](adr/0002-delivery-and-gitlab.md)。
+更新时间：2026-10-23。下方 v0.1.0 与 MS0～MS6 表格记录原本机 / ARM64 可迁移交付：P0 的39项需求已验证，v0.1.0已发布，边界见[ADR 0002](adr/0002-delivery-and-gitlab.md)。后续 GitHub / codex-lb / Linux AMD64 的实际进度见本页末尾；不能把历史结果当作新生产环境验收。P1尚未启动。
 
 ## 当前交付
 
@@ -36,7 +36,7 @@
 - 了解曾经失败和如何修复：读[交付过程归档](evidence/delivery-ledger-2026-10-23.md)与对应原始证据，不在日常操作指南中复述整段流水线历史。
 - 维护或迁移：读[运维入口](operations/README.md)；安装包不包含业务数据库和秘密，完整数据迁移/在线切换需独立方案。
 
-当前仍需后续条件才能开展的项目是正式主机/TLS/外部邮箱、不同CPU架构安装和可选P1；这些不冒称已通过。
+上述历史验收不覆盖后续正式主机/TLS/外部邮箱、不同CPU架构安装和可选P1；新交付结果按下面的独立记录核对。
 
 
 ## 2026-10-23 — GitHub / codex-lb 生产交付进行中（REQ-ENG-05/07）
@@ -49,3 +49,10 @@
 - 新增 prod 随机管理员 bootstrap、无 demo 门禁、同机内存限制、完整 GitHub CI、GHCR digest/Release 发布和不可变源码部署；针对性单测与 actionlint 已通过。完整 `./scripts/check` 已在 codex-lb 通过：7 组 HTTP / 18 测试、9 组 PostgreSQL / 66 测试、27 项维修通知断言与响应丢失重放；新增及既有运维单测 144 项通过。真实 Actions/镜像/E2E/生产/备份恢复尚待验证。
 
 这是一条实施进度，后续完成证据另附；没有把计划记成生产验收结果。
+
+
+## 2026-10-23 — GitHub 首次版本发布验证结果（REQ-ENG-05/07/08）
+
+[PR #1](https://github.com/Monthlyaway/campus-study-room/pull/1) 已在完整验证通过后 rebase merge 到 main，保留 9 个逻辑提交、作者信息和源码树。PR verify 和正式 v0.2.0 verify 均通过，包括 158 项运维单测、真实 PostgreSQL/HTTP、三镜像隔离部署和 6 项浏览器测试。
+
+v0.2.0 的 publish 在 core 私有镜像上传后失败：GHCR REST 元数据未返回脚本要求的 repository 字段。只读 Actions 查询与 GitHub 页面已定位该误判，deploy 因上游失败没有执行。现有部分版本保留，修复后重新经 PR 验证并发布新版本。生产应用、实际课程账号、生产备份恢复与公网 UI 验收仍待完成；HTTPS 已可用不等于应用已上线。详见[本次验证与中断记录](evidence/github-production-v0.2.0.md)。
