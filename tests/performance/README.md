@@ -1,5 +1,7 @@
 # 可复现性能验收
 
+[测试选择](../../docs/development/testing.md) · [运维手册](../../docs/operations/runbook.md) · [历史性能证据](../../docs/evidence/performance.md)
+
 覆盖 PRD §12、技术方案 §10.3 和 T50-03。必须使用真实 Docker 服务与 PostgreSQL，程序固定 20 个并发会话、60 秒预热和 300 秒统计窗口，不能用缩短版结果替代验收。
 
 ## 准备和运行

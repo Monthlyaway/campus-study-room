@@ -1,45 +1,45 @@
 # 账号、授权与基础资料
 
-D 模块由 `core-service` 的 `AdminService`、`AccessService` 和 `core.persistence` 中的账号、角色、范围、空间与配置实体实现。业务查询与写入通过 Spring Data JPA；列表在数据库执行过滤与分页。PostgreSQL advisory lock 仅用于串行化管理员成员关系变更，不承载通用 CRUD。
+这页面向修改 D 模块的开发者，覆盖 REQ-D-01 至 D-05 及相关审计。管理人员操作见[用户手册](../user-guide/README.md)；环境、角色样例与密码来源见[演示账号](../development/demo-accounts.md)。
 
-## 授权与会话
+## 实现入口
 
-每个用户角色绑定独立拥有范围。授权查询要求同一个启用角色同时提供所需权限与匹配范围；不会把角色 A 的权限与角色 B 的范围拼接。`SELF` 表示个人范围，不能授予教室管理权限。`ROOM`、`DEPARTMENT`、`ALL` 依次表示指定教室、院系和全部范围；`SHARED` 仅覆盖公共教室。创建新教室时以待创建教室的院系或公共归属验证权限。
+[CoreController](../../services/core-service/src/main/java/com/campus/studyroom/core/CoreController.java)提供入口，[AdminService](../../services/core-service/src/main/java/com/campus/studyroom/core/AdminService.java)处理管理事务，[AccessService](../../services/core-service/src/main/java/com/campus/studyroom/core/AccessService.java)复核身份与权限，[AdminViews](../../services/core-service/src/main/java/com/campus/studyroom/core/AdminViews.java)构造公开投影，[persistence](../../services/core-service/src/main/java/com/campus/studyroom/core/persistence)保存用户、绑定、空间、配置与版本。公开字段以 [core.yaml](../../contracts/openapi/core.yaml)为准。
 
-`AccessService.valid` 验证启用状态、持久化 authVersion 与 8 小时绝对期限。修改用户、密码、角色绑定或角色权限都会使旧会话失效。`/auth/me` 返回当前权限、启用角色的范围和 `bookingLimits.reservationMaxHours/applicationMaxHours`，前端据此设置时长选择；业务创建仍独立读取数据库配置。
+实体写入使用 Spring Data JPA，列表在 PostgreSQL 完成过滤/分页。advisory lock 用于串行化管理员成员关系变更，不是通用 CRUD 锁。公开 DTO 显式构造，不返回密码散列。
 
-账号/角色/范围、审计与版本变化在同一事务提交。最后一个启用系统管理员不能停用或移除关键角色；`SYSTEM_ADMIN` 角色必须保留账号和权限管理能力，但不会因此自动获取业务审批权限。公开 DTO 显式构造，用户列表与详情不包含密码散列。
+## 授权需要同一角色绑定
 
-## 基础资料与配置
+每个角色绑定独立拥有范围。所需权限与匹配范围必须来自**同一个启用角色绑定**，不能拼接角色 A 的权限与角色 B 的范围。
 
-院系、校区、楼栋、教室、座位使用独立实体与版本号。上级资源需启用。已有资源不允许直接更改归属；停用教室、座位或修改开放时间时，先按统一协议锁定房间，再拒绝存在有效资源占用的更改。停用院系、校区或楼栋还检查启用的下级引用。
+| 范围 | 语义 |
+| --- | --- |
+| SELF | 个人范围，不能授予教室管理权 |
+| ROOM | 指定教室 |
+| DEPARTMENT | 指定院系 |
+| SHARED | 公共教室 |
+| ALL | 全部范围 |
 
-开放时间必须是每周整数小时、不重叠区间。修改规则时锁定房间并增加房间版本。系统配置通过全局配置版本锁更新，支持 M1/M2 最长时长 1–12 整数小时；一批变更任一非法则全部回滚。重复配置键会被拒绝。
+创建教室时，以待建教室的院系或公共归属判断范围。每次受保护请求检查账号启用、持久 authVersion 和 8 小时绝对会话期限；用户、密码、角色绑定、角色权限变化使相关旧会话失效。`/auth/me` 返回当前权限、启用绑定范围和 `bookingLimits`，UI 据此展示，创建时服务端仍读取数据库配置。
 
-`GET /users?q=...&page=1&size=20` 对用户名和显示名做不区分大小写的包含搜索，转义用户输入中的 SQL LIKE 通配符。总数与返回页使用同一条件。教室列表亦在数据库按访问范围、楼栋和指定院系过滤，座位列表先验证房间可见性。
+账号/绑定/版本和审计同事务。最后一个启用系统管理员不能被停用或移除关键角色，SYSTEM_ADMIN 角色必须保留账号/权限管理能力。系统管理员不会自动拥有两级审批、开修或验收资格；这些资格需按业务角色单独验证。
 
-## 迁移与验证
+## 空间与系统配置
 
-初始迁移没有允许 `SELF` 写入范围表，新增 `V20261022130000__self_role_scope.sql` 扩展类型和字段形状约束，保留现有数据与 `SHARED`。不修改已经应用的迁移。部署必须先迁移再启动新应用。
+院系、校区、楼栋、教室、座位各有实体和版本。前三类写入要求 `user:manage`；教室/座位写入要求对应 `room:manage` 范围。当前前端空间页入口另要求 `room:manage`，因此维护上级主数据需同时满足页面入口与API写权限。上级须启用；已有资源不能直接更换归属。停用房间/座位或修改开放时间，先锁房间，再拒绝与有效资源占用冲突的变更。停用院系、校区、楼栋还检查启用下级引用。创建子资源与停用父资源必须正确互斥。
 
-```sh
-./mvnw -B -ntp -pl tools/migration-runner -am -DskipTests package
-python3 tests/integration/run_admin_persistence.py
-STUDYROOM_TEST_PASSWORD='<由本机 secret 注入>' python3 tests/integration/admin_http.py
-```
+开放规则为每周整数小时且区间不重叠，更新时锁房间并增加房间版本。系统配置以总版本锁批量更新，M1/M2 最长时长均为 1–12 整数小时；重复 key 或任一非法项导致全批回滚。审计 beforeJson/afterJson 保存此次修改项的 `{key,value}` 数组、操作者和时间。已有订单保留原配置快照，不能追溯改变。
 
-runner 使用独立 `studyroom_admin_integration` PostgreSQL 数据库，执行迁移与种子后验证，不向演示业务库写测试账号。2026-10-22 实际执行 `AdminPersistenceTest` 7/7 通过，无跳过，5.702 秒；覆盖 SELF 持久化/会话失效、同绑定范围隔离与公共教室创建、搜索分页总数、配置批量原子性与过期版本、最后管理员和系统角色保护、开放时间父版本，以及创建子资源与停用父资源的并发互斥。普通 Maven 的条件跳过不能替代该实际数据库验证。
+`GET /users?q=...&page=1&size=20` 对用户名/显示名作不区分大小写的包含查询，转义 SQL LIKE 通配符；total 与页面使用同一条件。教室查询按授权范围、楼栋、院系过滤，座位查询先确认房间可见性。房间本页关联名称/座位数量和角色本页权限采用批量读取，避免 N+1；空页不额外查询关联。
 
-统一迁移并重启后的真实 HTTP 回归 2/2 通过，4.550 秒。实际断言共享 cookie 为 `STUDYROOMSESSION`；SELF 绑定保存成功，旧会话立即返回 401；新会话可访问维修后，管理员停用账号，使 core 和 repair 均返回 401。还验证了搜索大小写/总数、密码散列不返回、非法范围 422 不留下绑定、过期版本 409。真实密码不写入版本库。
+状态命令 `expectedVersion` 必须是非负整数，类型错误 400，过期版本 409。新密码重置成功为 204 空响应；同 key 重放不会再次改密码或使新会话失效。旧版本已保存的 200 幂等响应仍按原结果重放，不重写历史。
 
-## 性能回归
+<a id="迁移与验证"></a>
 
-教室分页按本页 ID 批量读取教学楼、校区和启用座位数量，避免逐行触发统计查询；空页无需额外读取关联数据。`AdminPersistenceTest.roomPageUsesBoundedQueriesAndBatchedSeatCounts` 用 21 间真实教室检查 size 1/20 的 SQL 数量保持有界，校验有/无座位的统计及建筑/校区名称。角色列表也按数据库页批量读取权限码，不逐角色查权限。加入两项后真实 PostgreSQL 管理回归为 9/9 通过，性能环境前后 SQL 和完整负载证据见 [性能验收](../evidence/performance.md)。
+## 如何修改和验证
 
-## 配置审计补充验证
+迁移只能新增；例如 [SELF 范围扩展](../../db/migration/core/V20261022130000__self_role_scope.sql)扩展约束且保留既有 SHARED 数据。先迁移后启动新应用，开发步骤见[迁移指南](../development/backend.md)。接口变更同步 OpenAPI、输入/输出、生成客户端和行为测试。
 
-批量配置更新在同一事务内保存旧值与新值：审计`beforeJson`和`afterJson`均为`[{key,value}]`数组，只包含此次更新的配置项。操作者与生效时间保留在审计字段中。真实HTTP与PG矩阵已验证旧4小时订单不变、新3小时拒绝、新2小时成功，以及0/13/1.5拒绝、非管理员拒绝、审计旧4新2与版本不被失败请求改变，见[矩阵证据](../evidence/core/acceptance-matrix.md)。
+按[测试矩阵](../development/testing.md)运行 AdminPersistence，覆盖同绑定范围、SELF 持久化/会话失效、最后管理员保护、父子资源并发、开放规则父版本、配置全批原子性和分页 SQL 数量。`admin_http.py` 进一步验证公开响应不泄漏密码散列、旧版本 409 和两个服务共享会话失效；这些入口的前置和数据副作用不同，不能用普通 Maven 的条件跳过代替真实 PG。
 
-## 协议边界
-
-状态命令的 `expectedVersion` 必须是非负整数，不能把小数截断后用于状态转换；格式错误400，合法但过期的版本409。新的重置密码请求返回204且无响应体；相同幂等键重放不会再次重置密码或使刚建立的新会话失效。旧版本已持久化的200幂等结果保持原结果，不重写历史记录。
+权限修改后旧浏览器返回 401 通常是预期失效，重新登录；403 看同绑定范围，404 看对象可见性，409 刷新版本和当前资源占用。更详细步骤见[排障](observability.md)。历史行为与性能证据分别见[矩阵](../evidence/core/acceptance-matrix.md)、[输入边界](../evidence/core/typed-inputs.md)、[性能](../evidence/performance.md)，本页不维护随运行变化的历史测试计数。
