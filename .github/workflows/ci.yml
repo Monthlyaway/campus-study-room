@@ -1,125 +1,19 @@
-name: Campus CI and release
+name: Read-only package diagnostics
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: campus-study-room-codex-lb
-  cancel-in-progress: false
+  packages: read
 jobs:
-  verify:
-    if: >-
-      github.repository == 'Monthlyaway/campus-study-room' &&
-      github.actor == 'Monthlyaway' && github.triggering_actor == 'Monthlyaway' &&
-      (github.event_name != 'pull_request' ||
-       (github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'ycy/')))
+  inspect:
+    if: github.repository == 'Monthlyaway/campus-study-room' && github.actor == 'Monthlyaway' && github.triggering_actor == 'Monthlyaway'
     runs-on: [self-hosted, Linux, X64, campus-study-room]
-    timeout-minutes: 120
-    env:
-      CI: 'true'
-      MAVEN_OPTS: '-Xmx384m -XX:ActiveProcessorCount=2'
-      JAVA_TOOL_OPTIONS: '-Xmx384m -XX:ActiveProcessorCount=2'
-      NODE_OPTIONS: '--max-old-space-size=640'
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-      PIP_INDEX_URL: https://pypi.org/simple
-      COMPOSE_PARALLEL_LIMIT: '1'
-    steps:
-      - name: Check out exact commit
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Verify runner and event
-        run: python3 scripts/github-preflight.py
-      - name: Install locked frontend dependencies
-        run: ./scripts/web install --frozen-lockfile
-      - name: Full backend, frontend, PostgreSQL and HTTP checks
-        run: ./scripts/check
-      - name: Build and test immutable three-image release
-        run: python3 scripts/ci-release.py
-      - name: Test summary
-        if: always()
-        run: python3 scripts/github-summary.py
-      - name: Independent artifact privacy gate
-        id: privacy
-        if: always()
-        run: python3 scripts/github-sanitize.py
-      - name: Upload sanitized test and release evidence
-        if: always() && steps.privacy.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: verified-release-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            output/check/
-            output/container-release/
-            output/browser/
-          if-no-files-found: error
-          retention-days: 14
-  publish:
-    if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
-    needs: verify
-    runs-on: [self-hosted, Linux, X64, campus-study-room]
-    timeout-minutes: 30
-    permissions:
-      contents: write
-      packages: write
-      actions: read
+    timeout-minutes: 5
     env:
       GH_TOKEN: ${{ github.token }}
-      CI: 'true'
     steps:
-      - name: Check out release commit
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Download successful verification evidence
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: verified-release-${{ github.run_id }}-${{ github.run_attempt }}
-          path: output
-      - name: Publish tested images and GitHub release
-        run: python3 scripts/github-release.py publish
-      - name: Upload release manifests and checksums
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: published-release-${{ github.ref_name }}
-          path: output/github-release/
-          if-no-files-found: error
-          retention-days: 90
-  deploy:
-    if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
-    needs: publish
-    runs-on: [self-hosted, Linux, X64, campus-study-room]
-    timeout-minutes: 30
-    environment:
-      name: production
-      url: https://49.51.193.169
-    permissions:
-      contents: read
-      packages: read
-      actions: read
-      deployments: write
-    env:
-      GH_TOKEN: ${{ github.token }}
-      CI: 'true'
-    steps:
-      - name: Check out release commit
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Download immutable published release
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: published-release-${{ github.ref_name }}
-          path: output/github-release
-      - name: Deploy production from immutable release
-        run: python3 scripts/github-release.py deploy output/github-release
+      - name: Read package association
+        shell: bash
+        run: |
+          gh api users/Monthlyaway/packages/container/campus-study-room-core --jq '{keys:keys,name,visibility,repository:{id:.repository.id,name:.repository.name,full_name:.repository.full_name,owner:.repository.owner.login}}'
+          gh api repos/Monthlyaway/campus-study-room --jq '{id,full_name,private}'
