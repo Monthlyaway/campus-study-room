@@ -1,123 +1,97 @@
-# 离线发布与服务器迁移入口
+# 可迁移发布包：格式、导出与校验
 
-本模块对应 D 的可迁移安装、固定镜像组合和发布校验要求。`scripts/portable_release.py` 将已经验证的发布清单导出为可复制目录；`scripts/import-release` 在目标服务器离线校验并调用现有部署流程。运行时只需要 Python 3.10+、Docker Engine/Desktop 和 Docker Compose v2，不需要 Git、Java、Node 或依赖下载。
+对应 REQ-ENG-03/05/07。第一次安装请走[安装指南](../operations/installation.md#从离线包安装新环境)，维护既有实例请走[升级流程](../operations/runbook.md#升级既有实例)，当前正式包位置与摘要见[接手卡](../operations/current-instance.md#当前可搬运的安装包)。本页面向准备发行包或排查校验失败的维护者。
+
+`scripts/portable_release.py` 把已验证发布清单导出为完整目录；`scripts/import-release` 校验后调用正式部署器。目标需要 Python 3.10+、Docker Engine/Desktop 与 Compose v2，不需要 Git/Java/Node 或编译依赖下载。支持 local/dev/test，prod 拒绝。
 
 ## 发布包内容
 
 | 文件 | 用途 |
 | --- | --- |
-| `manifest.json` | 保留原始发布清单：提交、三个应用镜像内容 ID、Compose、依赖基线和所有 SQL 迁移摘要 |
-| `portable.json` | 格式版本、提交、目标平台、五个镜像的来源引用、归档引用、内容 ID、OS、architecture、variant，以及三项主要文件 SHA-256 |
-| `images.tar` | `docker save` 导出的 core、repair、web、PostgreSQL、Mailpit 五个镜像 |
-| `source.tar.gz` | `git archive` 指定清单完整提交生成的源码；归档 PAX comment 保留提交 SHA |
-| `INSTALL.md` | 针对此包的安装步骤、架构要求和数据边界 |
-| `SHA256SUMS` | 前述五个文件的 SHA-256；自身不递归计算摘要 |
+| `manifest.json` | 完整提交、三个应用镜像内容 ID、Compose/依赖基线/全部迁移摘要 |
+| `portable.json` | 格式/提交/平台、五镜像来源与归档引用、内容 ID、OS/architecture/variant、主要文件摘要 |
+| `images.tar` | docker save 导出的 core、repair、web、PostgreSQL、Mailpit 五镜像 |
+| `source.tar.gz` | git archive 指定提交源码；PAX comment 保留完整提交 SHA |
+| `INSTALL.md` | 该包版本、安装步骤、平台与数据边界 |
+| `SHA256SUMS` | 前述五文件摘要，不递归计算自己 |
 
-源码来自指定提交，不读取未提交工作区。导出拒绝 `.git`、`.local`、`secrets`、依赖/编译目录、运行日志、数据库 dump、符号链接、硬链接和路径穿越条目。秘密与业务数据库均不在发布包里；目标环境第一次部署会生成自己的随机秘密。若要搬迁已有业务数据，另行使用受控备份/恢复流程，不能将发布包当作数据备份。
+指定提交的源码不读取未提交工作区；导出拒绝运行/秘密/依赖/编译目录、日志、数据库 dump、链接及路径穿越条目。初次目标安装生成自己的秘密，运输包不会搬迁来源服务器的业务数据。校验和用于完整性和组件一致性，不是发布者签名；包与可信摘要必须通过可信渠道取得。
 
-## 导出
+## 构建与导出
 
-先将离线安装器及其 Compose 接口提交，再基于该提交构建发布。旧提交若没有完整安装器会拒绝导出。
-
-```sh
-./scripts/build-release campus-study-room-local-20261022
-./scripts/export-release .local/releases/campus-study-room-local-20261022/manifest.json
-```
-
-实际发布清单路径以 `build-release` 输出为准。`export-release` 首先执行现有 `verify_manifest`；随后在清单旁新建 `portable/`。目录已存在时拒绝覆盖，避免把不同发布混入同一目录。复制整个目录到目标服务器。
-
-三个应用引用和 ID 来自已验证清单。运行镜像优先读取可选的 `runtimeImages.postgres` / `runtimeImages.mailpit`，其结构同应用 `{ "ref": "…", "id": "sha256:…" }`；未提供时从归档源码的 `docs/dependency-baseline.json` 读取固定引用。无论哪种来源，运行镜像引用必须与归档基线一致。提供 ID 时进一步检查本机实际内容。
-
-五个镜像必须都是同一 `linux/arm64` 或 `linux/amd64` 平台，且与导出 Docker daemon 一致。导出后再次检查所有镜像 ID 和平台，完整目录最终一次重命名落地。导出不自动拉取镜像；缺失镜像由发布准备步骤处理。
-
-## 离线导入
-
-可以取得完整`portable/`目录，或取得README所列单一运输归档及其`.sha256`。单一归档的真实顶层目录是`campus-study-room-v0.1.0-linux-arm64/`，里面才是`INSTALL.md`、`SHA256SUMS`和`source.tar.gz`；先完成外层校验与解包。下面下载与解包路径须替换为绝对路径，新解包目录的父目录须存在，目标本身不能已存在：
+在具备[完整开发工具](../development/local-setup.md#前置条件)的发布源码根目录执行。先完成检查并提交最终代码，`git status --short` 必须为空；不要在待提交文档/代码尚有修改时构建正式包。Docker context 必须是计划导出平台的 daemon。
 
 ```sh
-set -eu
-studyroom_download_dir=/absolute/path/to/downloads
-studyroom_unpack_dir=/absolute/path/to/new-unpack-directory
-studyroom_package=campus-study-room-v0.1.0-linux-arm64
-cd "$studyroom_download_dir"
-if command -v sha256sum >/dev/null 2>&1; then
-  sha256sum -c "$studyroom_package.tar.gz.sha256"
-else
-  shasum -a 256 -c "$studyroom_package.tar.gz.sha256"
-fi
-mkdir "$studyroom_unpack_dir"
-tar -xzf "$studyroom_package.tar.gz" -C "$studyroom_unpack_dir"
-studyroom_bundle_dir="$studyroom_unpack_dir/$studyroom_package"
+env -u STUDYROOM_STATE_DIR ./scripts/check
+git status --short
+docker context show
+docker info --format '{{.OSType}}/{{.Architecture}}'
 ```
 
-若取得的本来就是完整目录，则仅设置 `studyroom_bundle_dir=/absolute/path/to/portable`，无需以上外层解包。接着校验包内文件、读取安装说明并解包源码。以下为首次`test`安装，默认应用18082、Mailpit18027；新源码目录的父目录须存在，目标本身不能已存在：
+检查失败先修复；检查生成了需要提交的变更则按[贡献流程](../contributing.md)提交后再继续。构建器固定使用 `local` 配置，不能继承指向 test 实例的状态变量。以下 `env -u` 让构建使用本 checkout 的默认 local 配置；不启动或更新目标 test 应用。
 
 ```sh
-set -eu
-studyroom_source_dir=/absolute/path/to/new-source-directory
-export STUDYROOM_STATE_DIR=/absolute/path/to/persistent-test-state
-cd "$studyroom_bundle_dir"
-if command -v sha256sum >/dev/null 2>&1; then
-  sha256sum -c SHA256SUMS
-else
-  shasum -a 256 -c SHA256SUMS
-fi
-cat INSTALL.md
-mkdir "$studyroom_source_dir"
-tar -xzf source.tar.gz -C "$studyroom_source_dir"
-# 如需更改端口，先执行本节末尾的预配置步骤，再执行导入。
-"$studyroom_source_dir/scripts/import-release" test "$studyroom_bundle_dir"
+studyroom_release_id="r-$(date -u +%Y%m%dT%H%M%S)-$(git rev-parse --short=12 HEAD)"
+env -u STUDYROOM_STATE_DIR ./scripts/build-release "$studyroom_release_id"
+studyroom_manifest="$PWD/.local/releases/$studyroom_release_id/manifest.json"
+test -f "$studyroom_manifest"
 ```
 
-这些命令不需要`.git`。密码在固定状态目录的 `secrets/demo_password`，演示账号与[README](../../README.md#本地安装入口)相同。首次安装前，若主机已有同名`test`环境，选择其原状态目录进行升级，或先配置独立Compose项目和端口再建立另一套环境，不能只换状态目录而复用原项目/数据卷。
+成功输出 manifest 路径，绑定完整 HEAD 与三应用内容 ID。releaseId 目录必须未存在；失败留下的目录保留用于排查，重新构建选新发布号，不覆盖混用。构建成功只代表镜像和清单已生成，还需在隔离目标实际部署/浏览器验收。
 
-导入器默认核对自身所在源码目录；如果从已有可信安装器运行，也可用 `--source-dir /absolute/path/to/new-source-directory` 将包内源码解到**尚不存在**的新目录，不要提前`mkdir`空目录。已存在目录仅用于核对已解包的完整源码，不覆盖修改后的文件；源码目录内现有`.local`等运行状态不参与源码摘要，也不会删除。
-
-升级时使用新版本的源码与完整包，同时继续使用原环境名、绝对`STUDYROOM_STATE_DIR`和其中的Compose项目。例如原环境为`test`，将上述状态目录替换为原路径后执行新源码的`import-release test`；它沿用正式部署门禁并备份已有数据库。不要对发布环境运行`install.sh`，也不要用`import-release`重新导入旧包来绕过回退检查。需要回退时，保留当前已验证源码、旧版三应用镜像与清单，在同一状态目录下执行 `"$studyroom_source_dir/scripts/rollback" test /absolute/path/to/previous/manifest.json`；跨schema回退须先具备[实际兼容证明](release-operations.md#状态与门禁)。回退不会降级数据库或删除秘密/数据卷。
-
-导入按顺序执行：
-
-1. `SHA256SUMS` 必须恰好覆盖五个文件，逐项验证摘要，拒绝指向其他文件的符号链接。
-2. 验证 `portable.json` 与原清单的版本、提交、镜像引用/内容 ID 和文件摘要一致。
-3. 验证源码归档全部路径、提交、Compose、依赖基线、完整迁移集合，以及离线安装器文件是否齐全。
-4. 检查目标 Docker daemon OS/architecture 与五个镜像平台一致，再校验或解包源码。
-5. `docker load` 后检查所有镜像内容 ID、OS、architecture、variant。
-6. 调用核验源码中的 `ops.deploy(environment, manifest_path, runtime_images=...)`，沿用部署锁、维护窗口、备份、迁移、基线数据、健康检查及失败处理。
-
-校验和能发现传输损坏与组件不一致，不是签名，也不能证明整个包的发布者身份。应使用可信传输渠道，并保留可信发布清单。导入前校验失败不会加载镜像或创建环境；加载后镜像身份不匹配不会开始部署。
-
-当前命令支持`local`、`dev`、`test`；`prod`明确拒绝。需要预配置监听端口时，在上述导入命令之前、源码解包之后执行：
+导出前需要本 daemon 已有依赖基线指定的 PostgreSQL/Mailpit 镜像。可从 [dependency-baseline.json](../dependency-baseline.json) 核对固定引用；若缺失，在**联网的发布准备机**执行以下固定基线拉取，不在离线目标执行：
 
 ```sh
-"$studyroom_source_dir/scripts/init-env" test --directory "$STUDYROOM_STATE_DIR"
+python3 - <<'PY'
+import json, pathlib, subprocess
+images = json.loads(pathlib.Path('docs/dependency-baseline.json').read_text())['images']
+for name in ('postgres', 'mailpit'):
+    subprocess.run(['docker', 'pull', images[name]], check=True)
+PY
+env -u STUDYROOM_STATE_DIR ./scripts/export-release "$studyroom_manifest"
 ```
 
-`init-env`不自动读取`STUDYROOM_STATE_DIR`，因此这里必须显式传`--directory`。编辑该目录的`compose.env`，同步设置`WEB_PORT`、`MAIL_UI_PORT`及`PUBLIC_BASE_URL`；新建第二套同名环境还须使用不同的`COMPOSE_PROJECT_NAME`，而升级必须保留原项目名。随后再执行上面的导入命令。当前19282/19227实例是独立`test`环境，原状态目录为 `/Users/agiuser/Codes/campus-study-room/.local/portable-install`；维护它应复用该目录，不套用首次安装的默认端口或新状态目录。
+导出器自身不自动 pull。五镜像须全部为同一 linux/arm64 或 linux/amd64 且与 daemon 一致；ARM64 正式包不能当作 AMD64 包。成功在 manifest 旁生成 `portable/`，目录已存在时拒绝覆盖。将**完整目录**经可信渠道交付，或另行打成运输归档并附外层校验和；目标新装步骤统一见安装指南。导出、导入和浏览器通过分别记录，不把包成功生成称为已部署。
 
-## 运行镜像与离线保证
+三个应用引用/ID 来自已验证清单。运行镜像从清单可选 `runtimeImages.postgres/mailpit` 或归档源码基线读取；引用必须与基线一致，已指定 ID 时还要核对本机实际内容。导出后再次检查镜像身份/平台，完整目录最后一次重命名落地。
 
-Docker 加载本地归档后未必保留仓库 `RepoDigests`。PostgreSQL、Mailpit 因此分别保存为 `studyroom-runtime-postgres:offline-<完整内容ID>` 和 `studyroom-runtime-mailpit:offline-<完整内容ID>`。导入重新校验内容 ID 后，将这两个别名显式传入 `POSTGRES_IMAGE`、`MAILPIT_IMAGE`。部署器将覆盖值写入环境 `release.env`，Compose 的运行镜像字段允许这两个覆盖键，后续启动无需向仓库解析原 digest。
+## 导入接口
 
-这不会放宽镜像身份验证：别名中的 ID、导出记录以及实际 Docker image ID 必须相等。应用镜像仍使用原发布清单的引用。导入只执行 `docker load`、检查和部署，不执行 `docker pull` 或构建。
+推荐先按安装指南校验、解出完整源码，再执行该源码的入口：
 
-本机生成的 ARM64 包用于 ARM64 Docker 服务器。AMD64 目标必须另行构建并导出对应平台的五个镜像；不能把同一归档宣称为跨架构安装包。导入器拒绝架构不一致，即使目标装有模拟器也不静默切换。
+```sh
+"$studyroom_source_dir/scripts/import-release" "$studyroom_env" "$studyroom_bundle_dir"
+```
 
-## 接口与验证
+导入器默认核对自己所在源码目录。另一种方式是用已有可信安装器并指定 `--source-dir /absolute/path/to/new-source`：目标**不存在**时自动解出包内源码；目标存在时只核对已解出的完整源码，不填补空目录，不覆盖修改。两种方式不能混用为“先 mkdir 空目录，再让 --source-dir 自动解包”。现有源码目录下 `.local` 运行状态不参与源码摘要，也不会被删除。
 
-```python
+按以下顺序校验与执行：
+
+1. SHA256SUMS 恰好覆盖五个 payload，摘要一致且文件非链接。
+2. portable 与原 manifest 的版本、提交、引用/ID、文件摘要一致。
+3. 源码归档路径、完整提交、Compose、依赖基线、全部迁移、安装器完整性通过。
+4. daemon 平台与五镜像一致，源码目录内容/执行权限符合归档。
+5. docker load 后，五个实际镜像 ID/OS/architecture/variant 与记录一致。
+6. 以核验源码调用 deploy，执行原有锁、维护、备份、迁移、种子、版本/健康与失败门禁。
+
+文件/平台校验失败不会开始部署；加载后镜像身份不符也会停止。已进入部署阶段的失败由[运维手册](../operations/runbook.md#发布失败或入口持续-503)处理。升级必须保留原环境、状态/project；旧包导入不能越过 schema 门禁，回退要走 rollback。
+
+## 运行镜像与离线语义
+
+docker load 不保证保留 RepoDigests，PostgreSQL/Mailpit 因此保存为带完整内容 ID 的 `studyroom-runtime-<name>:offline-<ID>` 别名。导入再次核对 ID 后将引用传给部署器，写入 `release.env`。后续 Compose 继续读取该文件，无需重新解析原远程 digest；应用仍用 manifest 引用。
+
+别名中的 ID、portable 记录与实际 image ID 必须相同，不能以别名存在替代校验。导入不 pull、不构建；平台不匹配即拒绝，不因目标有模拟器而静默切换。
+
+当前实测是 ARM64 同 daemon 的独立项目安装与后续升级；网络未切断，也不是异机/AMD64 验收。来源数据库、秘密和 Mailpit 不在包内；迁移已有业务需要独立数据方案，restore 仅提供隔离恢复验证。真实结果按版本保留于[发布证据](../evidence/release/README.md)，不将历史 B 首次安装改称 V6 空库安装。
+
+## 开发接口与验证
+
+```text
 export_release(manifest_path, verified_manifest, output_dir=None, *, root=ROOT)
 verify_bundle(bundle_dir)
 import_release(bundle_dir, environment, source_dir=None)
 ```
 
-`export_release` 返回完整包目录；`verify_bundle` 只读校验，不调用 Docker；`import_release` 返回实际部署源码目录。CLI 输出错误时返回非零状态。文件检查与 Docker 参数均使用标准库和参数数组，不使用 shell 拼接。
+export 返回完整目录；verify_bundle 只校验文件且不调用 Docker；import 返回实际部署源码目录。CLI 错误为非零退出。校验与 Docker 使用参数数组，不拼接 shell。
 
-单元测试位于 `tests/ops/test_portable_release.py`，覆盖全部文件损坏、缺失摘要、篡改源码与清单不一致、路径穿越、私密目录、链接条目、ARM64/AMD64 不匹配、混合镜像架构、运行镜像 ID 变化、清单验证后的变化、加载后 ID 错误、无 Git 源码导入、运行别名传递和 prod 门禁。
-
-```sh
-python3 -m unittest discover -s tests/ops -p test_portable_release.py -v
-```
-
-上述单测用模拟 Docker 检查发布与拒绝顺序；真实 Docker 导出、移除原 digest 引用后导入、独立目标状态目录启动和业务验收由发布演练记录补充。不能用单测通过替代实际离线安装验证。
-
-2026-10-22 已实际导出B并在独立项目、新源码目录、新秘密/卷上导入，五个运行镜像ID完全匹配，见[发布演练](../evidence/release/README.md)。本次同ARM64 daemon内隔离，未切断宿主网络；跨服务器/AMD64未实测。
+`python3 -m unittest discover -s tests/ops -p test_portable_release.py -v` 检查损坏/缺失摘要、源码不一致、路径穿越/私密目录/链接、平台不符、运行镜像身份变化、加载后错误、无 Git 导入、别名传递与 prod 拒绝。该单测使用模拟 Docker，不能代替实际安装；集成和浏览器目标准备见[隔离发行版环境](../operations/installation.md#准备浏览器-e2e-的隔离发行版环境)。

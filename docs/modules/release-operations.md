@@ -1,6 +1,17 @@
 # 发布、数据库版本与应用回退
 
+人类操作步骤见[升级、回退与恢复手册](../operations/runbook.md)。本页解释发布状态和失败门禁；兼容演练属于发布准备，不是在故障现场直接套用的恢复脚本。对应 REQ-ENG-05/07。
+
 `scripts/studyroom.py` 负责整套 core/repair/web 镜像发布，独立迁移器负责 schema。数据库和秘密保存在固定 Compose 项目及 `STUDYROOM_STATE_DIR`，升级/回退不会删除卷、重建会话表或覆盖已有秘密。只更换源码目录时必须继续使用原状态目录与 Compose 项目名，否则新秘密无法访问旧数据库卷。
+
+| 目标 | 正常入口 | 改动范围 |
+| --- | --- | --- |
+| 升级固定应用组合 | deploy / import-release | 维护窗口、备份、向前迁移、三应用及版本验证 |
+| 应用回退 | rollback | 只切换三应用，不迁移/seed；数据库结构保持 |
+| 保存恢复点 | backup / schedule-backup | 生成经过校验的 dump 和配对元数据 |
+| 验证恢复能力 | restore | 在当前 PostgreSQL 新建隔离库；在线库不切换 |
+
+逐项操作及预期结果见[日常手册](../operations/runbook.md)。跨 schema 兼容演练是高级发布准备；不应替代以上日常入口。现有恢复验证不能宣称完成异机数据搬迁或线上切换。
 
 ## 状态与门禁
 
@@ -35,6 +46,8 @@
 恢复流程：检查 pending 阶段、服务日志及实际数据库；修复同一发布后重新 deploy，或取得匹配当前数据库的兼容证明后执行 `scripts/rollback`。不得修改/删除已应用迁移、手工清空 pending 来绕过检查，或回退数据库结构。
 
 ## V1 → V2 → V1 的可执行演练
+
+本节会创建并修改业务数据、切换应用版本，仅用于明确隔离的兼容演练项目。日常升级、回退、备份和隔离恢复分别使用[运维手册](../operations/runbook.md)，不能将这段演练脚本用于当前交付实例。
 
 工具：`tests/integration/release_compatibility.py`。它只允许显式隔离的 dev/test 项目，要求环境 `compose.env` 中同时具有：
 
@@ -86,24 +99,16 @@ V2 增量迁移 `V20261022150000__reservation_operator_note.sql` 为预约增加
 
 ## 每日备份与七天保留
 
-长期运行的本机或服务器环境可在安装时使用 `./install.sh test --schedule-backups`。已安装、离线导入或自定义状态目录的环境使用：
+实际安装/检查/补做/取消命令集中在[备份调度手册](../operations/runbook.md#安装或检查每日备份调度)。源码新装可选 `install.sh <env> --schedule-backups`；既有或离线实例使用 schedule-backup 并显式传入状态目录。install 启用主机任务，可能立即触发；status 查询；run 可能生成备份并执行保留期清理。
 
-```sh
-./scripts/schedule-backup install test --state-dir /absolute/path/to/deployment-state
-./scripts/schedule-backup status test --state-dir /absolute/path/to/deployment-state
-./scripts/schedule-backup run test --state-dir /absolute/path/to/deployment-state
-```
+`scripts/backup_schedule.py` 每小时检查，以 UTC 日期判定当日成功；标记、dump、配对元数据、SHA 和完整解码记录一致且不是符号链接时才跳过。丢失/损坏则补做，失败不更新标记；force 可追加。备份持有发布共用的环境锁，发布前仍独立备份，不被当日成功标记跳过。
 
-macOS安装当前用户的LaunchAgent；Linux以root执行时安装systemd系统timer，普通用户安装user timer。服务器建议以具备目标Docker访问权限的运维用户配置系统timer；普通user timer取决于用户会话/linger，工具不会修改linger或授予Docker权限。macOS退出登录、宿主关机或Docker停止时不会完成备份；恢复后检查并补做当日备份。未成功备份不更新当日标记，下次小时检查重试。
+备份采用 pg_dump 自定义格式，TOC 和完整解码通过后才把 0600 的 partial 发布为 dump；配对元数据记录 SHA、时间、实际 PG/Flyway、应用清单和快照恢复点，不含秘密。只有新备份成功后，才清理超过七天且命名/元数据/摘要匹配的 dump/json 对；未知、损坏、链接、partial 和恢复报告保留。
 
-调度每小时检查一次，仅当当天dump、元数据与标记的SHA一致、完整解码验证记录有效且没有符号链接时才跳过；丢失或损坏则补备份。每个UTC日期最多自动完成一次有效备份；`run --force`可立即追加。备份和发布共用环境锁。成功生成`pg_dump -Fc`并通过`pg_restore --list`和`pg_restore --file=/dev/null`全量解码后才从`.partial`改为正式`.dump`，元数据与dump均0600。元数据包括SHA-256、开始/完成时间、实际PG/Flyway清单、当时运行release manifest及恢复点说明，不含秘密。发布前仍单独备份，不被“当天已备份”跳过。
+macOS 使用当前用户 LaunchAgent，Linux root 使用系统 timer、普通用户使用 user timer。任务保存解释器、源码和状态绝对路径；源码迁移后需重新 install。会话、主机或 Docker 不可用会影响调度，工具不修改 linger 或 Docker 权限。备份日志在 `backup-scheduler.log`，remove 仅卸载该实例任务，不删除数据/日志。
 
-仅在一次新备份成功后，清理本环境备份目录里超过七天、命名/元数据/校验全部匹配的dump与json对。未知文件、校验不符、符号链接、失败partial和恢复报告保留供排查。不要把该策略误认为异机容灾；备份应另行加密同步到部署方指定存储。
-
-取消调度用相同参数执行 `./scripts/schedule-backup remove test --state-dir ...`，只卸载该环境的任务定义，保留数据、备份和日志。日志在状态目录的`backup-scheduler.log`。仓库移动后重新执行install以刷新绝对路径。
-
-2026-10-22已在独立便携安装环境实际生成备份，核对完整解码、SHA、版本与迁移清单，并安装launchd；首次系统触发退出码0，正确识别当日已成功备份。内存截断64字节的负例证明TOC检查返回0但全量解码失败，原备份不变。丢失/损坏/链接等回归通过；七天保留通过临时文件反证测试，尚未经历真实七天；Linux systemd定义已校验，未在独立Linux宿主实际加载。见[备份调度证据](../evidence/release/scheduled-backup.json)。
+这是本机保留策略，不是异机灾备。2026-10-22 的[调度证据](../evidence/release/scheduled-backup.json)覆盖真实 macOS 备份与 launchd、截断归档反证；七天保留通过临时文件测试，未经历真实七天；Linux systemd 定义已校验，未在独立 Linux 宿主实际加载。此范围不随文档更新扩大。
 
 ## GitLab 合并历史
 
-用户于2026-10-22指定 Fast-forward merge，默认不 squash。项目已实际保存该设置：需要时先rebase特性分支到最新main，再由同一提交的成功流水线允许合并；不创建额外merge commit，保留逻辑提交。Squash策略为Allow（默认不勾选），不是Encourage或Require。Pipelines must succeed已勾选，Skipped pipelines are considered successful未勾选。禁止通过修改门禁或直接推送main绕开失败测试。
+当前五门禁、受保护 Runner 引用、Fast-forward/default no-squash 和发行制品流程统一见[GitLab 手册](../operations/gitlab.md)。历史发布记录保留原提交与 pipeline，后续文档 HEAD 不改变运行版本或旧验收结果。
