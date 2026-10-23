@@ -6,6 +6,8 @@ The small expression parser handles GitLab variables, equality, &&, || and group
 it does not use Python eval or repeat the production branch-selection function.
 """
 import re
+import shlex
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -225,6 +227,46 @@ class CiWorkflowTest(unittest.TestCase):
                      "require_junit_report(ROOT / 'output/browser/junit.xml')",
                      "ops.verify_running_release('test', manifest)", "npx playwright install --with-deps chromium"]:
             self.assertIn(gate, script)
+
+    def container_bootstrap_commands(self):
+        release = section(self.source, 'container-release')
+        block = re.search(r'^  before_script:\n(.*?)(?=^  script:)', release, re.M | re.S).group(1)
+        return [line.removeprefix('    - ') for line in block.splitlines() if line.strip()]
+
+    def test_ci_alpine_mirror_rewrite_preserves_release_channels_and_unrelated_sources(self):
+        commands = self.container_bootstrap_commands()
+        rewrite = shlex.split(commands[0])
+        self.assertEqual(['sed', '-i'], rewrite[:2])
+        self.assertEqual('/etc/apk/repositories', rewrite[-1])
+        self.assertEqual(4, len(rewrite))
+        original = ('https://dl-cdn.alpinelinux.org/alpine/v3.22/main\n'
+                    'https://dl-cdn.alpinelinux.org/alpine/v3.22/community\n'
+                    '# https://dl-cdn.alpinelinux.org/alpine/edge/testing\n'
+                    'https://dl-cdnXalpinelinuxXorg/alpine/v3.22/main\n'
+                    'https://example.invalid/alpine/v3.22/main\n')
+        # Execute the actual CI substitution; omit -i only to keep this test read-only
+        # and portable between macOS BSD sed and Linux/BusyBox sed.
+        actual = subprocess.run(['sed', rewrite[2]], input=original, text=True,
+                                capture_output=True, check=True).stdout
+        expected = ('https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.22/main\n'
+                    'https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.22/community\n'
+                    '# https://dl-cdn.alpinelinux.org/alpine/edge/testing\n'
+                    'https://dl-cdnXalpinelinuxXorg/alpine/v3.22/main\n'
+                    'https://example.invalid/alpine/v3.22/main\n')
+        self.assertEqual(expected, actual)
+        repeated = subprocess.run(['sed', rewrite[2]], input=actual, text=True,
+                                  capture_output=True, check=True).stdout
+        self.assertEqual(expected, repeated)
+
+    def test_ci_alpine_install_preserves_signature_tls_packages_and_failure_behavior(self):
+        commands = self.container_bootstrap_commands()
+        self.assertEqual(2, len(commands))
+        self.assertEqual(['apk', 'add', '--no-cache', 'python3', 'git'], shlex.split(commands[1]))
+        self.assertNotIn('--allow-untrusted', '\n'.join(commands))
+        self.assertNotIn('--no-check-certificate', '\n'.join(commands))
+        self.assertNotIn('||', '\n'.join(commands))
+        self.assertNotIn('/etc/apk/keys', '\n'.join(commands))
+        self.assertNotIn('http://', '\n'.join(commands))
 
     def test_expression_reader_rejects_unsupported_syntax_instead_of_silently_passing(self):
         with self.assertRaises(AssertionError):

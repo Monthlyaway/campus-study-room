@@ -140,6 +140,7 @@ container-release:
     action: start
     auto_stop_in: 1 day
   before_script:
+    - sed -i 's|^https://dl-cdn\.alpinelinux\.org/alpine/|https://mirrors.tuna.tsinghua.edu.cn/alpine/|' /etc/apk/repositories
     - apk add --no-cache python3 git
   script:
     - python3 scripts/ci-release.py
