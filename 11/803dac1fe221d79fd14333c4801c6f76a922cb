@@ -1,0 +1,29 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "11803dac1fe221d79fd14333c4801c6f76a922cb",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/gitlab-alpine-mirror.md",
+      "additions": {
+        "human": 26
+      }
+    },
+    {
+      "old_path": ".gitlab-ci.yml",
+      "new_path": ".gitlab-ci.yml",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "tests/ops/test_ci_workflow.py",
+      "new_path": "tests/ops/test_ci_workflow.py",
+      "additions": {
+        "human": 42
+      }
+    }
+  ]
+}
