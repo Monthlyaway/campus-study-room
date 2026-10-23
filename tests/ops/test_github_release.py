@@ -7,6 +7,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -93,23 +94,142 @@ class GitHubReleaseTest(unittest.TestCase):
             self.assertEqual('c' * 40, identity[2])
             self.assertEqual('ci-123-1-' + 'c' * 12, identity[3])
 
-    def test_existing_public_or_unlinked_package_is_rejected(self):
-        for package in ({'visibility': 'public', 'repository': {'full_name': release.REPOSITORY}},
-                        {'visibility': 'private', 'repository': {'full_name': 'another/repo'}},
-                        {'visibility': 'private'}):
-            with self.subTest(package=package), patch.object(release, 'api', return_value=package):
-                with self.assertRaises(RuntimeError):
+    def package(self, name='core'):
+        # Actual GHCR REST response shape: repository is not always returned.
+        return {'name': 'campus-study-room-' + name, 'visibility': 'private',
+                'package_type': 'container', 'owner': {'login': 'Monthlyaway', 'id': 102352706}}
+
+    def image_manifest(self):
+        return {**self.manifest, 'images': {
+            name: {'id': 'sha256:' + str(index) * 64, 'ref': 'local-' + name + ':mutable'}
+            for index, name in enumerate(('core', 'repair', 'web'), 1)}}
+
+    def image_labels(self):
+        return {'org.opencontainers.image.source': 'https://github.com/Monthlyaway/campus-study-room',
+                'org.opencontainers.image.revision': self.commit,
+                'org.opencontainers.image.version': 'v0.2.0'}
+
+    def test_private_package_with_omitted_repository_metadata_allowed(self):
+        for name in ('core', 'repair', 'web'):
+            package = self.package(name)
+            with self.subTest(name=name), patch.object(release, 'api', return_value=package):
+                self.assertEqual(package, release.package_private(name))
+        with patch.object(release, 'api', return_value=None) as request:
+            self.assertIsNone(release.package_private('core', missing=True))
+            request.assert_called_once_with(
+                'users/Monthlyaway/packages/container/campus-study-room-core', missing=True)
+
+    def test_package_requires_private_expected_owner_name_and_container_type(self):
+        for field, bad_value in (('visibility', 'public'), ('visibility', 'internal'),
+                                 ('name', 'campus-study-room-web'), ('package_type', 'npm'),
+                                 ('owner', {'login': 'another-owner'}), ('owner', None)):
+            for missing in (False, True):
+                package = self.package()
+                if missing:
+                    package.pop(field)
+                else:
+                    package[field] = bad_value
+                with self.subTest(field=field, value=bad_value, missing=missing), \
+                        patch.object(release, 'api', return_value=package), self.assertRaises(RuntimeError):
                     release.package_private('core')
 
-    def test_private_linked_package_and_repository_allowed(self):
-        with patch.object(release, 'api', return_value={
-                'visibility': 'private', 'repository': {'full_name': release.REPOSITORY}}):
-            release.package_private('web')
+    def test_optional_repository_metadata_must_match_when_present(self):
+        for repository in (None, {}, {'full_name': 'someone/another-repo'}, 'invalid'):
+            package = {**self.package(), 'repository': repository}
+            with self.subTest(repository=repository), patch.object(release, 'api', return_value=package):
+                with self.assertRaises(RuntimeError):
+                    release.package_private('core')
+        package = {**self.package(), 'repository': {'full_name': release.REPOSITORY}}
+        with patch.object(release, 'api', return_value=package):
+            self.assertEqual(package, release.package_private('core'))
+
+    def test_private_repository_identity_is_still_required(self):
         with patch.object(release, 'api', return_value={'private': True, 'full_name': release.REPOSITORY}):
             release.private_repository()
-        with patch.object(release, 'api', return_value={'private': False, 'full_name': release.REPOSITORY}):
-            with self.assertRaises(RuntimeError):
-                release.private_repository()
+        for repo in ({'private': False, 'full_name': release.REPOSITORY},
+                     {'private': True, 'full_name': 'someone/another-repo'}):
+            with self.subTest(repo=repo), patch.object(release, 'api', return_value=repo):
+                with self.assertRaises(RuntimeError):
+                    release.private_repository()
+
+    def test_all_tested_image_ids_require_source_commit_and_version_labels(self):
+        manifest = self.image_manifest()
+        with patch.object(release.subprocess, 'check_output', return_value=json.dumps(self.image_labels())) as inspect:
+            release.verify_image_labels(manifest)
+        self.assertEqual([info['id'] for info in manifest['images'].values()],
+                         [call.args[0][-1] for call in inspect.call_args_list])
+        for call in inspect.call_args_list:
+            self.assertEqual(['docker', 'image', 'inspect', '--format', '{{json .Config.Labels}}'], call.args[0][:-1])
+
+    def test_any_tested_image_with_missing_or_wrong_source_commit_or_version_is_rejected(self):
+        manifest = self.image_manifest()
+        for name in manifest['images']:
+            for field in self.image_labels():
+                for missing in (True, False):
+                    labels = self.image_labels()
+                    if missing:
+                        labels.pop(field)
+                    else:
+                        labels[field] = 'unverified-value'
+                    def inspected(args, **kwargs):
+                        return json.dumps(labels if args[-1] == manifest['images'][name]['id'] else self.image_labels())
+                    with self.subTest(image=name, field=field, missing=missing), \
+                            patch.object(release.subprocess, 'check_output', side_effect=inspected), \
+                            self.assertRaises(RuntimeError):
+                        release.verify_image_labels(manifest)
+        with patch.object(release.subprocess, 'check_output', return_value='null'), self.assertRaises(RuntimeError):
+            release.verify_image_labels(manifest)
+
+    def publish_inputs(self, root):
+        manifest = self.image_manifest()
+        manifest_path, evidence_path = root / 'manifest.json', root / 'result.json'
+        manifest_path.write_text(json.dumps(manifest))
+        evidence_path.write_text(json.dumps({**self.evidence, 'manifestSha256': release.sha(manifest_path)}))
+        return manifest, SimpleNamespace(manifest=manifest_path, evidence=evidence_path, output=root / 'published')
+
+    def test_wrong_last_image_label_stops_publish_before_any_push(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest, args = self.publish_inputs(Path(tmp))
+            def inspected(command, **kwargs):
+                self.assertEqual(['docker', 'image', 'inspect'], command[:3])
+                labels = self.image_labels()
+                if command[-1] == manifest['images']['web']['id']:
+                    labels.pop('org.opencontainers.image.source')
+                return json.dumps(labels)
+            with patch.object(release, 'ops_module', return_value=SimpleNamespace(verify_manifest=lambda path: manifest)), \
+                    patch.dict(os.environ, self.env, clear=True), \
+                    patch.object(release.subprocess, 'check_output', side_effect=inspected), \
+                    patch.object(release, 'run') as mutate, patch.object(release, 'api') as request:
+                with self.assertRaisesRegex(RuntimeError, 'labels do not match: web'):
+                    release.publish(args)
+                mutate.assert_not_called()
+                request.assert_not_called()
+            self.assertFalse(args.output.exists())
+
+    def test_existing_version_tag_is_not_overwritten_when_repository_metadata_omitted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest, args = self.publish_inputs(Path(tmp))
+            def checked(command, **kwargs):
+                if command[:3] == ['docker', 'image', 'inspect']:
+                    return json.dumps(self.image_labels())
+                if command == ['git', 'rev-parse', 'HEAD']:
+                    return self.commit
+                if command == ['git', 'status', '--porcelain']:
+                    return ''
+                if command[:4] == ['gh', 'api', '--paginate', '--slurp']:
+                    return json.dumps([[{'metadata': {'container': {'tags': ['v0.2.0']}}}]])
+                raise AssertionError('Unexpected command: ' + str(command))
+            with patch.object(release, 'ops_module', return_value=SimpleNamespace(verify_manifest=lambda path: manifest)), \
+                    patch.dict(os.environ, self.env, clear=True), \
+                    patch.object(release.subprocess, 'check_output', side_effect=checked), \
+                    patch.object(release, 'run') as mutate, patch.object(release, 'private_repository'), \
+                    patch.object(release, 'api', side_effect=[None, self.package()]):
+                with self.assertRaisesRegex(RuntimeError, 'Immutable package tag already exists: core:v0.2.0'):
+                    release.publish(args)
+                self.assertEqual([['git', 'fetch', 'origin', 'main'],
+                                  ['git', 'merge-base', '--is-ancestor', self.commit, 'origin/main']],
+                                 [call.args[0] for call in mutate.call_args_list])
+            self.assertFalse(args.output.exists())
 
     def archive(self, path, name, kind=tarfile.REGTYPE):
         with tarfile.open(path, 'w:gz') as archive:
