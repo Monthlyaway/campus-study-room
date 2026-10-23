@@ -1,10 +1,7 @@
 workflow:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PROJECT_ID == "11753" && $CI_COMMIT_BRANCH == "ycy/ci-container-check" && $CI_COMMIT_REF_PROTECTED == "true" && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web")'
+    - when: never
 
 stages: [release-test]
 
@@ -15,7 +12,7 @@ variables:
 
 container-release:
   stage: release-test
-  tags: [amd64-build]
+  tags: [studyroom-release-arm64]
   image: $STUDYROOM_CI_REGISTRY/docker:28.5.2-cli@sha256:625d9431a9f54c5a2bc90f24f0e1c3d55b1349fd857dd85035f98c2c9acbdd4d
   services:
     - name: $STUDYROOM_CI_REGISTRY/docker:28.5.2-dind@sha256:2a232a42256f70d78e3cc5d2b5d6b3276710a0de0596c145f627ecfae90282ac
@@ -38,7 +35,7 @@ container-release:
   script:
     - |
       set -eu
-      printf '%s\n' 'Connectivity diagnostic only: no release build or deployment.'
+      printf '%s\n' 'Protected ARM64 Runner diagnostic only: no application build, test or deployment.'
       printf 'DOCKER_HOST=%s\nDOCKER_TLS_CERTDIR=%s\nDOCKER_CERT_PATH=%s\nDOCKER_TLS_VERIFY=%s\nCI_BUILDS_DIR=%s\n' \
         "$DOCKER_HOST" "$DOCKER_TLS_CERTDIR" "$DOCKER_CERT_PATH" "$DOCKER_TLS_VERIFY" "$CI_BUILDS_DIR"
       [ "$DOCKER_HOST" = tcp://docker:2376 ]
@@ -108,4 +105,58 @@ container-release:
         printf '%s\n' 'TLS Docker daemon remained unavailable; retain the concrete errors above.' >&2
         exit 1
       fi
-      printf '%s\n' 'TLS connectivity diagnostic passed; this is not a release acceptance result.'
+      client_version=$(docker version --format '{{.Client.Version}}')
+      server_version=$(docker version --format '{{.Server.Version}}')
+      client_platform=$(docker version --format '{{.Client.Os}}/{{.Client.Arch}}')
+      server_platform=$(docker version --format '{{.Server.Os}}/{{.Server.Arch}}')
+      compose_version=$(docker compose version --short)
+      printf 'Client=%s Server=%s Compose=%s ClientPlatform=%s ServerPlatform=%s\n' \
+        "$client_version" "$server_version" "$compose_version" "$client_platform" "$server_platform"
+      [ "$client_version" = 28.5.2 ]
+      [ "$server_version" = 28.5.2 ]
+      [ "${compose_version#v}" = 2.40.3 ]
+      [ "$client_platform" = linux/arm64 ]
+      [ "$server_platform" = linux/arm64 ]
+      for file in client/ca.pem client/cert.pem client/key.pem server/ca.pem server/cert.pem server/key.pem; do
+        [ -s "$DOCKER_TLS_CERTDIR/$file" ]
+      done
+      case "$CI_JOB_ID" in ''|*[!0-9]*) exit 1 ;; esac
+      case "$CI_PIPELINE_ID" in ''|*[!0-9]*) exit 1 ;; esac
+      [ "$DOCKER_TLS_CERTDIR" = "$CI_BUILDS_DIR/.studyroom-dind-$CI_JOB_ID" ]
+      [ "$DOCKER_CERT_PATH" = "$DOCKER_TLS_CERTDIR/client" ]
+      case "$CI_PROJECT_DIR" in "$CI_BUILDS_DIR"/*) ;; *) exit 1 ;; esac
+      missing_client_dir="$CI_BUILDS_DIR/.studyroom-missing-client-$CI_JOB_ID"
+      [ ! -e "$missing_client_dir" ]
+      if DOCKER_CERT_PATH="$missing_client_dir" busybox timeout 8 docker info --format '{{.ServerVersion}}'; then
+        printf '%s\n' 'ERROR: connection without the client credential path unexpectedly succeeded.' >&2
+        exit 1
+      else
+        printf '%s\n' 'missing_client_credentials=rejected'
+      fi
+      # Pull and inspect within the same private Docker 28 daemon. Never reuse an outer Docker 29 OCI index ID.
+      nested_image="$STUDYROOM_CI_REGISTRY/docker:28.5.2-cli@sha256:625d9431a9f54c5a2bc90f24f0e1c3d55b1349fd857dd85035f98c2c9acbdd4d"
+      busybox timeout 180 docker pull --platform linux/arm64 "$nested_image"
+      nested_id=$(docker image inspect "$nested_image" --format '{{.Id}}')
+      nested_platform=$(docker image inspect "$nested_image" --format '{{.Os}}/{{.Architecture}}')
+      printf '%s\n' "$nested_id" | grep -Eq '^sha256:[0-9a-f]{64}$'
+      [ "$nested_platform" = linux/arm64 ]
+      marker_dir="$CI_PROJECT_DIR/.ci-dind-marker-$CI_JOB_ID"
+      [ ! -e "$marker_dir" ]
+      mkdir -m 755 "$marker_dir"
+      expected="studyroom-ci-marker-$CI_PIPELINE_ID-$CI_JOB_ID"
+      printf '%s\n' "$expected" > "$marker_dir/value"
+      chmod 444 "$marker_dir/value"
+      actual=$(busybox timeout 30 docker run --rm --pull never --network none --read-only \
+        --cap-drop ALL --security-opt no-new-privileges \
+        --mount "type=bind,src=$marker_dir,dst=/probe,readonly" \
+        "$nested_id" sh -ec '
+          test ! -e /var/run/docker.sock
+          cat /probe/value
+          if touch /probe/write-must-fail 2>/dev/null; then
+            printf "%s\n" "ERROR: marker bind mount is writable" >&2
+            exit 1
+          fi
+        ')
+      [ "$actual" = "$expected" ]
+      printf 'nested_readonly_marker=matched image_id=%s platform=%s\n' "$nested_id" "$nested_platform"
+      printf '%s\n' 'Actual job TLS/ARM64/nested-marker diagnostic passed; this is not the full release acceptance result.'
