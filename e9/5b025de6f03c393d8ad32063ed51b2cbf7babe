@@ -1,0 +1,45 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/gitlab-runner-registration.md",
+      "additions": {
+        "human": 51
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/evidence/gitlab-dind-startup.md",
+      "new_path": "docs/evidence/gitlab-dind-startup.md",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 5
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    }
+  ]
+}
