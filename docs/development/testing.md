@@ -108,6 +108,14 @@ python3 tests/integration/run_fault_matrix.py stop
 
 `stop` 保留数据库、`.local/fault-matrix` 和 `output/fault-matrix` 证据，不会清空 fixture。已有 fixture 时不要重复 `all`、`setup` 或 `prepare`；先核对已有工单和进程，再选择与当前状态相符的恢复/核验阶段。各阶段和精确断言见[故障矩阵记录](../evidence/repair-fault-matrix.md)；停机补偿的固定时钟/进程恢复证据见[恢复记录](../evidence/core/restart-recovery.md)。复现历史演练前核对原版本与当前产物，历史通过不等于本次执行结果。
 
+## 手机弹窗与布局检查
+
+桌面打开的弹窗可能保留点击位置作为动画原点。缩至 375px 后，手机样式将原点固定在中心，避免退出动画沿旧桌面位置越出视口；修改响应式样式时应覆盖这一切换过程。
+
+[浏览器 helper](../../tests/browser/helpers.mjs) 保留 `.ant-modal:visible, .ant-drawer-open .ant-drawer-content-wrapper` 选择器，在一次 `evaluateAll` 页面回调内读取选中元素、视口/页面宽度及各元素 `getBoundingClientRect()`，避免先枚举可见元素、再跨调用读取尺寸的竞争。页面和可见弹层仍按 **1px 容差、5 秒轮询上限**判断稳定布局，没有扩大容差或移除弹层检查。
+
+[管理员用例](../../tests/browser/studyroom.spec.mjs) 额外在桌面打开创建账号弹窗，等待打开动画结束，缩至 375px 后关闭，并用 `requestAnimationFrame` 逐帧检查退出过程：每个采样帧均不得超出同一 1px 边界，实际采样帧数须大于零，观察循环以 2 秒为上限并断言弹窗完成关闭。该步骤不提交账号创建，之后继续原管理员空结果与学生操作权限检查。逐帧断言补充稳定布局检查，不能用最终关闭后的空元素集合代替动画过程。这里说明实现与通过标准；本轮修复是否通过，以实际浏览器报告和[证据索引](../evidence/README.md)为准。
+
 ## 如何判断改动已验证
 
 纯策略或日志格式改动先跑相应模块单元；SQL、迁移、锁序、幂等、期限改动要跑对应真实 PG；公开协议改动增加契约和 HTTP 行为；跨服务变化增加实际 HTTP 与故障重试；交互变化增加浏览器试用。按[贡献指南](../contributing.md)完成最终门禁，并记录本次命令、目标、版本、结果与未覆盖项。
