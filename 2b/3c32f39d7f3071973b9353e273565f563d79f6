@@ -1,0 +1,19 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "2b3c32f39d7f3071973b9353e273565f563d79f6",
+  "prompts": {},
+  "changes": [
+    {
+      "old_path": ".gitlab-ci.yml",
+      "new_path": ".gitlab-ci.yml",
+      "additions": {
+        "human": 59
+      },
+      "deletions": {
+        "human": 8
+      }
+    }
+  ]
+}
