@@ -4,13 +4,13 @@
 
 ## codex-lb 部署准备快照
 
-以下为 **2026-10-23 v0.2.0 发布中断后**的已核对状态，不是自动刷新的健康页面。codex-lb 的完整检查、Linux AMD64 三镜像隔离部署和真实浏览器 6 项验证已通过；v0.2.0 的 publish 在首个镜像上传后失败，deploy 跳过，GitHub Release 未创建，生产应用尚未启动。HTTPS 入口已配置，最近一次外部 HTTPS 检查通过证书校验、应用响应为 **502**。完整运行身份与失败原因见 [v0.2.0 验证与中断记录](../evidence/github-production-v0.2.0.md)，后续状态以[进度](../progress.md)为准。
+以下为 **2026-10-23 v0.2.1 浏览器验证失败后**的已核对状态，不是自动刷新的健康页面。PR #2 完整 CI 通过后已 rebase merge；正式 v0.2.1 的全仓检查通过，但浏览器 6 项中 1 项失败，verify 未通过，publish 与 deploy 均跳过，没有该版本的新 Release 或 package。生产应用尚未启动。HTTPS 入口已配置，最近一次外部 HTTPS 检查通过证书校验、应用响应为 **502**。运行身份与失败位置见 [v0.2.1 记录](../evidence/github-production-v0.2.1.md)，v0.2.0 的独立结果保留在[原发布中断记录](../evidence/github-production-v0.2.0.md)，后续状态以[进度](../progress.md)为准。
 
 | 项目 | 已核对事实 / 配置位置 |
 | --- | --- |
 | 主机与公网入口 | codex-lb；`https://49.51.193.169` |
-| 发布候选 | `v0.2.0` → `62d2462a6f5eb83b2061cb254f6502936488c3ed`；verify 成功，publish 失败，deploy 跳过 |
-| 发布中断边界 | core 已上传并核对 digest / 镜像 ID；repair、web 未上传，未创建 Release；部分上传不作为生产版本 |
+| 发布候选 | `v0.2.1` → `655cc322b96118827efa9c5572aeab323a055f60`；全仓检查通过，浏览器 1/6 失败，verify 失败，publish/deploy 跳过 |
+| 发布中断边界 | v0.2.1 没有发布；v0.2.0 仅 core 的既有部分上传保持原记录，不作为生产版本 |
 | HTTP / HTTPS | TCP 80/443 可达；HTTP 308 到 HTTPS；不使用 `-k` 的 TLS 校验成功，应用响应当前为 502 |
 | HTTPS 服务 | 宿主 nginx 系统服务 active；回环 upstream `127.0.0.1:18443` |
 | 证书 | Let’s Encrypt YE2；SAN 为 IP `49.51.193.169` |
@@ -26,7 +26,7 @@
 | 生产持久状态 | `/home/ubuntu/.local/state/campus-study-room/prod`；与 CI/浏览器测试状态隔离 |
 | 不可变发布源码 | `/home/ubuntu/Deployments/campus-study-room/releases/<releaseId>/source`；每版单独保留 |
 
-该服务器约 2 核/2 GiB RAM、4 GiB swap；已通过的串行 CI 不代表原 4 核/8 GiB 性能验收或 CI 与生产共同运行容量已验。当前生产镜像运行、课程账号创建与实际登录、HTTPS 业务流程、定时备份及隔离恢复均待执行。先完成发布修复及新版本验证，再由正式 deploy 推广已测试镜像；届时补齐三应用 digest、运行版本、备份/恢复与资源观测。账号凭据只在[演示账号](../development/demo-accounts.md)维护，本页不复制密码。
+该服务器约 2 核/2 GiB RAM、4 GiB swap；已通过的串行 CI 不代表原 4 核/8 GiB 性能验收或 CI 与生产共同运行容量已验。当前生产镜像运行、课程账号创建与实际登录、HTTPS 业务流程、定时备份及隔离恢复均待执行。先完成本次弹窗动画/布局采样修复及新版本验证，再由正式 deploy 推广已测试镜像；届时补齐三应用 digest、运行版本、备份/恢复与资源观测。账号凭据只在[演示账号](../development/demo-accounts.md)维护，本页不复制密码。
 
 日常证书查询与排障见[GitHub 运维手册](github.md#ip-https-与续期)。公网仅开放应用 HTTP/HTTPS 入口；数据库、内部 API、Mailpit 保持私网/回环，SSH 保持既有规则。
 

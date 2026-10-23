@@ -4,7 +4,7 @@
 
 快速查找：[公共层](#d-公共层)、[M1](#m1-自习座位预约)、[M2](#m2-整室申请)、[M3](#m3-报修与验收)、[跨模块](#跨模块一致性)、[工程交付](#工程交付)。本表面向验收；使用系统请读[用户手册](user-guide/README.md)。
 
-当前新增 GitHub / codex-lb 目标的状态见[后续验收](#github-与-codex-lb-的后续验收)：v0.2.0 verify 成功、publish 中断，生产部署与账号/备份验收尚未完成。以下 39 项 VERIFIED 保留原 v0.1.0 交付范围。
+当前新增 GitHub / codex-lb 目标的状态见[后续验收](#github-与-codex-lb-的后续验收)：v0.2.1 全仓检查通过、浏览器 1/6 失败，publish/deploy 跳过；生产部署与账号/备份验收尚未完成。以下 39 项 VERIFIED 保留原 v0.1.0 交付范围。
 
 更新时间：2026-10-23。V6本机浏览器、正式离线导入、同schema正式回退/恢复及源码绑定运输包均通过；feature683506完整五job PASS，MR !1已Fast-forward合main，annotated tag已指向同一S。main683689与tag683743完整五job均已PASS，[v0.1.0正式Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布；用户确定的本机与可迁移交付范围内39项P0均为VERIFIED。提交前限定审计见[报告](evidence/runtime-audit-final-v6.md)，GitLab最终事实见[发布记录](evidence/gitlab-release-v0.1.0.md)。本表逐条保留[PRD](../01_PRD.md)的**39个P0 REQ**，关联[技术方案](../02_Technical_Design.md)和[milestone](../03_Development_Milestones.md)；每项测试只证明其实际断言与运行条件。
 
@@ -170,13 +170,13 @@ P1 `REQ-AGENT-01`未启动，不计入以上39项，也不用于替代P0验收�
 
 ## GitHub 与 codex-lb 的后续验收
 
-上表 VERIFIED 与原交付边界按原版本保留。2026-10-23 用户新增 GitHub Actions、codex-lb 同机 CI/生产、GHCR/Release 与公网 IP HTTPS 目标，决策见 [ADR 0004](adr/0004-github-codex-lb-production.md)，操作见 [GitHub 手册](operations/github.md)。新范围整体为 **IN_PROGRESS**：实际运行身份、PR 与 Actions 链接集中在 [v0.2.0 验证与中断记录](evidence/github-production-v0.2.0.md)，宿主 TLS 配置与观测见[接手卡](operations/current-instance.md#codex-lb-部署准备快照)。
+上表 VERIFIED 与原交付边界按原版本保留。2026-10-23 用户新增 GitHub Actions、codex-lb 同机 CI/生产、GHCR/Release 与公网 IP HTTPS 目标，决策见 [ADR 0004](adr/0004-github-codex-lb-production.md)，操作见 [GitHub 手册](operations/github.md)。新范围整体为 **IN_PROGRESS**：最新 PR、tag 与 Actions 结果见 [v0.2.1 浏览器失败记录](evidence/github-production-v0.2.1.md)，此前 [v0.2.0 发布中断记录](evidence/github-production-v0.2.0.md) 保留原范围；宿主 TLS 配置与观测见[接手卡](operations/current-instance.md#codex-lb-部署准备快照)。
 
 | 新平台范围 | 已执行证据 | 尚待验收 |
 | --- | --- | --- |
 | REQ-ENG-04：环境隔离 | codex-lb 上独立 CI 状态、三镜像 test 部署与真实业务验证通过 | 正式生产状态与 CI 并存、资源观测；生产尚未启动 |
-| REQ-ENG-05：GitHub CI | PR 与 v0.2.0 tag 的完整 verify 通过，包含全仓检查、真实 PostgreSQL/HTTP、三镜像隔离部署、浏览器 6 项与报告隐私门禁；PR #1 rebase merge 保留逻辑提交 | publish 因 GHCR 元数据兼容性检查失败，deploy 跳过；修复须经新一轮验证。当前套餐不强制 branch protection，维护流程核对结果不冒充服务端强制门禁 |
-| REQ-ENG-06：固定版本与推广 | tag verify 绑定实际 commit、同一 run/attempt 的测试清单与镜像身份；core 已上传并按 digest 回拉核对 | repair/web 上传、完整 GitHub Release、正式推广和生产回退；部分上传不等于发布成功 |
+| REQ-ENG-05：GitHub CI | PR #1 / #2 与 v0.2.0 tag 的完整 verify 通过；PR 均 rebase merge 保留逻辑提交。v0.2.1 的全仓检查通过，含 164 项 ops 与真实 PostgreSQL/HTTP | v0.2.1 浏览器 1/6 失败，verify 未通过，publish/deploy 跳过；弹窗动画及布局检查修复后的验证尚未完成。当前套餐不强制 branch protection，维护流程核对结果不冒充服务端强制门禁 |
+| REQ-ENG-06：固定版本与推广 | v0.2.0 tag verify 绑定实际 commit、同一 run/attempt 的测试清单与镜像身份；其 core 已上传并按 digest 回拉核对，原事实保留 | v0.2.1 因 verify 失败未发布新 package/Release；完整发布、正式推广和生产回退仍待验，旧部分上传不等于新版本成功 |
 | REQ-ENG-07：服务器安装与维护 | Linux AMD64 的隔离 test 部署、健康与三版本核对通过；Ubuntu SSH/systemd 运行基础已配置 | codex-lb 生产部署、定时备份与隔离恢复内容核对；旧 ARM64 导入/回退证据不替代本机验收 |
 | REQ-ENG-08：安全与隐私 | 公网 IP 证书、外部 TLS 校验及续期 dry-run 通过；CI 报告隐私门禁通过 | 生产 HTTPS 登录、Secure Cookie 与课程账号范围的实际验证；外部 SMTP 实际收信仍待配置 |
 
