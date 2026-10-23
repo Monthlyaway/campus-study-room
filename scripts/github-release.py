@@ -63,10 +63,11 @@ def api(path, *, missing=False):
     return json.loads(result.stdout)
 
 
-def private_repository():
+def public_repository():
     repo = api('repos/' + REPOSITORY)
-    if not repo.get('private') or repo.get('full_name') != REPOSITORY:
-        raise RuntimeError('Release target must remain the expected private repository')
+    if (not isinstance(repo, dict) or repo.get('full_name') != REPOSITORY
+            or repo.get('private') is not False or repo.get('visibility') != 'public'):
+        raise RuntimeError('Release target must remain the expected public repository')
 
 
 def package_private(name, *, missing=False):
@@ -158,7 +159,7 @@ def publish(args):
     run(['git', 'fetch', 'origin', 'main'], cwd=ROOT)
     run(['git', 'merge-base', '--is-ancestor', manifest['commit'], 'origin/main'], cwd=ROOT)
     tag = manifest['releaseId']
-    private_repository()
+    public_repository()
     if api('repos/' + REPOSITORY + '/releases/tags/' + tag, missing=True) is not None:
         raise RuntimeError('Release already exists; never replace a published release automatically')
     for name in manifest['images']:
@@ -215,7 +216,7 @@ def publish(args):
          '--title', 'Campus Study Room ' + tag, '--notes-file', notes,
          *assets, output / 'SHA256SUMS'])
     run(['gh', 'release', 'edit', tag, '--repo', REPOSITORY, '--draft=false'])
-    print('Published private release: https://github.com/' + REPOSITORY + '/releases/tag/' + tag)
+    print('Published public release: https://github.com/' + REPOSITORY + '/releases/tag/' + tag)
 
 
 def extract_source(archive, destination):
@@ -271,7 +272,7 @@ def verify_source(archive, destination):
 
 
 def deploy(args):
-    private_repository()
+    public_repository()
     bundle = args.bundle.resolve()
     manifest = json.loads((bundle / 'manifest.json').read_text())
     ops_module().validate_manifest_fields(manifest)
