@@ -17,7 +17,7 @@ git fetch origin
 
 先检查未提交变更和当前分支，再创建自己的 `ycy/` 工作分支。所有代码编辑、构建、commit 和 push 在上述服务器执行。不能在 Mac clone 后直接推 GitHub，也不能使用现有生产目录做测试状态目录。
 
-服务器资源约为 2 核、2 GiB RAM、4 GiB swap。Actions 使用本仓库专用 self-hosted runner 2.338.1，Docker 29.1.3 / Compose 2.40.3；版本来源见[依赖基线](../dependency-baseline.json)。工作流以 `campus-study-room-codex-lb` concurrency 组串行调度，构建与集成按阶段执行；部署还持有生产环境文件锁。运行前核对 runner 在线、目标仓库和完整提交。只允许可信项目代码使用该 runner；不可信 fork/PR 不应取得服务器或生产访问能力。
+服务器资源约为 2 核、2 GiB RAM、4 GiB swap。Actions 使用本仓库专用 self-hosted runner 2.338.1，Docker 29.1.3 / Compose 2.40.3（Ubuntu 包完整版本 `2.40.3+ds1-0ubuntu1~22.04.1`，CI 严格比对完整值）；版本来源见[依赖基线](../dependency-baseline.json)。工作流以 `campus-study-room-codex-lb` concurrency 组串行调度，构建与集成按阶段执行；部署还持有生产环境文件锁。运行前核对 runner 在线、目标仓库和完整提交。只允许可信项目代码使用该 runner；不可信 fork/PR 不应取得服务器或生产访问能力。
 
 ## 检查和合入
 
