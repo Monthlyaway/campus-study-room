@@ -27,7 +27,7 @@ Asia/Shanghai、带偏移时间、左闭右开区间、整点小时、14 天结�
 ## 开发、验收与提交
 
 1. 在 `docs/progress.md` 记录真实状态，不把计划当成果。
-2. 执行 `./scripts/check` 及改动涉及的集成/E2E；数据库测试用 PostgreSQL，M3 写回用真实 HTTP。失败须修复，禁止弱化断言。
+2. 开发阶段只运行本次改动必要的针对性验证与缺陷复现；提交 PR 后，由 codex-lb 上的 GitHub Actions 执行完整 `./scripts/check`、真实 PostgreSQL/HTTP/SMTP 集成及发布浏览器 E2E。不要在 Mac 或 codex-lb 开发目录先重复跑一遍整套集成检查，再让 PR CI 重跑；仅在定位具体 CI 失败或用户明确要求时，补充有针对性的复现。合入前核对最新提交的完整 CI 成功，取消、跳过或旧 SHA 的成功不能代替。数据库测试用 PostgreSQL，M3 写回用真实 HTTP；失败须修复，禁止弱化断言或绕过 CI。此流程依据用户在 2026-10-23 的明确调整。
 3. 前端使用 Sites skill 的本地设计指导、Playwright skill 调试。至少另一名 agent 实际试用桌面与 375px 界面并记录反馈。禁止用 mock 页面代替端到端验收。
 4. 状态/API/schema/配置改动同步更新 README、模块 docs、OpenAPI 与需求追踪表。
 5. 提交前检查 diff、生成物、secret 扫描和测试结果；只暂存本任务文件。Conventional Commits，正文含任务/需求编号。不冒充其他模型或真实人员署名。
