@@ -1,0 +1,89 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "66842da8989f6717dbf2bd6caeec7dcfc2385d4e",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/frontend-release-final-v5.md",
+      "additions": {
+        "human": 42
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v5-portable-import.json",
+      "additions": {
+        "human": 178
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v5-production-equivalence.json",
+      "additions": {
+        "human": 39
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v5-r4-rollback.json",
+      "additions": {
+        "human": 375
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-final-v5.json",
+      "additions": {
+        "human": 768
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-final-v5.md",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "old_path": "AGENTS.md",
+      "new_path": "AGENTS.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/evidence/release/README.md",
+      "new_path": "docs/evidence/release/README.md",
+      "additions": {
+        "human": 20
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 20
+      },
+      "deletions": {
+        "human": 14
+      }
+    },
+    {
+      "old_path": "tests/browser/REVIEW.md",
+      "new_path": "tests/browser/REVIEW.md",
+      "additions": {
+        "human": 12
+      }
+    }
+  ]
+}
