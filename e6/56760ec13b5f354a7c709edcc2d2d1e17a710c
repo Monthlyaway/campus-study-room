@@ -1,0 +1,79 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "e656760ec13b5f354a7c709edcc2d2d1e17a710c",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/operations/README.md",
+      "additions": {
+        "human": 49
+      }
+    },
+    {
+      "new_path": "docs/operations/current-instance.md",
+      "additions": {
+        "human": 48
+      }
+    },
+    {
+      "new_path": "docs/operations/gitlab.md",
+      "additions": {
+        "human": 64
+      }
+    },
+    {
+      "new_path": "docs/operations/installation.md",
+      "additions": {
+        "human": 177
+      }
+    },
+    {
+      "new_path": "docs/operations/runbook.md",
+      "additions": {
+        "human": 222
+      }
+    },
+    {
+      "old_path": "docs/modules/bootstrap.md",
+      "new_path": "docs/modules/bootstrap.md",
+      "additions": {
+        "human": 63
+      },
+      "deletions": {
+        "human": 14
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 56
+      },
+      "deletions": {
+        "human": 94
+      }
+    },
+    {
+      "old_path": "docs/modules/portable-release.md",
+      "new_path": "docs/modules/portable-release.md",
+      "additions": {
+        "human": 56
+      },
+      "deletions": {
+        "human": 82
+      }
+    },
+    {
+      "old_path": "docs/modules/release-operations.md",
+      "new_path": "docs/modules/release-operations.md",
+      "additions": {
+        "human": 19
+      },
+      "deletions": {
+        "human": 14
+      }
+    }
+  ]
+}
