@@ -9,7 +9,7 @@
 1. 从 [PRD](../01_PRD.md)、[规格导读](reference/README.md)和相关模块确定需求编号与受影响角色。先查看工作区，不覆盖已有未提交工作。
 2. 把变更范围分给明确负责人。共享接口、schema、安全或资源锁改动需相关调用方共同评审；模块归属见 [ADR 0001](adr/0001-module-and-shared-layer-ownership.md)。
 3. 修改实现及相应契约、生成客户端、迁移和文档。已部署迁移不重写；运行账号不获得 DDL 权限；不直接改 core 表来修复维修同步。
-4. 按[测试指南](development/testing.md)选择针对性验证，并运行仓库完整门禁 `./scripts/check`。快检 `--unit-only` 不代表真实 PG/HTTP/SMTP 或浏览器通过。必要的浏览器、故障、性能或发布验证分别执行，记录实际范围。
+4. 开发阶段按[测试指南](development/testing.md)只做本次改动必要的针对性验证或缺陷复现，然后提交 PR。完整 `./scripts/check`、真实 PG/HTTP/SMTP 集成和发布浏览器 E2E 交给 codex-lb 上的 GitHub Actions，不在 Mac 或服务器开发目录预先重复整套检查；定位具体 CI 失败或用户明确要求时再做针对性复现。快检 `--unit-only` 不代表完整验收，合入仍须核对最新 SHA 的完整 CI 成功。实际执行、取消与尚未验证的范围分别记录。
 5. 复核差异、生成漂移、链接、敏感内容和输出。只暂存本次文件，使用 Conventional Commits；正文写任务/需求编号与原因，一个逻辑改动一笔提交，不冒充其他模型或人类署名。
 6. 在 codex-lb 的工作分支提交并通过 GitHub PR 合入 main。核对最新 SHA 的完整 CI，使用 rebase merge、默认不 squash。需要更新基线时先 rebase 再验证，不重写 main 历史。专用 runner、同机资源与套餐限制见[GitHub 工作流](operations/github.md)，不能为让检查变绿放宽可信代码边界或跳过 job。
 
