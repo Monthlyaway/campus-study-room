@@ -5,10 +5,16 @@ COPY modules modules
 COPY services services
 COPY tools tools
 COPY db db
+ENV MAVEN_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"
 RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp -DskipTests package
 
 FROM eclipse-temurin:21.0.12.1_1-jre-noble@sha256:35501d3f93173b420ac9001658eb68157e813316b865087e345c187fca422c4c
 ARG SERVICE=core-service
+ARG RELEASE_ID=development
+ARG RELEASE_COMMIT=working-tree
+LABEL org.opencontainers.image.source="https://github.com/Monthlyaway/campus-study-room" \
+      org.opencontainers.image.revision="${RELEASE_COMMIT}" \
+      org.opencontainers.image.version="${RELEASE_ID}"
 RUN groupadd --gid 10001 studyroom && useradd --uid 10001 --gid studyroom --no-create-home studyroom
 WORKDIR /app
 COPY --from=build /build/services/${SERVICE}/target/*.jar /app/application.jar
