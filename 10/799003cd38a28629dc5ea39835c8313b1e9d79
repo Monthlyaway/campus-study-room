@@ -1,0 +1,45 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "10799003cd38a28629dc5ea39835c8313b1e9d79",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/precommit-final-v5-supplement.json",
+      "additions": {
+        "human": 182
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 55
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "docs/modules/portable-release.md",
+      "new_path": "docs/modules/portable-release.md",
+      "additions": {
+        "human": 45
+      },
+      "deletions": {
+        "human": 8
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 18
+      },
+      "deletions": {
+        "human": 13
+      }
+    }
+  ]
+}
