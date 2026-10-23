@@ -96,7 +96,7 @@ def scheduler_files(environment, state, platform=None):
         raise RuntimeError('Docker CLI must be installed before scheduling backups')
     command = [sys.executable, str(Path(__file__).resolve()), 'run', environment, '--state-dir', str(state)]
     search_path = ':'.join(dict.fromkeys([str(Path(docker).parent), '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin', '/usr/sbin', '/sbin']))
-    if any('\n' in item or '\r' in item for item in command):
+    if any('\n' in item or '\r' in item for item in [*command, str(ops.ROOT)]):
         raise RuntimeError('Scheduler paths cannot contain line breaks')
     log = state / 'backup-scheduler.log'
     if platform == 'darwin':
@@ -107,8 +107,14 @@ def scheduler_files(environment, state, platform=None):
     if platform.startswith('linux'):
         def quoted(value):
             return '"' + value.replace('\\', '\\\\').replace('"', '\\"').replace('%', '%%') + '"'
+        # WorkingDirectory is a scalar path, not a quoted ExecStart/Environment token.
+        # Preserve literal spaces, quotes and backslashes; only specifiers need escaping.
+        working_directory = str(ops.ROOT).replace('%', '%%')
+        if working_directory.endswith((' ', '\t', '\\')):
+            # A final slash protects path characters from trimming or line continuation.
+            working_directory += '/'
         service = '[Unit]\nDescription=Campus Study Room checked daily backup\n[Service]\nType=oneshot\nUMask=0077\n'
-        service += 'WorkingDirectory=' + quoted(str(ops.ROOT)) + '\nEnvironment=' + quoted('PATH=' + search_path) + '\n'
+        service += 'WorkingDirectory=' + working_directory + '\nEnvironment=' + quoted('PATH=' + search_path) + '\n'
         service += 'ExecStart=' + ' '.join(map(quoted, command)) + '\n'
         timer = '[Unit]\nDescription=Campus Study Room daily backup check\n[Timer]\nOnBootSec=2min\nOnUnitActiveSec=1h\n[Install]\nWantedBy=timers.target\n'
         return label, {label + '.service': service.encode(), label + '.timer': timer.encode()}

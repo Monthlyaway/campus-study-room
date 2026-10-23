@@ -1,8 +1,10 @@
 import contextlib
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import plistlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -178,6 +180,41 @@ class BackupScheduleTests(unittest.TestCase):
             self.assertIn(b'"/tmp/studyroom state"', linux[label + '.service'])
             self.assertIn(b'OnUnitActiveSec=1h', linux[label + '.timer'])
             self.assertNotIn('PASSWORD', repr(files) + repr(linux))
+
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Requires the real Linux systemd unit parser')
+    def test_linux_scheduler_units_pass_systemd_parser_with_exact_working_directory(self):
+        analyze = shutil.which('systemd-analyze')
+        self.assertIsNotNone(analyze, 'Linux CI must provide systemd-analyze for scheduler validation')
+        directories = (
+            Path('/home/ubuntu/Deployments/campus-study-room/releases/v0.2.2/source'),
+            Path('/tmp/studyroom space/"quoted"/back\\slash/%h/50%/source'),
+            Path('/tmp/studyroom trailing space '),
+            Path('/tmp/studyroom trailing\\'),
+        )
+        for root in directories:
+            with self.subTest(root=str(root)), tempfile.TemporaryDirectory() as directory:
+                with patch.object(schedule.ops, 'ROOT', root), patch.object(schedule.shutil, 'which', return_value='/usr/local/bin/docker'):
+                    _, files = schedule.scheduler_files('test', Path('/tmp/studyroom state'), 'linux')
+                units = []
+                for name, contents in files.items():
+                    unit = Path(directory) / name
+                    unit.write_bytes(contents)
+                    units.append(str(unit))
+                # verify parses these temporary units; it never installs or starts them.
+                result = subprocess.run([analyze, 'verify', *units], text=True, capture_output=True,
+                                        env={**os.environ, 'LC_ALL': 'C', 'SYSTEMD_LOG_LEVEL': 'debug',
+                                             'SYSTEMD_COLORS': '0'}, timeout=30)
+                output = result.stdout + '\n' + result.stderr
+                self.assertEqual(0, result.returncode, result.stderr[-4000:])
+                parsed = [line.lstrip('\t').removeprefix('WorkingDirectory: ')
+                          for line in output.splitlines() if line.lstrip('\t').startswith('WorkingDirectory: ')]
+                self.assertEqual([str(root)], parsed, 'systemd must preserve the exact working directory')
+
+    def test_scheduler_rejects_working_directory_line_injection(self):
+        for root in (Path('/tmp/source\nType=exec'), Path('/tmp/source\rExecStart=/bin/true')):
+            with self.subTest(root=str(root)), patch.object(schedule.ops, 'ROOT', root), patch.object(schedule.shutil, 'which', return_value='/usr/local/bin/docker'):
+                with self.assertRaisesRegex(RuntimeError, 'line breaks'):
+                    schedule.scheduler_files('test', Path('/tmp/studyroom state'), 'linux')
 
 
 if __name__ == '__main__':
