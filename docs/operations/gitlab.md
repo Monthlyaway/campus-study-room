@@ -1,4 +1,6 @@
-# GitLab 验收、合并与发布
+# GitLab 验收、合并与发布（历史归档）
+
+> 本页保留 2026-10-23 迁移前的 GitLab 配置与验收流程。新开发与发布使用 [GitHub 工作流](github.md)；下文“当前”均指归档时刻，不代表现在应在 GitLab 执行或扩大旧 Runner 授权。
 
 [运维导航](README.md) · [贡献流程](../contributing.md) · [发布包参考](../modules/portable-release.md)
 

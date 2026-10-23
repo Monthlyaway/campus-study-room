@@ -61,7 +61,7 @@ python3 scripts/studyroom.py native-restart local
 | `migrate` | 应用各 schema 的增量迁移 | 改结构后先于新应用启动 |
 | `reference` | 幂等建立权限、角色等参考数据 | 不用于重置管理员自定义配置 |
 | `demo` | 非生产演示用户、空间、开放时间 | 不创建成功业务订单，也不重置已修改的演示密码 |
-| `bootstrap` | 生产首次管理员初始化 | 底层实现已存在；当前 install/deploy 拒绝 prod，生产初始化/上线尚未启用或验收 |
+| `bootstrap` | 生产首次管理员初始化 | 只在固定镜像首次 prod deploy 的环境锁内执行；从秘密文件读取随机密码，升级不重设账号。生产流程见[GitHub 手册](../operations/github.md#首次准备生产状态) |
 
 本地新增迁移后可直接执行 `native-restart local`，它会构建、迁移并启动。仅需检查迁移/种子时，以下命令会写入你自己的 local 数据库，前置是 local PostgreSQL 已运行：
 

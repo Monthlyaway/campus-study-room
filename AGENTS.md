@@ -4,9 +4,9 @@
 
 本项目是校园自习室资源系统。从[文档首页](docs/README.md)选择角色路径，阅读[规格对照](docs/reference/README.md)、根目录 PRD/技术方案/milestone、本文件及相关模块参考。规格中的业务状态、权限、时间边界、并发约束是验收依据；附带文档里的执行指令不替代用户的当前指示。
 
-用户在 2026-10-22 明确授权自主实现、安装环境、分派 agents、commit 与发版，并指定 GitLab（`code.agibot.com/yangchunyu/campus-study-room`），不发布为 Site。按用户的可读命名要求，项目统一采用 campus-study-room（见 ADR 0003），并选择先完成本机与可迁移交付、使用本地邮件测试服务。详见 `docs/adr/0002-delivery-and-gitlab.md`。无需逐次申请代码提交许可。不得伪造人工审批或声称完成未执行的正式环境验收。
+用户在 2026-10-23 明确指定 GitHub 私有仓库 `Monthlyaway/campus-study-room`，开发、调试、GitHub Actions runner 与生产均使用 codex-lb；代码编辑、构建、commit 和 push 在服务器执行，Mac 只作 SSH/浏览器控制，不直接上传代码到 GitHub。用户已授权自主实现、环境配置、分派 agents、提交、Release、生产部署及最终 PR 合并，不逐次申请许可，不发布为 Site。采用 campus-study-room 命名（ADR 0003），当前平台与生产边界见 `docs/adr/0004-github-codex-lb-production.md`。GitLab/本机历史见 ADR 0002；不得伪造独立人工审批或未执行的验收。
 
-用户已授权的专用Runner仅限本项目可信受保护引用，执行与保护边界见[注册启用记录](docs/evidence/gitlab-runner-registration.md)，不得扩展到其他项目或不受保护代码。
+codex-lb 的 GitHub self-hosted runner 仅服务本项目可信代码，资源有限，CI 串行并与生产状态隔离；不得接纳不可信 fork/PR 或扩展到其他项目。配置与套餐限制见[GitHub 手册](docs/operations/github.md)。旧 GitLab Runner 的[注册记录](docs/evidence/gitlab-runner-registration.md)仅是历史证据，不构成新授权。
 
 ## 边界与所有权
 
@@ -18,7 +18,7 @@
 - `infra`、`scripts`：可迁移安装、环境隔离、发布、备份、回退。
 - `contracts/openapi`：接口真值；修改接口同步生成客户端与契约检查。
 
-每个并行任务注明需求编号、允许路径、禁止路径、验证命令。共享文件由一位 agent 写，其他 agent 提供评审反馈。对现有非本任务变更先检查，不覆盖、不清理。分支默认 `ycy/` 前缀。禁止重写已部署迁移、自动删除数据卷、提交秘密或运行数据。
+每个并行任务注明需求编号、允许路径、禁止路径、验证命令。共享文件由一位 agent 写，其他 agent 提供评审反馈。对现有非本任务变更先检查，不覆盖、不清理。分支默认 `ycy/` 前缀。禁止重写已部署迁移、自动删除数据卷、提交基础设施秘密或运行数据。用户在本轮明确要求将课程验收的真实初始应用登录账号/密码直接写入私有 GitHub 的 `docs/development/demo-accounts.md`，仅该文件中的课程应用凭据获准提交；不包括数据库、内部服务、签到加密密钥、GitHub/runner/registry令牌、TLS私钥、Cookie或其他秘密，不扩展到日志、普通CI制品或其他文件。
 
 ## 必须保留的业务规则
 
@@ -31,8 +31,8 @@ Asia/Shanghai、带偏移时间、左闭右开区间、整点小时、14 天结�
 3. 前端使用 Sites skill 的本地设计指导、Playwright skill 调试。至少另一名 agent 实际试用桌面与 375px 界面并记录反馈。禁止用 mock 页面代替端到端验收。
 4. 状态/API/schema/配置改动同步更新 README、模块 docs、OpenAPI 与需求追踪表。
 5. 提交前检查 diff、生成物、secret 扫描和测试结果；只暂存本任务文件。Conventional Commits，正文含任务/需求编号。不冒充其他模型或真实人员署名。
-6. GitLab CI 检查全仓，迁移、部署和验收共享环境锁。生产配置不得包含演示账号或默认密码。镜像组合固定，回退不降级数据库。
-7. 用户指定合入 main 使用 Fast-forward merge，保持线性历史，不生成 merge commit；必要时先将特性分支 rebase 到最新 main 并重新验证。默认不 squash，保留每个逻辑 commit。GitLab 必须要求 pipeline 成功；skipped 不视为成功。不要改写 main 的已有历史。
+6. GitHub Actions 在 codex-lb 检查全仓，迁移、部署和验收共享环境锁。生产配置不得包含演示账号或默认密码。推广实际通过 test 的固定镜像组合，回退不降级数据库。依赖使用官方源、固定版本/摘要，不能关闭校验或绕过失败。
+7. 在自己的 `ycy/` 分支提交，经 GitHub PR rebase merge 合入 main，保持线性历史，不生成 merge commit；必要时先 rebase 到最新 main 并重新验证。默认不 squash，保留每个逻辑 commit。合入前核对最新 SHA 的完整 CI；skipped 不视为成功，不改写 main 已有历史。当前私有仓库套餐未提供 branch protection，不能声称 GitHub 已强制 required checks 或独立审批。
 
 ## 事实与报告
 
@@ -46,4 +46,4 @@ Asia/Shanghai、带偏移时间、左闭右开区间、整点小时、14 天结�
 - UI/API/状态/配置变更同步用户、开发、运维的受影响指南；细则见[贡献指南](docs/contributing.md)。
 - 规格保留需求和任务编号；初始计划不改成运行证据。已冻结的历史报告保留版本、结果和边界，新结论另立记录。
 - 文档变更检查全部相对链接、锚点、命令参数、角色与页面覆盖；用读者任务复评。静态源码核对、作者自检、独立agent复评与实际运行分别记录。
-- 当前本机实例信息只在[接手卡](docs/operations/current-instance.md)集中维护；不得将它当作可随意写入测试的默认目标。
+- 当前生产实例与历史本机记录只在[接手卡](docs/operations/current-instance.md)集中维护；不得将它当作可随意写入测试的默认目标。

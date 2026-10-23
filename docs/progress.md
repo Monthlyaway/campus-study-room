@@ -37,3 +37,15 @@
 - 维护或迁移：读[运维入口](operations/README.md)；安装包不包含业务数据库和秘密，完整数据迁移/在线切换需独立方案。
 
 当前仍需后续条件才能开展的项目是正式主机/TLS/外部邮箱、不同CPU架构安装和可选P1；这些不冒称已通过。
+
+
+## 2026-10-23 — GitHub / codex-lb 生产交付进行中（REQ-ENG-05/07）
+
+用户已指定后续开发、CI 与生产运行均在 codex-lb，使用 GitHub PR rebase merge，默认不 squash。实现位于 `ycy/github-operations`，历史 GitLab 记录保留，现行边界见 ADR 0004。
+
+- codex-lb 专用 GitHub Actions runner 2.338.1 已注册 online，由 systemd 自动启动；Java 21.0.12.1、Node 24.22.1、Docker 29.1.3、Compose 2.40.3 已核实。
+- 私有仓库仅允许 rebase merge；API 与网页都明确当前套餐无法强制私有仓库 branch protection，不能报告已强制。production environment 已建立，无伪造人工审批。
+- 公网 IP `49.51.193.169` 已取得受信任的短期 HTTPS 证书，80/443 外部可达；nginx 与六小时续期检查 timer 已安装。应用尚未部署，当前 502 不算上线成功。
+- 新增 prod 随机管理员 bootstrap、无 demo 门禁、同机内存限制、完整 GitHub CI、GHCR digest/Release 发布和不可变源码部署；针对性单测与 actionlint 已通过。完整 `./scripts/check` 已在 codex-lb 通过：7 组 HTTP / 18 测试、9 组 PostgreSQL / 66 测试、27 项维修通知断言与响应丢失重放；新增及既有运维单测 144 项通过。真实 Actions/镜像/E2E/生产/备份恢复尚待验证。
+
+这是一条实施进度，后续完成证据另附；没有把计划记成生产验收结果。

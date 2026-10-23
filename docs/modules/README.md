@@ -12,7 +12,7 @@
 | [维修模块](repair.md) | 状态机、outbox、core HTTP、重试和租约 | [后端开发](../development/backend.md) |
 | [前端模块](web.md) | 页面权限、请求规则、当前界面实现 | [前端开发](../development/frontend.md) |
 | [请求关联与日志](observability.md) | requestId、JSON 日志、敏感字段边界 | [运行排障](../operations/runbook.md) |
-| [环境与运维](operations.md) | local/dev/test、状态目录、配置、GitLab/Runner | [运维导航](../operations/README.md) |
+| [环境与运维](operations.md) | 环境、状态目录、配置、CI/Runner | [运维导航](../operations/README.md) |
 | [Ubuntu 环境引导](bootstrap.md) | 运行依赖安装、输入清单、验证和边界 | [安装指南](../operations/installation.md) |
 | [离线发布与导入](portable-release.md) | 导出格式、校验、首次导入与迁移 | [安装指南](../operations/installation.md) |
 | [发布、备份与回退](release-operations.md) | 整套发布、兼容门禁、备份调度、失败恢复 | [运维手册](../operations/README.md) |

@@ -124,7 +124,7 @@
 | 技术方案§1/§2.3/§6 契约 | 日常写入已JPA；[56公开+5内部具名schema与真实HTTP](evidence/core/contracts.md)；[关键M1/M2 typed命令及原hash重放][typed] | 保留已有Java Map投影不单独作为业务缺陷；关键输入已类型化，OpenAPI具名schema与实际HTTP检查约束边界。新增接口或变更时同步契约；默认完整check已实际纳入5例契约和6例输入边界，不再列为未执行 |
 | milestone G0～G6 | 对应39项P0在本次交付范围内已闭合，原milestone初始状态保留为规格 | [工作进度](progress.md)的MS0～MS6为DONE、MS7为NOT_STARTED；实际证据按版本记录，不回填人工签字或历史pipeline |
 
-## 最终交付边界
+## 2026-10-23 GitLab / ARM64 归档交付边界
 
 1. **本机V6已验。** S的450源码/五镜像正式导入、浏览器6/6及privacy1/1、V6→V5→V6正式回退与运输包核对通过。242生产/构建输入与R4/V5一致，性能/SQL及恢复保留R4原标签；不扩展重复性能测试，也不假称旧结果为V6实测。
 2. **历史和数据保留。** R4负载100002历史、core合成恢复后100003；午夜签到属于14b→R2且后续INTERRUPTED。V6首次API夹具因旧预约重叠409的证据保留，选择真实空闲时段后通过，未删旧业务或弱化规则。
@@ -165,3 +165,7 @@ P1 `REQ-AGENT-01`未启动，不计入以上39项，也不用于替代P0验收�
 [repair-matrix]: evidence/repair-acceptance.md
 
 [typed]: evidence/core/typed-inputs.md
+
+## GitHub 与 codex-lb 的后续验收
+
+上表 VERIFIED 与原交付边界按原版本保留。2026-10-23 用户新增 GitHub Actions、codex-lb 同机 CI/生产、GHCR/Release 与公网 IP HTTPS 目标，决策见 [ADR 0004](adr/0004-github-codex-lb-production.md)，操作见 [GitHub 手册](operations/github.md)。REQ-ENG-04/05/06/07/08 在新平台的发布、隔离、恢复、TLS 和容量证据须单独记录于[进度](progress.md)与[证据索引](evidence/README.md)；旧 GitLab/ARM64 结论不自动覆盖新平台，外部 SMTP 实际收信仍待条件。

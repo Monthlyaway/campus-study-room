@@ -45,7 +45,7 @@ flowchart LR
 | PostgreSQL / Mailpit | 分别使用 `postgres-data`、`mail-data` 持久卷 | 重建应用不等于删除数据；备份还须安全保存签到密钥，见 [运维手册](../operations/runbook.md) |
 | 环境状态目录 | `STUDYROOM_STATE_DIR` 保存秘密文件、控制标记和发布状态 | 数据卷、状态目录、源码目录用途不同；秘密按需挂载到 `/run/secrets`，不会打进应用镜像 |
 
-当前交付范围是本机及可迁移的 local/dev/test，见 [交付 ADR](../adr/0002-delivery-and-gitlab.md)。图中是现有单主机 HTTP 部署；公网域名/TLS、外部 SMTP 实收、正式服务器、多主机拓扑不能由本机结果推定已验收。离线镜像包含架构信息，ARM64 包不能当作 AMD64 包使用，目标架构的验证应查对应证据。
+当前交付目标为 codex-lb 单主机生产与同机 CI，见 [当前 ADR](../adr/0004-github-codex-lb-production.md)。图中展示应用 Compose 内的 HTTP 链路；生产在其前面增加宿主 HTTPS 入口，将公网 `49.51.193.169:443` 反代到回环 Web，容器内部服务不公开。TLS、AMD64、生产与资源实测分别查看新证据，不能由旧本机结果推定通过。外部 SMTP 尚未提供，多主机拓扑不在本轮范围。离线镜像包含架构信息，ARM64 包不能用于 AMD64。
 
 ## 业务边界落在哪些源码模块？
 
@@ -83,9 +83,9 @@ repair 的房间、人员 ID 是外部引用，不是读取 core 表的许可证
 | 任务可在重启后重新判断，旧邮件租约不能覆盖新结果 | [TaskExecutor](../../services/core-service/src/main/java/com/campus/studyroom/core/TaskExecutor.java)、[Notifications](../../services/core-service/src/main/java/com/campus/studyroom/core/Notifications.java) | [SharedPersistenceTest](../../services/core-service/src/test/java/com/campus/studyroom/core/SharedPersistenceTest.java)、[重启恢复证据](../evidence/core/restart-recovery-v4.md)：具体组合以证据正文为准 |
 | 应用回退保留新 schema，原会话仍可用 | SessionPrincipal、[发布控制器](../../scripts/studyroom.py) | [兼容演练](../../tests/integration/release_compatibility.py)、[发布证据](../evidence/release/README.md)：证明绑定具体镜像、迁移和数据库，不通用于未来发布 |
 
-本地默认完整门禁入口是 [`./scripts/check`](../../scripts/check)；`--unit-only` 的结果不能代表 PostgreSQL、真实 HTTP 或浏览器通过。独立 E2E、故障、兼容和性能检查见 [测试指南](../development/testing.md)。[GitLab CI](../../.gitlab-ci.yml) 的依赖顺序是 `backend + frontend → integration → container-release → package`；单独一个编译作业成功不表示交付门禁通过。
+本地默认完整门禁入口是 [`./scripts/check`](../../scripts/check)；`--unit-only` 的结果不能代表 PostgreSQL、真实 HTTP 或浏览器通过。独立 E2E、故障、兼容和性能检查见 [测试指南](../development/testing.md)。[GitHub Actions](../../.github/workflows/ci.yml) 的 `verify` 串行执行完整检查及三镜像/真实浏览器测试，版本 tag 按 `verify → publish → deploy` 发布并推广同一镜像组合，deploy 是绑定 production environment 的独立可重跑作业；单独一个编译步骤成功不表示交付门禁通过。
 
-OpenAPI 模式检查证明格式与合同相符，不能替代授权、并发和业务组合测试。[历史性能结果](../evidence/performance.md) 保留其原版本、硬件及限制，不能改标成当前版本的新跑成绩。现存请求 DTO 迁移范围等代码限制见 [核心模块参考](../modules/core.md)；P1 与正式生产范围见 [交付 ADR](../adr/0002-delivery-and-gitlab.md)。
+OpenAPI 模式检查证明格式与合同相符，不能替代授权、并发和业务组合测试。[历史性能结果](../evidence/performance.md) 保留其原版本、硬件及限制，不能改标成当前版本的新跑成绩。现存请求 DTO 迁移范围等代码限制见 [核心模块参考](../modules/core.md)；P1 未启动，当前生产/资源/授权边界见 [交付 ADR](../adr/0004-github-codex-lb-production.md)。
 
 ## 接下来读哪一页？
 

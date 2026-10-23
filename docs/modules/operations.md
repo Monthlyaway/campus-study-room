@@ -46,11 +46,11 @@
 | scheduler 文件/日志 | 调度工具 | 路径改变后重新 install；status 是查询，run 可能写备份并清理过期对 |
 | PID/JAR/原生日志 | 原生开发入口 | 不与容器实例身份混用，不凭 PID 数字杀进程 |
 
-`compose.env` 中端口、PUBLIC_BASE_URL、回环绑定及 project 是实例输入；`release.env` 只允许 RELEASE_ID、RELEASE_COMMIT、三应用镜像及 PostgreSQL/Mailpit 镜像键。`MAIL_MODE=smtp`、SMTP_HOST=mailpit、SMTP_PORT=1025 对应当前本地邮件模式。正式 TLS/外部 SMTP 尚未验收，不通过改 `ENV_NAME` 为 prod 启用生产。
+`compose.env` 中端口、PUBLIC_BASE_URL、回环绑定及 project 是实例输入；`release.env` 只允许 RELEASE_ID、RELEASE_COMMIT、三应用镜像及 PostgreSQL/Mailpit 镜像键。`MAIL_MODE=smtp`、SMTP_HOST=mailpit、SMTP_PORT=1025 对应当前本机邮件收件模式，不能证明真实外部投递。prod 要求 HTTPS origin、Secure Cookie 和回环应用绑定，使用已验证 Release 的部署路径；不能只将测试配置的 `ENV_NAME` 改为 prod。具体配置见[生产准备](../operations/github.md#首次准备生产状态)，TLS 实测见[当前实例](../operations/current-instance.md)。
 
 ## 秘密与数据
 
-七类秘密为 postgres/core/repair/migration 数据库密码、内部服务密码、签到加密密钥及演示初始密码。只说明文件名与位置，不在文档输出其值。[演示账号](../development/demo-accounts.md)统一维护账号与角色，不在运维手册复制另一份账号表。
+公共运行秘密为 postgres/core/repair/migration 数据库密码、内部服务密码和签到加密密钥。local/dev/test 另有演示初始密码 `demo_password`；prod 生成首次管理员秘密 `admin_password`，不生成 demo 密码，部署器拒绝生产状态中的 demo 密码和 demo 账号。只说明文件名与位置，不在文档输出其值。[演示账号](../development/demo-accounts.md)统一维护账号与角色，不在运维手册复制另一份账号表。
 
 业务角色不能执行 DDL，迁移由独立 `studyroom_migration` 执行；审计表对业务角色只允许查询和插入。容器入口读取私有挂载后，Java 应用以 UID 10001 运行。具体身份与权限设计见[架构安全](../architecture/security.md)。
 
@@ -66,6 +66,6 @@
 
 ## 验证与交付范围
 
-当前实施状态由[交付进度](../progress.md)统一记录；本机安装/回退/恢复的各版本事实见[发布证据](../evidence/release/README.md)。GitLab 当前五门禁和 Runner/FF 规则见[GitLab 手册](../operations/gitlab.md)。历史诊断不再作为本页的待办状态；后续成功不改写旧流水线失败。
+当前实施状态由[交付进度](../progress.md)统一记录；本机安装/回退/恢复的各版本事实见[发布证据](../evidence/release/README.md)。现行 Actions、runner、PR 合入与 GHCR/Release 见[GitHub 手册](../operations/github.md)，GitLab 规则保留为历史。历史诊断不再作为本页的待办状态；后续成功不改写旧流水线失败。
 
 源码对应 [studyroom.py](../../scripts/studyroom.py)、[init-env](../../scripts/init-env)、[Compose](../../infra/compose/compose.yml)、[备份调度](../../scripts/backup_schedule.py)。静态定义与单测不能代替真实新环境验收。

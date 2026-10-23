@@ -9,7 +9,7 @@
 ./scripts/web dev
 ```
 
-打开 `http://localhost:8000`，用该环境的[演示账号与密码文件](demo-accounts.md)登录。能查询教室、刷新后仍保持登录，才说明前后端链路可用。管理员首页是用户管理，试预约请用学生账号。8000 是开发代理页，源码容器新装默认 18080，[现有发行实例](../operations/current-instance.md)另用 19282；不能混用它们的密码、状态目录或测试结果。原生后端更新需要 `native-restart`，仅重跑 `dev-up` 不替换运行中的 JAR。
+打开 `http://localhost:8000`，用该环境的[演示账号与密码文件](demo-accounts.md)登录。能查询教室、刷新后仍保持登录，才说明前后端链路可用。管理员首页是用户管理，试预约请用学生账号。8000 是开发代理页，源码容器新装默认 18080，[现有服务器实例](../operations/current-instance.md)使用独立生产状态与 HTTPS 入口；不能混用它们的密码、状态目录或测试结果。原生后端更新需要 `native-restart`，仅重跑 `dev-up` 不替换运行中的 JAR。
 
 ## 代码地图与路由
 

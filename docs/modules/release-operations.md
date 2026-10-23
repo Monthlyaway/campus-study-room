@@ -111,4 +111,4 @@ macOS 使用当前用户 LaunchAgent，Linux root 使用系统 timer、普通用
 
 ## GitLab 合并历史
 
-当前五门禁、受保护 Runner 引用、Fast-forward/default no-squash 和发行制品流程统一见[GitLab 手册](../operations/gitlab.md)。历史发布记录保留原提交与 pipeline，后续文档 HEAD 不改变运行版本或旧验收结果。
+历史五门禁、Runner 引用和 v0.1.0 发行流程见[GitLab 归档手册](../operations/gitlab.md)。现行 CI、PR rebase merge、GHCR 与 Release 见[GitHub 手册](../operations/github.md)。历史发布记录保留原提交与 pipeline，后续文档 HEAD 不改变运行版本或旧验收结果。

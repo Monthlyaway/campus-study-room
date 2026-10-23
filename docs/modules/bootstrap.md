@@ -2,7 +2,7 @@
 
 [安装导航](../operations/installation.md) · [运维手册](../operations/runbook.md) · [发布包机制](portable-release.md)
 
-对应技术方案 §11.3、REQ-ENG-03/04/07。入口为 `./scripts/bootstrap <env> <inventory>`，用于准备 Ubuntu 的固定 Docker 运行时、部署账号、状态目录与配置；**它不安装应用**。完成后按本页交接步骤导入完整包。当前支持 local/dev/test 与 Mailpit，prod 在连接服务器、安装组件前拒绝；不依赖 GitLab registry。
+对应技术方案 §11.3、REQ-ENG-03/04/07。入口为 `./scripts/bootstrap <env> <inventory>`，用于准备 Ubuntu 的固定 Docker 运行时、部署账号、状态目录与配置；**它不安装应用**。完成后按本页交接步骤导入完整包。此 Ansible 引导器仍支持 local/dev/test 与 Mailpit，prod 在连接服务器、安装组件前拒绝。codex-lb 已有运行时，生产走 [GitHub/GHCR 发布路径](../operations/github.md)，不通过此旧引导器安装；该工具不依赖 registry。
 
 真实 Ubuntu SSH/systemd/daemon/网络分支尚未验收，AMD64 只核对过包可用性。以下是现有实现的执行路径，不能把文档存在或语法校验通过写成实际服务器安装成功。
 
@@ -14,7 +14,7 @@
 | 受管主机 | Ubuntu 24.04 LTS、Python 3.12、systemd、至少 4 vCPU / 8 GiB；可访问 Ubuntu/Docker 官方软件源 |
 | SSH 身份 | 已获授权账号和免交互 sudo、私钥、从可信渠道核对的完整主机公钥 |
 | 部署输入 | 环境、独立 project、回环端口、部署账号及状态/发布/备份绝对路径 |
-| 应用包 | 与目标 Docker daemon 相同架构的完整包；当前正式包只有 ARM64 |
+| 应用包 | 与目标 Docker daemon 相同架构的完整包；原 v0.1.0 包为 ARM64，不能直接用于 AMD64 |
 
 实现接受 ARM64、AMD64。控制端首次运行在用户缓存创建隔离虚拟环境，安装 `infra/ansible/requirements.txt` 精确版本，不更改系统 Python。机器类型的完整前置条件对照见[安装指南](../operations/installation.md#先检查机器与工具)。
 

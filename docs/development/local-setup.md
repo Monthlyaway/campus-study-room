@@ -1,8 +1,16 @@
-# 在本机开发
+# 在 codex-lb 开发
 
 [开发导航](README.md) · [演示账号](demo-accounts.md) · [测试选择](testing.md)
 
-本页帮助开发者从源码启动可调试的应用。只想使用已安装系统，请读[用户手册](../user-guide/README.md)；只想安装运行包，请读[安装指南](../operations/installation.md)。以下命令都从仓库根目录执行。
+本页帮助开发者从源码启动可调试的应用。只想使用已安装系统，请读[用户手册](../user-guide/README.md)；只想安装运行包，请读[安装指南](../operations/installation.md)。以下代码编辑、构建、测试和 Git 操作都在 codex-lb 的仓库根目录执行；Mac 仅作为连接终端。
+
+```sh
+ssh codex-lb
+cd /home/ubuntu/Codes/campus-study-room
+git status --short --branch
+```
+
+后续使用 `ycy/` 工作分支；提交与 PR 流程见 [GitHub 手册](../operations/github.md)。同机 CI 与生产会占用资源，不要并行启动额外全仓构建；测试必须使用独立状态和端口。
 
 ## 先选运行模式
 
@@ -12,7 +20,7 @@
 | 从源码安装一套容器应用 | `./install.sh local` | `.local/local`；应用 18080，邮件 18025 | 构建并启动完整 Compose 环境 |
 | 导入已有发行包 | [离线导入](../modules/portable-release.md) | 显式指定持久状态目录，端口取自该目录配置 | 导入固定镜像并部署，不下载编译依赖 |
 | 完整本地检查 | `./scripts/check` | `.local/check/<运行编号>`；随机端口 | 创建隔离 PG/邮件/后端，写入本轮测试数据 |
-| 使用这台机器现有交付实例 | [当前实例](../operations/current-instance.md) | `.local/portable-install`；应用 19282，邮件 19227 | 使用既有数据，不能作为随意运行测试的目标 |
+| 使用现有生产实例 | [当前实例](../operations/current-instance.md) | 以接手卡的服务器、版本和状态为准 | 使用既有数据，不能作为写入测试的目标 |
 
 原生开发与容器安装的默认 `local` 指向同一状态目录，不能把它们当成两套隔离环境同时运行。本文假设这是你自己的开发 checkout，端口未被其他实例占用。已有环境先确认归属、配置和运行方式；不要为启动开发进程随意停止别人的服务。
 
@@ -20,7 +28,7 @@
 
 ## 前置条件
 
-- Git 和仓库 SSH 读取权限。
+- Git 和 GitHub 私有仓库读取权限；服务器已有认证时复用，不把令牌放入仓库或 URL。
 - Java 21；仓库的 Maven Wrapper 负责固定 Maven 版本。
 - Node 24，项目基线是 `.node-version` 中的 24.22.1；`scripts/web` 固定使用 pnpm 10.34.7。
 - Python 3.10+、Docker Engine/Desktop、Compose v2。Docker 需已启动。
@@ -36,21 +44,21 @@ docker version
 docker compose version
 ```
 
-Java 需指向 21；可通过你已有的版本管理器设置 `JAVA_HOME`。脚本在 macOS 会识别已有的 Homebrew OpenJDK 21 路径，但这不替代其他机器上的 Java 安装。不要把另一台机器的私有路径或临时下载代理写进项目配置。
+Java 需指向 21；codex-lb 通过系统安装的 Java 与已配置 Node 运行工具。其他服务器可通过版本管理器设置 `JAVA_HOME`。不要把另一台机器的私有路径或临时下载代理写进项目配置。
 
 ## 启动后端和前端
 
 还没有源码时先 clone；已有 checkout 直接进入该目录：
 
 ```sh
-git clone git@code.agibot.com:yangchunyu/campus-study-room.git
+git clone https://github.com/Monthlyaway/campus-study-room.git
 cd campus-study-room
 ./scripts/dev-up local
 ./scripts/web install --frozen-lockfile
 ./scripts/web dev
 ```
 
-`dev-up` 会生成缺失的本地配置和随机秘密，启动 PG/Mailpit，构建 Java 应用，执行迁移、reference/demo 种子，再启动两个 Java 进程。看到 `Backend ready: core localhost:8081, repair localhost:8082` 后，前端命令在当前终端持续运行；浏览器打开 `http://localhost:8000`。
+`dev-up` 会生成缺失的本地配置和随机秘密，启动 PG/Mailpit，构建 Java 应用，执行迁移、reference/demo 种子，再启动两个 Java 进程。看到 `Backend ready: core localhost:8081, repair localhost:8082` 后，前端命令在当前终端持续运行；浏览器通过 SSH 转发访问 `http://localhost:8000`。在控制电脑另开终端执行 `ssh -N -L 8000:127.0.0.1:8000 -L 18025:127.0.0.1:18025 codex-lb`；数据库和内部后端端口不向公网开放。
 
 默认 local 的地址如下。端口已由你修改时，以 `.local/local/compose.env` 为准；不要打印整个配置或秘密目录到公开日志。
 

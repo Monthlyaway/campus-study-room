@@ -6,7 +6,7 @@
 
 ## 先确定操作对象
 
-每次打开新终端，先从该实例的交接记录填写下列值。当前本机值见[接手卡](current-instance.md)。`studyroom_source_dir` 应是与目标发布机制兼容、已验证的源码目录，不是任意旧 checkout。
+每次打开新终端，先从该实例的交接记录填写下列值。当前服务器值见[接手卡](current-instance.md)；先 SSH 到 codex-lb 再操作。`studyroom_source_dir` 应是与目标发布机制兼容、已验证的源码目录，不是任意旧 checkout。
 
 ```sh
 set -eu
@@ -62,7 +62,7 @@ print('commit:', value['commit'])
 PY
 ```
 
-完成技术巡检后打开登录页；需要验证用户操作时使用该环境自己的[演示账号](../development/demo-accounts.md)，不要把测试脚本指向当前交付实例随意写入业务。
+完成技术巡检后打开登录页；local/dev/test 使用该环境自己的[演示账号](../development/demo-accounts.md)，prod 使用正式管理员/用户账号。不要把可写测试脚本指向生产或其他既有交付实例。
 
 ## 查看容器日志与追踪请求
 
@@ -216,7 +216,7 @@ tail -n 100 "$STUDYROOM_STATE_DIR/backup-scheduler.log"
 | 数据库密码错误 | 是否切错状态目录、Compose project 或秘密文件缺失 | 找回对应原秘密；不要初始化替代值、删卷或重建库 |
 | 演示账号密码不对 | 访问地址和状态目录是否对应、账号是否已重置 | 看[账号说明](../development/demo-accounts.md)，不要混用其他环境密码 |
 | Mailpit 没收到预期邮件 | 业务是否已提交、core 日志/邮件任务、Mailpit 状态 | SMTP 是本地收件，不是外部投递；不要修改已提交业务来“重试” |
-| GitLab job pending 或 skipped | 对应提交/五门禁、受保护引用、Runner 标签/可用性 | 走[CI 排障](gitlab.md#流水线失败或等待)，不跳过 container-release |
+| GitHub job queued 或 skipped | 最新提交、可信仓库/actor、runner 在线与串行队列 | 走[CI 排障](github.md#失败时检查什么)，不跳过完整检查和容器/浏览器验证 |
 | 原生后端修改未生效 | JAR 副本、PID 身份、core/repair 日志 | 使用[原生重启](../development/local-setup.md#修改代码后如何生效)，不混用容器发布 |
 
 处理后重复最初失败的检查，记录实际版本、现象及结果。历史演练和新故障分别记录，不用早先通过的证据替代本次验证。

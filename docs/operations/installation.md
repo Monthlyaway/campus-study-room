@@ -2,7 +2,7 @@
 
 [运维导航](README.md) · [当前实例](current-instance.md) · [升级既有实例](runbook.md#升级既有实例)
 
-本页用于建立新的 local/dev/test 环境。已有发布实例直接走升级流程；已有业务数据迁往另一台机器还需要独立的数据迁移与切换方案。离线包只交付程序和运行镜像，`restore` 只恢复到隔离库。
+本页用于建立新的 local/dev/test 环境；codex-lb 的生产安装与当前配置入口见[GitHub 发布](github.md)及[接手卡](current-instance.md)，不得通过 demo 安装路径初始化生产。已有发布实例直接走升级流程；已有业务数据迁往另一台机器还需要独立的数据迁移与切换方案。离线包只交付程序和运行镜像，`restore` 只恢复到隔离库。
 
 ## 先检查机器与工具
 
@@ -14,7 +14,7 @@
 | Ubuntu 引导控制端 | Python 3.12+、venv、OpenSSH、可信 inventory | PyPI，以及目标主机的 Ubuntu/Docker 官方软件源 |
 | Ubuntu 受管主机 | Ubuntu 24.04、Python 3.12、systemd、已授权免交互 sudo、可信 SSH 身份 | 安装固定 Docker 组件；之后再导入应用 |
 
-应用主机建议至少 4 vCPU / 8 GiB，并为五镜像、数据库、备份及保留的历史版本准备磁盘空间。当前正式运输包仅 linux/arm64；另一架构必须另行构建和验收。先运行以下只读工具检查，核对 Docker **daemon** 的平台和所选 context，而不是只看客户端主机：
+原性能基线为 4 vCPU / 8 GiB；用户选择的 codex-lb 是 2 核/约 2 GiB，CI 串行并设置内存预算，具体容量不能沿用原性能结论。为镜像、数据库、备份及历史版本准备磁盘空间。原 v0.1.0 运输包为 linux/arm64；codex-lb 的新发布须选择 linux/amd64 并有独立验收。先运行以下只读工具检查，核对 Docker **daemon** 的平台和所选 context，而不是只看客户端主机：
 
 ```sh
 python3 --version
@@ -64,7 +64,7 @@ export STUDYROOM_STATE_DIR=/absolute/path/to/new-local-state
 适合想从当前 checkout 构建完整容器应用的维护者。首次获取源码：
 
 ```sh
-git clone git@code.agibot.com:yangchunyu/campus-study-room.git
+git clone https://github.com/Monthlyaway/campus-study-room.git
 cd campus-study-room
 ```
 
@@ -174,4 +174,4 @@ PY
 
 把实际环境名、状态/source 路径、project、Docker context、端口、版本和维护者记录在部署方的私有交接记录中。秘密只在状态目录管理；需要长期运行时按[备份调度](runbook.md#安装或检查每日备份调度)启用任务，并另行安排独立存储保护。远程 Ubuntu 默认回环访问，通过[SSH 转发](../modules/bootstrap.md#完成后导入应用)打开 Web/Mailpit。
 
-后续使用[运维手册](runbook.md)，不重新执行首次安装来升级不可变发行版。当前验收未覆盖真实异机/断网安装、AMD64 目标或线上数据库切换；这些应在对应部署条件具备后单独验收。
+后续使用[运维手册](runbook.md)，不重新执行首次安装来升级不可变发行版。本页步骤不能替代实际验收。GitHub/AMD64 与生产结果见[当前进度](../progress.md)；真实断网安装与线上数据库切换需要单独方案和证据，不能由同机导入结果推断。
