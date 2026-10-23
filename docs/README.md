@@ -27,7 +27,7 @@
 | 为什么查询有空位，提交却冲突？维修为何还在同步？ | [数据与一致性](architecture/data-consistency.md) |
 | 应该运行哪种测试，结果保存在哪？ | [测试指南](development/testing.md) |
 | 如何把系统搬到另一台服务器？ | [安装选择](operations/installation.md)和[离线迁移参考](modules/portable-release.md) |
-| 当前这台机器跑的是哪份包？ | [当前本机实例](operations/current-instance.md) |
+| 当前这台机器跑的是哪份包？ | [当前实例](operations/current-instance.md) |
 | 如何评估一次修改、提交或文档变更？ | [贡献与文档维护](contributing.md) |
 
 ## 文档各自负责什么
@@ -49,4 +49,4 @@
 - [真实实施分工](team.md)、[伦理与风险记录](ethics-and-risks.md)、[固定依赖基线](dependency-baseline.json)。
 - [五角色文档评审与整改记录](reviews/documentation-2026-10-23.md)。
 
-本仓库直接维护 Markdown，链接可在 GitLab 和本地编辑器中使用。用户指南不依赖被忽略的 `output/` 目录；历史报告提及的原始日志可能只在本机或保留的 CI artifacts 中存在，应按报告标明的保存位置获取。
+本仓库直接维护 Markdown，链接可在 GitHub 和编辑器中使用。现行开发、CI 与发布见[GitHub 手册](operations/github.md)，GitLab 页面和 Mac 实例仅保留历史记录。用户指南不依赖被忽略的 `output/` 目录；历史报告提及的原始日志可能只在本机或保留的 CI artifacts 中存在，应按报告标明的保存位置获取。

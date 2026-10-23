@@ -1,6 +1,36 @@
-# 当前本机实例接手卡
+# 当前实例接手卡
 
 [运维导航](README.md) · [巡检与排障](runbook.md) · [演示账号](../development/demo-accounts.md)
+
+## codex-lb 部署准备快照
+
+以下为 **2026-10-23 本轮生产部署准备**的已核对状态，不是自动刷新的健康页面。HTTPS 入口已经配置，当前外部 HTTPS 请求返回 **502**，因为生产应用尚未启动；不得把 TLS 成功写成生产上线成功。完整检查仍在远程执行，v0.2.0 是待发布候选，实际发布结果以[进度](../progress.md)与[证据索引](../evidence/README.md)为准。
+
+| 项目 | 已核对事实 / 配置位置 |
+| --- | --- |
+| 主机与公网入口 | codex-lb；`https://49.51.193.169` |
+| HTTP / HTTPS | TCP 80/443 可达；HTTP 308 到 HTTPS；不使用 `-k` 的 TLS 校验成功，应用响应当前为 502 |
+| HTTPS 服务 | 宿主 nginx 系统服务 active；回环 upstream `127.0.0.1:18443` |
+| 证书 | Let’s Encrypt YE2；SAN 为 IP `49.51.193.169` |
+| 首次证书有效期 | `2026-10-23T08:15:52Z` 至 `2026-10-30T00:15:51Z`；真实续期后需重新查询 |
+| Certbot | 5.4.0，ACME 库 5.4.0；`/home/ubuntu/.local/tools/certbot/bin/certbot` |
+| TLS 持久状态 | `/home/ubuntu/.local/state/campus-study-room/tls`；私钥不提交、不上传报告 |
+| 续期任务 | `campus-study-room-certificate.timer` enabled/active，每六小时检查，最多十分钟随机延迟 |
+| 续期演练 | `renew --dry-run --run-deploy-hooks` 实际通过，模拟续期及 nginx reload hook 成功；没有更换生产证书 |
+| GitHub runner | `codex-lb-campus-study-room` online；2.338.1，专用系统服务 enabled/active |
+| Runner 标签 | `self-hosted`、`Linux`、`X64`、`campus-study-room` |
+| 运行工具 | Docker 29.1.3、Compose 2.40.3、GitHub CLI 2.103.0；Node 24.22.1、Java 21.0.12.1 |
+| 开发 checkout | `/home/ubuntu/Codes/campus-study-room`；代码编辑、commit 与 push 均在该服务器 |
+| 生产持久状态 | `/home/ubuntu/.local/state/campus-study-room/prod`；与 CI/浏览器测试状态隔离 |
+| 不可变发布源码 | `/home/ubuntu/Deployments/campus-study-room/releases/<releaseId>/source`；每版单独保留 |
+
+该服务器约 2 核/2 GiB RAM、4 GiB swap；配置预算不代表已通过原 4 核/8 GiB 的性能验收。当前不宣称生产镜像运行、管理员登录、备份/恢复或 CI 与生产共同运行已验。后续部署记录需补齐 tag/commit、三应用 digest、Actions/PR 链接、HTTPS 业务验证、备份/恢复和实际资源观测，保留这次准备快照的范围。
+
+日常证书查询与排障见[GitHub 运维手册](github.md#ip-https-与续期)。公网仅开放应用 HTTP/HTTPS 入口；数据库、内部 API、Mailpit 保持私网/回环，SSH 保持既有规则。
+
+## 历史 Mac 实例（停止作为开发入口）
+
+以下保留原本机交付记录，不能用于当前 codex-lb 的配置、密码或测试目标。后续代码开发和 push 均在服务器执行。
 
 这是截至 **2026-10-23 归档交付**的本机实例记录，不是每次打开文档时自动刷新得到的健康状态。接手时按[巡检步骤](runbook.md#先确定操作对象)确认实际运行情况。下列绝对路径只属于这台机器；新服务器按[安装指南](installation.md)选择自己的路径。
 

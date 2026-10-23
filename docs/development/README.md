@@ -7,7 +7,7 @@
 ## 第一次接手
 
 1. 阅读[架构总览](../architecture/README.md)，认识三个应用、两个共享代码模块和数据库边界。
-2. 按[开发环境](local-setup.md)启动原生后端和前端，核对地址与健康状态。
+2. 按[开发环境](local-setup.md)连接 codex-lb，在服务器启动原生后端和前端，通过 SSH 转发核对地址与健康状态。
 3. 从[演示账号](demo-accounts.md)选对角色，按[用户工作流](../user-guide/workflows.md)理解要开发的业务。
 4. 前端读[前端开发](frontend.md)，后端读[后端开发](backend.md)；调用接口时使用[API 指南](api.md)。
 5. 按[测试选择](testing.md)验证改动，再按[贡献流程](../contributing.md)提交。

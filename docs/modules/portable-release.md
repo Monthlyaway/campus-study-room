@@ -2,7 +2,7 @@
 
 对应 REQ-ENG-03/05/07。第一次安装请走[安装指南](../operations/installation.md#从离线包安装新环境)，维护既有实例请走[升级流程](../operations/runbook.md#升级既有实例)，当前正式包位置与摘要见[接手卡](../operations/current-instance.md#当前可搬运的安装包)。本页面向准备发行包或排查校验失败的维护者。
 
-`scripts/portable_release.py` 把已验证发布清单导出为完整目录；`scripts/import-release` 校验后调用正式部署器。目标需要 Python 3.10+、Docker Engine/Desktop 与 Compose v2，不需要 Git/Java/Node 或编译依赖下载。支持 local/dev/test，prod 拒绝。
+`scripts/portable_release.py` 把已验证发布清单导出为完整目录；`scripts/import-release` 校验后调用正式部署器。目标需要 Python 3.10+、Docker Engine/Desktop 与 Compose v2，不需要 Git/Java/Node 或编译依赖下载。离线导入支持 local/dev/test，仍拒绝直接 prod 导入；生产使用 [GitHub/GHCR 发布路径](../operations/github.md)，该限制不代表生产部署器整体未实现。
 
 ## 发布包内容
 
