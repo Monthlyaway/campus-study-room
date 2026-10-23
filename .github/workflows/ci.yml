@@ -15,5 +15,5 @@ jobs:
       - name: Read package association
         shell: bash
         run: |
-          gh api users/Monthlyaway/packages/container/campus-study-room-core --jq '{keys:keys,name,visibility,repository:{id:.repository.id,name:.repository.name,full_name:.repository.full_name,owner:.repository.owner.login}}'
+          gh api users/Monthlyaway/packages/container/campus-study-room-core --jq '{keys:keys,name,visibility,package_type,owner:{login:.owner.login,id:.owner.id},repository:{id:.repository.id,name:.repository.name,full_name:.repository.full_name,owner:.repository.owner.login}}'
           gh api repos/Monthlyaway/campus-study-room --jq '{id,full_name,private}'
