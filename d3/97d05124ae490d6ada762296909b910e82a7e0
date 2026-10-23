@@ -1,0 +1,87 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "d397d05124ae490d6ada762296909b910e82a7e0",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/gitlab-release-v0.1.0.md",
+      "additions": {
+        "human": 47
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-final-v6.json",
+      "additions": {
+        "human": 839
+      }
+    },
+    {
+      "new_path": "docs/evidence/runtime-audit-final-v6.md",
+      "additions": {
+        "human": 24
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 9
+      }
+    },
+    {
+      "old_path": "docs/evidence/release/README.md",
+      "new_path": "docs/evidence/release/README.md",
+      "additions": {
+        "human": 20
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "docs/modules/operations.md",
+      "new_path": "docs/modules/operations.md",
+      "additions": {
+        "human": 7
+      },
+      "deletions": {
+        "human": 7
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 1
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 26
+      },
+      "deletions": {
+        "human": 23
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 32
+      },
+      "deletions": {
+        "human": 32
+      }
+    }
+  ]
+}
