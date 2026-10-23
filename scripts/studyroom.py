@@ -16,6 +16,7 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = ROOT / "infra/compose/compose.yml"
@@ -101,13 +102,57 @@ def jar(service):
     return jars[0]
 
 
+def production_config(state, values):
+    """Fail closed before starting a production release; TLS terminates at the edge."""
+    url = urllib.parse.urlsplit(values.get("PUBLIC_BASE_URL", ""))
+    if (url.scheme != "https" or not url.hostname or url.username or url.password
+            or url.query or url.fragment or url.path not in ("", "/")):
+        raise RuntimeError("Production PUBLIC_BASE_URL must be an HTTPS origin without credentials, path or query")
+    try:
+        url.port
+    except ValueError as error:
+        raise RuntimeError("Invalid production HTTPS port") from error
+    if values.get("BIND_ADDRESS") != "127.0.0.1" or values.get("COOKIE_SECURE") != "true":
+        raise RuntimeError("Production requires loopback application binding and Secure cookies behind the HTTPS edge")
+    if values.get("MAIL_MODE") != "smtp" or not values.get("SMTP_HOST"):
+        raise RuntimeError("Production requires an explicit SMTP transport")
+    if (state / "secrets/demo_password").exists():
+        raise RuntimeError("Production state must not contain a demo password")
+
+
+def production_bootstrap(state, values):
+    """Validate owner-only bootstrap input without printing or putting passwords in argv."""
+    name, email = values.get("ADMIN_USERNAME", ""), values.get("ADMIN_EMAIL", "")
+    if not re.fullmatch(r"[a-z][a-z0-9._-]{2,63}", name) or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        raise RuntimeError("Set ADMIN_USERNAME and ADMIN_EMAIL for the first production administrator")
+    path = state / "secrets/admin_password"
+    if path.is_symlink() or not path.is_file() or path.stat().st_mode & 0o077:
+        raise RuntimeError("Production admin_password must be an owner-only regular secret file")
+    password = path.read_text().strip()
+    if (not 12 <= len(password) <= 64 or len(password.encode()) > 72
+            or password in {"DemoPassword123!", "ChangeMe123456!", "admin12345678"}):
+        raise RuntimeError("Production administrator password must be unique and contain 12–64 characters / <=72 UTF-8 bytes")
+    return {"ADMIN_USERNAME": name, "ADMIN_EMAIL": email}, path
+
+
 def migrate(environment, native=False, action="migrate", overrides=None):
+    if environment == "prod" and native:
+        raise RuntimeError("Production migrations must use the immutable release container")
     if action == "demo" and environment == "prod":
         raise RuntimeError("Demo seed is forbidden in prod")
     if native:
         run(["java", "-jar", jar("migration"), action], env=native_env(environment, "migration"))
     else:
         extra = []
+        if action == "bootstrap":
+            if environment != "prod":
+                raise RuntimeError("Administrator bootstrap is reserved for production")
+            state, values = config(environment)
+            production_config(state, values)
+            identity, password_path = production_bootstrap(state, values)
+            extra += ["--volume", str(password_path) + ":/run/secrets/admin_password:ro",
+                      "-e", "ADMIN_USERNAME", "-e", "ADMIN_EMAIL"]
+            overrides = {**(overrides or {}), **identity}
         if action == "demo":
             state, _ = config(environment)
             extra += ["-e", "DEMO_PASSWORD"]
@@ -643,7 +688,10 @@ def smoke(environment):
 
 def deploy(environment, path, rollback=False, runtime_images=None):
     if environment == "prod":
-        raise RuntimeError("Production is outside the current local delivery. Configure approved TLS/SMTP/deployment gates before enabling prod.")
+        state, values = config(environment)
+        production_config(state, values)
+        if not (state / "current-release.json").exists() and not rollback:
+            production_bootstrap(state, values)
     manifest = verify_manifest(path, allow_older_schema=rollback)
     if runtime_images and set(runtime_images) != {"POSTGRES_IMAGE", "MAILPIT_IMAGE"}:
         raise RuntimeError("Offline runtime override must contain PostgreSQL and Mailpit")
@@ -697,8 +745,16 @@ def deploy(environment, path, rollback=False, runtime_images=None):
                 attempt.update(phase="migrated", databaseAfter=migrated)
                 write_json(pending, attempt)
                 migrate(environment, action="reference", overrides=overrides)
+                if environment == "prod":
+                    # A copied test database must never silently become production.
+                    count = compose(environment, "exec", "-T", "postgres", "psql", "-v", "ON_ERROR_STOP=1",
+                                    "-U", "studyroom_bootstrap", "-d", "studyroom", "-At", "-c",
+                                    "SELECT count(*) FROM core.app_user WHERE school_no LIKE 'DEMO-%';",
+                                    capture=True).stdout.strip()
+                    if count != "0":
+                        raise RuntimeError("Production database contains demo accounts")
                 if previous is None:
-                    migrate(environment, action="demo", overrides=overrides)
+                    migrate(environment, action="bootstrap" if environment == "prod" else "demo", overrides=overrides)
             attempt["phase"] = "starting"
             write_json(pending, attempt)
             compose(environment, "up", "-d", "--wait", "--wait-timeout", "180", "core", "repair", "web", overrides=overrides)
@@ -790,6 +846,8 @@ def main():
     if command in ("deps", "native-up", "native-stop", "native-restart", "install", "migrate", "seed", "stop"):
         with environment_lock(environment):
             if command == "deps":
+                if environment == "prod":
+                    raise RuntimeError("Production database and SMTP ports must remain private; use deploy")
                 compose(environment, "up", "-d", "--wait", "postgres", "mailpit", native=True)
             elif command == "native-up":
                 native_up(environment)
@@ -804,6 +862,8 @@ def main():
                 from integration_harness import workspace_lock
                 with workspace_lock():
                     action = "migrate" if command == "migrate" else (args[1] if len(args) > 1 else "reference")
+                    if environment == "prod":
+                        raise RuntimeError("Production migration and bootstrap are performed by deploy under the release lock")
                     migrate(environment, native=True, action=action)
             else:
                 compose(environment, "stop")
