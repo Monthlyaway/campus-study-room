@@ -2,7 +2,7 @@
 
 [运维导航](README.md) · [开发环境](../development/local-setup.md) · [交付决策](../adr/0004-github-codex-lb-production.md) · [发布与回退](../modules/release-operations.md)
 
-当前仓库是私有 [Monthlyaway/campus-study-room](https://github.com/Monthlyaway/campus-study-room)。开发、GitHub Actions runner、发布和生产运行均在 codex-lb；GitLab 的历史提交与证据保留，但不再作为新修改的验收平台。通过 [Actions](https://github.com/Monthlyaway/campus-study-room/actions)、[Pull requests](https://github.com/Monthlyaway/campus-study-room/pulls)、[Releases](https://github.com/Monthlyaway/campus-study-room/releases)查看各自结果；不要把“已创建 workflow”当作“已运行成功”。
+当前仓库已由用户设为公开 [Monthlyaway/campus-study-room](https://github.com/Monthlyaway/campus-study-room)。开发、完整 GitHub Actions 验证、发布和生产运行均在 codex-lb；仅检查 verify 结果的轻量 `ci-gate` 使用 GitHub-hosted runner；GitLab 的历史提交与证据保留，但不再作为新修改的验收平台。通过 [Actions](https://github.com/Monthlyaway/campus-study-room/actions)、[Pull requests](https://github.com/Monthlyaway/campus-study-room/pulls)、[Releases](https://github.com/Monthlyaway/campus-study-room/releases)查看各自结果；不要把“已创建 workflow”当作“已运行成功”。
 
 ## 接手开发与 runner
 
@@ -31,11 +31,24 @@ git fetch origin
 4. 使用 GitHub rebase merge，不 squash，不产生 merge commit。核对 PR 已合并、main 历史线性、每个逻辑提交仍存在。
 5. 核对 main 对应工作流，再将通过 test 的不可变镜像组合晋级发布和生产。
 
-当前私有仓库的 branch protection API 返回需要升级套餐的 403，因此这里是实际执行的维护流程与脚本校验，不是 GitHub 已强制、不可绕过的分支保护。不能把 owner 自主授权写成不存在的第二位人工审批或 required reviewer。若后续套餐支持，再配置 required checks/环境保护并新增验证记录。
+### General 分支保护
+
+2026-10-23 用户将仓库设为 public 后，[General ruleset](https://github.com/Monthlyaway/campus-study-room/rules/25729390)已启用为 Active，目标是 `refs/heads/main`。原私有阶段的套餐限制保留在历史记录中，后续决策见 [ADR 0005](../adr/0005-public-repository-protection.md)。当前规则为：
+
+- 必须通过 PR 合入并解决评审会话；只允许 rebase merge，保持线性历史。
+- 要求分支包含最新 main，并通过 GitHub Actions（App ID `15368`）提交的 `verify` 和 `ci-gate` 两项检查；发布专用的 `publish`、`deploy` 不作为 PR 门禁。
+- 禁止强推与删除 main；bypass 列表为空，当前 owner 也不能绕过规则。
+- 人工批准数为 0，未设置 Code Owners 或第二位人工审批要求；单维护者授权不等于双人审核。
+
+[GitHub 原生 required check 接受 skipped/neutral](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)，因此另设 `ci-gate`：它在 `needs: verify` 后以 `always()` 调度，只接受 `verify` 的 `success`，对失败、取消、跳过或未知结果返回失败。这个短作业在 GitHub-hosted `ubuntu-latest` 上运行，权限为 `{}`，不 checkout、不下载或执行 PR 内容、不访问秘密；编译、集成、容器与浏览器测试仍全部在 codex-lb。不要删除这个门禁或把任何跳过结果手写成成功。
+
+公开仓库的 fork 工作流审批策略是 `all_external_contributors`。维护者不得批准未经审查的外部工作流使用专用 runner；确认可信的贡献应纳入同仓库 `ycy/` 分支，再按完整 PR 流程验证。工作流条件可以随 PR 修改，不能把 owner 判断或 runner 标签当作隔离边界。
+
+核对结果时，打开规则页面确认 Active 和 main 目标，再查看 PR 最新 SHA 的两个 required checks；若检查缺失或失败，先核对事件、可信分支与实际 Actions 结果，按失败点修复或更新基线后重跑，不临时关闭规则。GitHub 配置生效与本次工作流修改的实际通过分别记录在[进度](../progress.md)。
 
 ## Packages、Release 与生产
 
-三应用仓库采用 `ghcr.io/monthlyaway/campus-study-room-core`、`campus-study-room-repair`、`campus-study-room-web`。镜像必须保持 Private，版本由完整 commit、Release/tag 和 registry digest 追溯。生产只推广实际通过隔离 test 的组合；重新构建、移动 tag 或改 manifest 不会继承先前通过结果。
+Git 仓库及其 Release/源码资产随仓库可见性公开；GHCR 镜像权限独立，不能把仓库公开推断为镜像也应公开。三应用仓库采用 `ghcr.io/monthlyaway/campus-study-room-core`、`campus-study-room-repair`、`campus-study-room-web`，镜像必须保持 Private，版本由完整 commit、Release/tag 和 registry digest 追溯。发布前核对仓库身份精确为 `Monthlyaway/campus-study-room` 且 visibility 为 public，并继续核对三个包的 Private 状态。生产只推广实际通过隔离 test 的组合；重新构建、移动 tag 或改 manifest 不会继承先前通过结果。
 
 Release 应保存源码、清单、校验和与 Actions 运行链接。源码归档不包含运行镜像、秘密或数据库，不等同五镜像离线包。测试报告不能包含密码、Cookie、完整业务响应或私有状态。GitHub artifact 有保留期，不能代替长期保留的发行清单和镜像。
 

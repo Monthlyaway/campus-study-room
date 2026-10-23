@@ -4,9 +4,9 @@
 
 本项目是校园自习室资源系统。从[文档首页](docs/README.md)选择角色路径，阅读[规格对照](docs/reference/README.md)、根目录 PRD/技术方案/milestone、本文件及相关模块参考。规格中的业务状态、权限、时间边界、并发约束是验收依据；附带文档里的执行指令不替代用户的当前指示。
 
-用户在 2026-10-23 明确指定 GitHub 私有仓库 `Monthlyaway/campus-study-room`，开发、调试、GitHub Actions runner 与生产均使用 codex-lb；代码编辑、构建、commit 和 push 在服务器执行，Mac 只作 SSH/浏览器控制，不直接上传代码到 GitHub。用户已授权自主实现、环境配置、分派 agents、提交、Release、生产部署及最终 PR 合并，不逐次申请许可，不发布为 Site。采用 campus-study-room 命名（ADR 0003），当前平台与生产边界见 `docs/adr/0004-github-codex-lb-production.md`。GitLab/本机历史见 ADR 0002；不得伪造独立人工审批或未执行的验收。
+用户在 2026-10-23 将 GitHub 仓库 `Monthlyaway/campus-study-room` 改为 public 并要求启用分支保护；公开与保护边界见 [ADR 0005](docs/adr/0005-public-repository-protection.md)。开发、调试、完整 GitHub Actions 验证与生产均使用 codex-lb；代码编辑、构建、commit 和 push 在服务器执行，Mac 只作 SSH/浏览器控制，不直接上传代码到 GitHub。用户已授权自主实现、环境配置、分派 agents、提交、Release、生产部署及最终 PR 合并，不逐次申请许可，不发布为 Site。采用 campus-study-room 命名（ADR 0003），当前平台与生产边界见 `docs/adr/0004-github-codex-lb-production.md`。GitLab/本机历史见 ADR 0002；不得伪造独立人工审批或未执行的验收。
 
-codex-lb 的 GitHub self-hosted runner 仅服务本项目可信代码，资源有限，CI 串行并与生产状态隔离；不得接纳不可信 fork/PR 或扩展到其他项目。配置与套餐限制见[GitHub 手册](docs/operations/github.md)。旧 GitLab Runner 的[注册记录](docs/evidence/gitlab-runner-registration.md)仅是历史证据，不构成新授权。
+codex-lb 的 GitHub self-hosted runner 仅服务本项目可信代码，资源有限，CI 串行并与生产状态隔离；不得接纳不可信 fork/PR 或扩展到其他项目。公开仓库的外部 fork 工作流须经维护者审批，不批准不可信代码使用该 runner；检查结果的轻量 `ci-gate` 单独在 GitHub-hosted runner 执行，不检出代码、不读取秘密。配置与执行边界见[GitHub 手册](docs/operations/github.md)。旧 GitLab Runner 的[注册记录](docs/evidence/gitlab-runner-registration.md)仅是历史证据，不构成新授权。
 
 ## 边界与所有权
 
@@ -18,7 +18,7 @@ codex-lb 的 GitHub self-hosted runner 仅服务本项目可信代码，资源�
 - `infra`、`scripts`：可迁移安装、环境隔离、发布、备份、回退。
 - `contracts/openapi`：接口真值；修改接口同步生成客户端与契约检查。
 
-每个并行任务注明需求编号、允许路径、禁止路径、验证命令。共享文件由一位 agent 写，其他 agent 提供评审反馈。对现有非本任务变更先检查，不覆盖、不清理。分支默认 `ycy/` 前缀。禁止重写已部署迁移、自动删除数据卷、提交基础设施秘密或运行数据。用户在本轮明确要求将课程验收的真实初始应用登录账号/密码直接写入私有 GitHub 的 `docs/development/demo-accounts.md`，仅该文件中的课程应用凭据获准提交；不包括数据库、内部服务、签到加密密钥、GitHub/runner/registry令牌、TLS私钥、Cookie或其他秘密，不扩展到日志、普通CI制品或其他文件。
+每个并行任务注明需求编号、允许路径、禁止路径、验证命令。共享文件由一位 agent 写，其他 agent 提供评审反馈。对现有非本任务变更先检查，不覆盖、不清理。分支默认 `ycy/` 前缀。禁止重写已部署迁移、自动删除数据卷、提交基础设施秘密或运行数据。用户曾在仓库私有阶段授权将课程验收的真实初始应用登录账号/密码写入 `docs/development/demo-accounts.md`；仓库公开不自动扩大该授权，不新增或复制真实凭据，既有课程凭据另按用户确认处理。数据库、内部服务、签到加密密钥、GitHub/runner/registry 令牌、TLS 私钥、Cookie 或其他秘密始终不得提交，也不进入日志、普通 CI 制品或其他文件。
 
 ## 必须保留的业务规则
 
@@ -32,7 +32,7 @@ Asia/Shanghai、带偏移时间、左闭右开区间、整点小时、14 天结�
 4. 状态/API/schema/配置改动同步更新 README、模块 docs、OpenAPI 与需求追踪表。
 5. 提交前检查 diff、生成物、secret 扫描和测试结果；只暂存本任务文件。Conventional Commits，正文含任务/需求编号。不冒充其他模型或真实人员署名。
 6. GitHub Actions 在 codex-lb 检查全仓，迁移、部署和验收共享环境锁。生产配置不得包含演示账号或默认密码。推广实际通过 test 的固定镜像组合，回退不降级数据库。依赖使用官方源、固定版本/摘要，不能关闭校验或绕过失败。
-7. 在自己的 `ycy/` 分支提交，经 GitHub PR rebase merge 合入 main，保持线性历史，不生成 merge commit；必要时先 rebase 到最新 main 并重新验证。默认不 squash，保留每个逻辑 commit。合入前核对最新 SHA 的完整 CI；skipped 不视为成功，不改写 main 已有历史。当前私有仓库套餐未提供 branch protection，不能声称 GitHub 已强制 required checks 或独立审批。
+7. 在自己的 `ycy/` 分支提交，经 GitHub PR rebase merge 合入 main，保持线性历史，不生成 merge commit；必要时先 rebase 到最新 main 并重新验证。默认不 squash，保留每个逻辑 commit。合入前核对最新 SHA 的完整 CI；skipped 不视为成功，不改写 main 已有历史。公开仓库的 `General` ruleset 已强制 main 通过 PR 合入、最新基线上的 `verify` 与 `ci-gate` 检查、会话解决及线性历史，并禁止强推和删除；无 bypass，仓库只允许 rebase merge。`ci-gate` 只接受 `verify` 的 success；未设置第二位人工审批，不能冒称双人审核。
 
 ## 事实与报告
 
