@@ -1,113 +1,34 @@
-# 前端模块
+# 前端模块参考
 
-前端位于 `apps/web/`，产品名为「栖学 · 校园自习室」。采用 React 19、Umi 4、TypeScript 5、Ant Design 6；安装版本以 `apps/web/package.json` 和 `pnpm-lock.yaml` 为准。静态产物由统一 Nginx 入口提供，不依赖外网字体或图片，不发布为 Sites。
+[模块索引](README.md) · [前端开发指南](../development/frontend.md) · [用户手册](../user-guide/README.md)
 
-当前本机发布入口为 `http://localhost:19282`，V6 `r-20261023T022529-1079900`、完整源码提交 `10799003cd38a28629dc5ea39835c8313b1e9d79`；Mailpit 为 `http://localhost:19227`。这是正式离线导入后的独立验收实例，默认源码安装 18080 和开发 8000 入口分别管理。[V6 真实浏览器验收](../evidence/frontend-release-final-v6.md)在桌面与 375px 手机上完成六个流程，6/6 通过、耗时 113.061 秒，隐私反证 1/1 通过；历史 R4 性能及恢复证据保留原运行版本。feature 流水线 683506 的五个 job 已全部通过，MR !1 已 Fast-forward 合入 main，同一源码的 annotated tag `v0.1.0` 已推送。main 流水线 683689 与 tag 流水线 683743 均完整五 job PASS，容器内真实浏览器各 6/6，通过时间分别约 1.8 分钟和 1.5 分钟；tag 隐私反证 957.42035ms 通过。[正式 Release](https://code.agibot.com/yangchunyu/campus-study-room/-/releases/v0.1.0)已发布，见[GitLab 发布记录](../evidence/gitlab-release-v0.1.0.md)；提交前限定审计见[报告](../evidence/runtime-audit-final-v6.md)。后续纯文档提交与当前运行源码分别记录。
+`apps/web/` 实现「栖学 · 校园自习室」，采用 React 19、Umi 4、TypeScript 5、Ant Design 6。精确依赖以 [package.json](../../apps/web/package.json) 和 [pnpm-lock.yaml](../../apps/web/pnpm-lock.yaml) 为准；运行时使用 Node 24（项目基线为 24.22.1），根目录 `scripts/web` 固定 pnpm 10.34.7。静态产物由 Nginx 提供，不依赖外网字体或图片。
 
-## 本地开发
+## 所有权
 
-使用 Node 24.22.1 和 pnpm 10.34.7：
-
-```sh
-cd apps/web
-pnpm install --frozen-lockfile
-pnpm dev
-```
-
-默认地址 `http://localhost:8000`，开发代理将 `/api/v1/repairs` 转发到 repair 的 `127.0.0.1:8082`，其余 `/api` 转发到 core 的 `127.0.0.1:8081`。可通过启动命令的 `CORE_PROXY_URL`、`REPAIR_PROXY_URL` 环境变量覆盖。生产构建不烘焙环境 API 地址。
-
-## 页面与权限
-
-| 路由 | 页面 | 行为 |
-| --- | --- | --- |
-| `/login` | 登录 | 用户名/密码、字段错误、CSRF、登录后刷新令牌 |
-| `/seats` | 查找座位 | 上海日期、整点、时长、校区/楼宇/教室、插座、座位网格、预约确认 |
-| `/reservations` | 我的预约 | 状态/日期筛选、详情、签到、取消、历史复用、本人未签到记录 |
-| `/applications` | 教室申请 | 可申请教室、本人申请、待审批/已处理、双级时间线、撤销与冲突提示 |
-| `/repairs` | 设施报修 | 上报、本人/被派/管理列表、派单、开始、完工、验收、评价、原命令重试 |
-| `/notifications` | 通知中心 | 本人已读、授权邮件送达管理、来源/教室/状态筛选、失败与重试 |
-| `/admin/users` | 用户管理 | 创建、编辑、禁用、重置密码、角色和逐角色数据范围绑定 |
-| `/admin/roles` | 角色权限 | 新建角色、组合已注册权限、停用 |
-| `/admin/spaces` | 空间管理 | 校区、楼宇、院系、教室、座位、插座、每周开放区间与只读占用记录 |
-| `/admin/config` | 系统参数 | M1/M2 最长时长，聚合版本检查 |
-| `/admin/statistics` | 使用统计 | 预约/签到指标、日期与教室筛选、无数据签到率 |
-| `/admin/audit` | 审计 | core/repair 分开来源、业务编号查询、只读 |
-| `/display/:roomId` | 教室屏幕 | 专门权限、每分钟刷新、日期与当日编码 |
-
-`access.ts` 只控制界面可见性，不能代替服务端授权。本人历史始终有入口，收尾动作依赖每条记录服务端返回的 `allowedActions`。系统管理员不因为角色名称获得审批能力。
-
-## HTTP 与状态规则
-
-- `services/api.ts` 是唯一传输层，统一同源 Cookie、CSRF、请求编号、幂等键、错误封装和分页。
-- `pnpm generate` 使用官方 `@umijs/openapi` 从 `contracts/openapi/core.yaml`、`repairs.yaml` 生成类型与客户端。`services/generated/` 禁止手动编辑。生成客户端通过统一适配器发送请求，登录/会话直接使用生成函数。
-- 写操作在确认时建立幂等键。网络结果未确认时保留表单与原键，按钮改为「重试原请求」；改变表单内容才换键，超过 24 小时拒绝自动重发。
-- `409` 保留失败提示与请求编号，不显示成功；自动刷新相关查询、禁用旧版本确认，用户返回后重新决定。
-- 登录成功后重新取得 CSRF；会话失效后显示登录页，保留站内所在路径。权限改变刷新用户信息。
-- `BLOCK_PENDING` / `RELEASE_PENDING` 明确显示「同步中」、下次重试计划和服务端返回的人工关注提示。详情每 2 秒刷新，60 秒后停止密集轮询并保留手动刷新；成功重试原同步命令时，即使状态不变，也重新开始一个有界轮询窗口。只有服务端确认状态后显示生效或关闭。
-- 所有预约时间发送带偏移的 RFC3339，界面固定显示中国标准时间；历史复用只带入教室/座位，必须重新选时间和检查可用性。
-- 不展示其他学生姓名、邮箱或占用者身份；通知错误不影响已有业务成功状态。
-
-## 验证入口
-
-```sh
-pnpm generate
-pnpm typecheck
-pnpm test
-pnpm build
-```
-
-`tests/api.test.mjs` 执行真实客户端代码，替换 fetch 传输边界，覆盖 Cookie/CSRF/幂等键、网络不确定结果、同键重试、审批 409、登录令牌刷新和日期查询编码。它不替代真实后端与浏览器验收。
-
-浏览器验收使用 Playwright CLI，结果与截图写入忽略的 `output/playwright/`。375px 手机布局支持预约、签到、报修；管理表格允许内部横向滚动。实际验收结果由本文件和 `docs/evidence/` 记录，不把构建成功等同于业务闭环通过。
-
-## 2026-10-22 浏览器验收与反馈
-
-使用 Sites 的本地设计指导与 Playwright CLI，连接真实 core/repair/PostgreSQL 服务；桌面 1440×1000、手机 375×812。没有 mock 数据替代服务端结果。测试密码只从忽略的本地 secret 文件读取，截图不含密码。
-
-| 实际流程 | 结果与证据 |
+| 入口 | 负责内容 |
 | --- | --- |
-| 学生登录、筛选座位、选座确认、查看本人预约、手机详情内取消 | 通过。10月23日 09–11 时段、研习室02号座位，取消后列表和详情均变为已取消。截图 `output/playwright/seats-desktop.png`、`reservation-mobile.png`。 |
-| 申请人选择教室、填写用途、提交；院系审批；空间最终审批 | 通过。申请编号前缀 A4B69DE2，两级意见和状态显示在时间线；最终通过后测试撤销释放时段。 |
-| 双标签同时打开最终审批；第二标签先提交；第一标签再提交旧版本 | 通过。真实 HTTP 409，显示错误和请求号、旧确认按钮禁用；背景详情刷新为已批准，待办移除。截图 `output/playwright/approval-conflict.png`。 |
-| 管理员创建账号、找到账号、停用 | 通过。`frontend-review` 测试账号已停用。过程中发现后端忽略 `q` 搜索，修复后输入 `FRONTEND-review` 正确返回单行，复验通过。 |
-| 管理员保存角色权限、保存最长时长、查看审计 | 通过。以原值保存验证真实写入，审计中显示本次操作。没有给系统管理员业务审批权限。 |
-| 教室管理员查看座位、保存每周开放时间、查看占用记录 | 通过。开放规则正确回显并以原值保存；M1/M2 测试占用显示已释放。截图 `output/playwright/space-admin-desktop.png`。 |
-| 角色与范围保存 | 首轮发现后端遗漏 SELF，错误完整展示；修复迁移并重启后，申请人的两条 SELF 绑定通过真实浏览器保存成功。 |
-| 页面刷新后会话与路径恢复 | 通过。实际 HMR/整页重载后 Cookie 会话保留，仍在原业务页面。 |
+| [App.tsx](../../apps/web/src/pages/App.tsx) | 单一 Umi 通配入口中的路由分发、导航、角色首页、会话、主题与布局 |
+| [pages](../../apps/web/src/pages) | M1/M2/M3、通知、管理、教室屏，13 个页面路径见开发指南 |
+| [common.tsx](../../apps/web/src/components/business/common.tsx) | 查询/动作 Hook、表单、状态、时间、错误和加载 |
+| [api.ts](../../apps/web/src/services/api.ts) | 同源传输、CSRF、幂等键、请求号、204、解包和生成客户端适配器 |
+| [session.tsx](../../apps/web/src/services/session.tsx) | 当前身份上下文；业务数据使用页面 state 与查询 Hook |
+| [access.ts](../../apps/web/src/access.ts) | UI 权限和中文角色/权限名，不替代后端范围校验 |
+| [global.css](../../apps/web/src/global.css) | 响应式、手机卡片、表格滚动和无障碍样式 |
+| [generate.mjs](../../apps/web/scripts/generate.mjs) | 公共 OpenAPI 客户端生成，内部契约不进浏览器 |
 
-独立代理 `/root/repair_backend` 实际在 375px 上创建报修、查看详情、填写取消原因并取消成功；反馈初版表格裁切状态与操作，改成手机卡片后复验通过，标题、状态、房间、时间和详情按钮完整可见，无横向裁切。独立代理同时在 1440px 桌面检查列表和详情，未见裁切，取消历史完整。
+## 必须保持的行为
 
-实际点击发现统一操作 Modal 被详情 Drawer 遮住，确认按钮无法点击；统一动作及管理弹窗已提高层级，并用预约取消、审批和开放时间保存复验。调整了浅色提示背景、角色/权限中文名称，修复 Ant Design 6 的 Drawer、Timeline、Form 生命周期弃用提示。审批员默认进入待办，管理账号默认进入其授权工作台，不能选座的账号不显示选座按钮。
+- Cookie 同源会话，登录后更新 CSRF；业务写入用幂等键，状态动作带 `expectedVersion`。
+- 结果未确认时保留原 key/body；409 刷新并要求重选；错误提供 requestId。
+- 服务端 `allowedActions` 决定动作，管理员身份不隐含业务权限。
+- 上海时间、整点、左闭右开、14 天结束边界；维修异步同步不能提前显示完成。
+- 桌面和 375px 均可完成关键操作；查询失败、无选项和加载有明确反馈。
 
-尚未把真实浏览器签到、跨日时间推进、邮件投递等归入本轮前端通过项；相应服务端集成测试由后端与交付文档记录。开发服务器存在 Umi MFSU 的 async/await 目标兼容编译警告；生产构建与本地 Docker 静态构建已通过，仍以发布入口的实际预览验收为准。
+完整修改步骤、错误决策表、接口生成与验证矩阵统一维护在[前端开发指南](../development/frontend.md)。页面步骤维护在[用户手册](../user-guide/pages.md)。
 
-本轮前端静态检查：官方客户端重新生成、TypeScript 检查、6 项客户端传输测试、Umi 生产构建均通过。全仓检查由根代理统一执行，避免并行修改 Java 构建目录。
+## 测试与证据
 
+当前测试入口为 [apps/web/tests](../../apps/web/tests) 和 [tests/browser](../../tests/browser/README.md)，E2E 输出 `output/browser/`。全仓检查不自动跑浏览器；正式套件需要隔离、版本一致的打包应用。
 
-只读权限抽查：学生读取用户/角色/系统参数/审计/通知送达管理均返回 403；另一学生读取已有预约和报修详情均返回 404。无业务权限的学生和系统管理员查询审批待办或维修管理视图，结果总数为 0。对本轮 core/repair 运行日志扫描本地实际配置的秘密值，没有命中。通知送达界面以真实数据复验来源筛选，并正确显示服务端 payloadJson.message。
-
-独立代理 `/root/core_backend` 复验学生预约→375px 详情→取消通过；提出终态仍显示签到提示会误导，已将签到指引限制为 RESERVED 状态。
-
-Docker test 发布入口 `http://localhost:18082` 的独立生产静态页检查通过：使用 test 独立随机密码登录、375px 搜索真实可用座位；document/body 宽度均为 375px，无水平溢出。生产控制台无 CSP 拒绝、无脚本异常、无 Umi 开发警告，仅首次未登录 `auth/me` 的预期 401。截图 `output/playwright/docker-mobile-seats.png`。GET `/internal/v1/resource-commands`、`/internal/anything`、`/%69nternal/v1/resource-commands`、`/actuator/jobs`、`/actuator/health` 全部为 404。该检查没有创建新业务，避免与并行容器 HTTP 回归争用同一时段。
-
-真实资源断网下发现「超时后点击重试，文案恢复但轮询未重启」的问题，已修复并通过真实请求计数复验。独立环境身份、初次夹具失败、修复前后证据及同步恢复进展见 [前端同步故障验收](../evidence/frontend-sync.md)。最终发布包仍需按其精确 commit 单独运行完整浏览器套件。
-
-## 2026-10-23 确认按钮可访问名称回归
-
-候选 `14b9813d9f59676cb9b9618e4a3e3dd97406c102` 首次完整浏览器验收为 **5/6 通过**：维修“提交完工”已填写，但精确角色定位器始终没有找到“确认”按钮，点击步骤超时，没有发出该次 `/complete` 请求。原报告保存于 `output/browser-release-final-first/`。后续 M3 定向通过只能说明没有每次触发，不能视作修复证据。
-
-在同版真实预约409流程中，捕获了共用确认弹窗的可访问树与DOM：按钮名称是 `loading 确 认`，遗留的图标处于 `width:0/opacity:0/scale(0)` 离场动画，按钮本身已没有 loading 类。故障报告中的完工按钮视觉正常、输入保留，而点击步骤等不到其精确名称；这一证据支持共用按钮名称受隐藏动画图标影响。没有观测到表单被 `afterClose` 清空，因此未改动该生命周期。原始可访问树保留于 `output/browser-release-final-diagnostic-m1/`。
-
-共用 Modal 的确认按钮显式提供稳定的 `aria-label`（确认/重试原请求），并以 `aria-busy` 独立表示忙碌。409回归恢复精确名称定位，并检查 disabled 与 busy=false；维修快速连续“开始→完工”也检查可访问名称与忙碌状态。失败诊断同时保留点击及响应等待结果，优先报告真实点击失败，避免响应超时掩盖未点击的原因；只输出字段长度与按钮状态，不输出表单值或秘密。TypeScript、6项客户端测试及生产构建通过。新镜像真实浏览器结果在 `tests/browser/REVIEW.md` 中单独按运行版本记录。
-
-R2 `3350d5b4716185eb23379df6d177789a2751d46d` 的真实回归通过了稳定按钮名称、M3完工和验收，但第二次进入报修页立即上报时发现新的加载竞态：教室尚未返回，`create` 把空数组写进弹窗配置；数据返回后已开弹窗仍无选项。原全套结果仍记为5/6，保留于 `output/browser-release-r2-first/`。用真实网络1800ms延迟确定性复现：教室请求200/3条、父页面已显示教室名称，弹窗选项依旧0；证据 `output/browser-room-options-race/`，没有mock或业务写入。
-
-上报按钮现在等待可用教室列表，加载中显示忙碌且不能打开；查询失败在页面提供重试，成功空列表说明没有可报修教室。创建动作也校验就绪条件，避免捕获空选项。M3回归加入实际网络延迟，检查“未返回时disabled/busy→真实200后enabled→选择教室创建→取消”，没有增加固定等待来掩盖问题。发布镜像结果继续按精确版本记录。
-
-R3发布版 `3c7a93cae56e68d2a96adb1e022f4fffc8112c5e` 的完整6流程实际通过（119.255秒，无跳过/重试），涵盖两项界面修复、再次预约、拒绝理由、维修姓名与终态文案、手机加载/错误恢复。真实报告隐私反证及运行秘密扫描均通过。精确运行身份、旧候选失败记录、独立代理反馈，以及14b创建→R2午夜真实签到→维修中断零违约的版本边界见[发布版前端验收](../evidence/frontend-release.md)。
-
-## R4 离线发行版实际复验
-
-R4 `3012051f06c601e6c22a03e50d9d307a3054d1d9` 纳入CI与验收工具修正，业务页面代码和R3相同。正式离线导入19282后独立执行完整六流程，**6/6通过，100.806秒，0 skipped / unexpected / flaky，无重试**；启动时实际核对Web/core/repair三个版本接口一致。桌面1440×1000、手机375×812操作和截图保留，真实409、再次预约、拒绝必填理由、维修姓名/同步/终态，以及1800ms实际网络延迟下的报修入口均通过，没有新增阻塞反馈。
-
-真实Chromium失败报告隐私反证1/1通过；报告与HTML内嵌ZIP扫描7份运行秘密零命中。独立证据 `output/browser-release-v4/` 不覆盖旧R3记录，详见[R4前端验收](../evidence/frontend-release-v4.md)。[离线导入](../evidence/release/v4-portable-import.json)、[兼容演练](../evidence/release/v4-compatibility.json)与[正式回退](../evidence/release/v4-actual-rollback.json)各自记录数据与运行身份；R4[性能](../evidence/performance.md)及[core恢复](../evidence/core/restart-recovery-v4.json)也已独立通过，浏览器结果不替代这些不同层次的验收。
+历史 [V6 六流程](../evidence/frontend-release-final-v6.md)、[V5](../evidence/frontend-release-final-v5.md)、[R4](../evidence/frontend-release-v4.md)、[早期交互修复](../evidence/frontend-release.md)与[独立试用记录](../../tests/browser/REVIEW.md)保留原版本和范围。早期 CLI 产物不是当前套件默认输出，也不代表本轮重跑。交付状态看[进度](../progress.md)，运行环境看[接手卡](../operations/current-instance.md)。

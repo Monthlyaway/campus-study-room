@@ -1,78 +1,66 @@
-# 维修与验收模块
+# 维修与验收
 
-`repair-service` 是独立 Spring Boot 进程，使用 `repair` schema 保存工单，使用 `session` schema 读取共享登录会话。账号权限、房间引用、维修人员候选、资源封禁与邮件通知均通过 core 的真实 HTTP 接口取得；维修服务的数据库角色没有 core schema 访问权。
+这页用于修改 M3 状态、派单、验收、期限和跨服务同步。首次开发先读[后端指南](../development/backend.md)；业务人员操作见[用户手册](../user-guide/README.md)。覆盖 REQ-M3-01 至 M3-08、REQ-X-03/X-04，以及相关权限、通知和审计。
 
-本模块覆盖 REQ-M3-01 至 REQ-M3-08、REQ-X-03，以及 M3 的权限、通知、审计和可靠任务部分。完整契约为 `contracts/openapi/repairs.yaml`；控制器及业务实现位于 `services/repair-service/src/main/java/com/campus/studyroom/repair/`。
+## 服务边界与代码
 
-## 操作流程
+repair 是独立 Spring Boot 进程，使用 `repair` 保存业务、`session` 读取共享会话；运行账号没有 core schema 访问权。当前授权、房间引用、维修员候选、封禁/释放和通知都由 core 的真实 HTTP 接口提供。
 
-1. 学生在有准入权限的教室上报标题和故障说明，工单进入 `SUBMITTED`。本人只能取消尚未派发的工单。
-2. 调度员在自己的教室管理范围选择启用的维修员。`ASSIGNED` 可以重新派单，第一次派单确定的 48 小时完工期限不延长。
-3. 被指派维修员开始维修后返回 `202 BLOCK_PENDING`。资源命令先与工单一起落库；后台通过 HTTP 请求 core 封禁房间。只有收到 `ACTIVE` 确认才进入 `IN_REPAIR`。
-4. 维修员提交完工说明，进入 `AWAITING_ACCEPTANCE`，封禁保持。报修人或有范围的物业管理员验收；实际维修人不能验收自己的工作。拒绝需说明原因，回到 `IN_REPAIR`，沿用原封禁和首次完工期限。
-5. 验收通过返回 `202 RELEASE_PENDING`。只有收到 core 的 `RELEASED` 确认才 `CLOSED`；其他工单的封禁保持。报修人可提交一次 1–5 整数评分。
-
-派单同时保存 `assignedToName` 姓名快照：取自当前已授权的维修候选查询，不再发起用户资料查询。列表和详情直接读取快照；人员后来改名不修改历史快照，重新派单会更新。扩展迁移 `V20261022160000` 增加可空列，旧工单保持空值并由前端回退显示编号。
-
-本人历史、取消、验收和评价遵守账号启用后的收尾权限例外；撤销创建角色不会隐藏已承诺业务的收尾操作。接口返回 `allowedActions`，前端据此显示按钮，服务端仍独立验证权限、状态、版本和归属。
-
-## 一致性与恢复
-
-`repair_order` 使用 JPA `@Version` 和行锁。每个写请求要求 UUID `Idempotency-Key`；状态动作要求 `expectedVersion`。成功响应与业务在同一事务保存，同键同内容重试返回原响应；同键不同内容为 `409 IDEMPOTENCY_KEY_REUSED`，失败事务不留下成功占位。
-
-开始和解除分别固定 `sourceVersion=1/2`，资源版本与 JPA 版本无关。`outbox_command` 持久化完整 payload、SHA-256、commandId 和原 requestId，重试不改内容或编号。领取任务用短事务与 120 秒租约；连接超时 3 秒、响应超时 10 秒；HTTP 在事务外执行。确认阶段按工单 → outbox 锁序，避免与手动重试互锁。
-
-每 30 秒扫描待发送或租约过期的命令；前七次按指数退避，第八次起每 300 秒持续重试并输出结构化错误事件。`GET /repairs/{id}` 的 `sync` 给出是否待同步、尝试次数、最近尝试时间、下次尝试和通用错误码。物业管理员的 `retry-sync` 只调整原命令，不创建新 commandId，不抢占仍有效的租约。HTTP 200 但来源状态不匹配时记 `SYNC_STATE_CONFLICT`，不推进工单。
-
-期限任务分别持久化上报 +24h、首次派单 +48h、每轮完工 +48h。超时只产生通知，不改变状态或释放资源。任务行锁与唯一 dedup key 保证并发扫描不重复通知。验收后返修仍沿用首次完工期限；每轮验收超时独立去重。
-
-`repair_history`、`repair_acceptance`、`repair_rating`、`audit_event` 保留操作证据。数据库运行角色仅能 INSERT/SELECT 审计表。日志只记录 UUID、事件类型与错误码，不打印密码、会话、服务凭证或完整邮件内容。
-
-## 运行配置
-
-本地使用 `./scripts/dev-up` 统一初始化。服务默认监听 8082；对外通过 Nginx 的 `/api/v1/repairs` 同源代理访问。
-
-| 变量 | 用途 |
+| 实现 | 职责 |
 | --- | --- |
-| `DB_URL`、`DB_USERNAME`、`DB_PASSWORD` | 独立维修角色与 PostgreSQL 连接；兼容 `REPAIR_DB_*` 显式覆盖 |
-| `CORE_INTERNAL_URL` | core 私有 HTTP 地址 |
-| `INTERNAL_USERNAME`、`INTERNAL_PASSWORD` 或 `INTERNAL_PASSWORD_FILE` | 维修服务 Basic 身份；secret 注入 |
-| `COOKIE_SECURE` | 生产必须为 true，本机 HTTP 可为 false |
-| `CONTROL_DIR` | 发布控制目录；存在 `jobs-paused` 文件时停止新任务领取 |
-| `JOBS_PAUSED` | 启动时暂停任务的开关 |
-| `RELEASE_ID`、`GIT_COMMIT` | 版本响应 |
+| [RepairController](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairController.java) / [RepairDtos](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairDtos.java) | 公开入口与输入/响应；契约见 [repairs.yaml](../../contracts/openapi/repairs.yaml) |
+| [RepairService](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java) / [RepairPolicy](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairPolicy.java) | 状态转换、版本、幂等与业务事务 |
+| [RepairAccess](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairAccess.java) / [CoreClient](../../services/repair-service/src/main/java/com/campus/studyroom/repair/CoreClient.java) | 动态授权和内部 HTTP |
+| [RepairWorker](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java) / [OutboxCommand](../../services/repair-service/src/main/java/com/campus/studyroom/repair/OutboxCommand.java) | 持久命令、租约、重试、确认与期限扫描 |
+| [RepairOrder](../../services/repair-service/src/main/java/com/campus/studyroom/repair/RepairOrder.java) / [迁移](../../db/migration/repair) | JPA `@Version`、工单与历史数据 |
 
-私有 `GET /actuator/jobs` 返回 `{paused,active,activeRequests}`。发布器先创建暂停文件，再等待后台扫描和业务请求都归零；扫描计数覆盖暂停检查与整个扫描，避免领取前的计数空档。Nginx 必须拒绝公网 `/actuator/*`。共享会话 cookie 为 `STUDYROOMSESSION`；`/api/v1/repairs/version` 可查询维修服务实际版本。
+## 状态与职责分离
 
-## 验证入口
+| 动作与操作者 | 成功后的状态 | 必须保留的规则 |
+| --- | --- | --- |
+| 有准入权限的用户报修 | SUBMITTED | 本人仅能取消未派发工单 |
+| 范围内调度员派给启用维修员 | ASSIGNED | 可以重新派单，第一次派单的 48 小时完工期限不延长 |
+| 被指派维修员开始维修 | BLOCK_PENDING，HTTP 202 | 持久化 BLOCK 后异步请求 core；确认 ACTIVE 才进入 IN_REPAIR |
+| 维修员提交完工说明 | AWAITING_ACCEPTANCE | 封禁继续保持 |
+| 报修人或范围内物业管理员拒绝验收 | IN_REPAIR | 必须写原因，沿用原封禁和首次完工期限 |
+| 独立验收人通过 | RELEASE_PENDING，HTTP 202 | 实际维修人不能验收自己的工作；确认 RELEASED 才 CLOSED |
+| 报修人对已关闭工单评价 | CLOSED | 一次 1–5 整数评分 |
 
-```sh
-./mvnw -B -ntp -pl services/repair-service -am test
-python3 tests/integration/run_repair_persistence.py
-STUDYROOM_TEST_PASSWORD='<本地演示密码>' python3 tests/integration/repair_http.py
-python3 tests/integration/run_repair_faults.py
-```
+账号启用后，本人历史、取消、验收、评价保留相应收尾例外；撤销创建角色不应隐藏已承诺业务。`allowedActions` 帮助 UI 展示，服务端仍校验身份、范围、状态、版本、归属和职责分离。
 
-密码应从忽略目录或 secret 注入，上例为参数说明，不能把真实值写进 Git。API 测试可通过 `STUDYROOM_CORE_URL`、`STUDYROOM_REPAIR_URL` 或统一 `STUDYROOM_BASE_URL` 指定地址。持久化测试使用独立 `studyroom_repair_integration` 数据库，不向本地演示业务库写测试工单；需要已启动的本地 PostgreSQL 和已构建的迁移程序。
+派单把候选查询授权结果中的姓名保存为 `assignedToName` 快照，列表/详情不再逐个查询用户。之后改名不改变历史，重新派单更新快照。[扩展迁移](../../db/migration/repair/V20261022160000__assigned_worker_name_snapshot.sql)使用可空列，旧工单由界面回退显示编号，保持旧版兼容。
 
-单元测试检查收尾权限、取消状态、验收职责分离、评分边界、版本与重试策略。PostgreSQL 测试检查期限去重、8 线程并发扫描、返修期限和事务失败不泄漏 outbox。真实 HTTP 套件串联两个服务与数据库，检查 CSRF、对象不可枚举、幂等、完整维修/驳回/验收/评价、两个来源封禁叠加、维修取消预约和历史不复活。
+## 异步资源同步
 
-故障注入脚本仅用于本机原生开发进程：它暂时重启本 checkout 的 repair，让透明代理在 core 提交首个 BLOCK 后丢弃响应；验证原 commandId、requestId 和完整 payload 不变的重试，再恢复正常进程。HTTP 测试为每次运行建立独立学生和房间，避免与并行浏览器验收共享预约。实际结果见 [维修验收证据](../evidence/repair-validation-2026-10-22.md)，不以仅编译成功代表跨模块验收。
+工单与 outbox 同事务保存，之后由 worker 在数据库事务外调用 core。每个公开写请求要求 UUID 幂等键，状态命令要求整数 `expectedVersion`；同 key/内容重放原成功结果，不同内容 409，失败不留下成功占位。
 
-## 负面矩阵与真实邮件补充
+BLOCK/RELEASE 固定 `sourceVersion=1/2`，与工单 JPA 版本不同。outbox 保存完整 payload、SHA-256、commandId 和原 requestId，重试必须全部保持。领取用短事务和 120 秒租约；HTTP 连接超时 3 秒、请求超时 10 秒；确认阶段按工单 → outbox 锁序。每 30 秒扫描待发或过期租约，前七次指数退避，第八次起持续每 300 秒重试。HTTP 200 但来源状态不符，记录 `SYNC_STATE_CONFLICT`，不推进工单。
 
-2026-10-22新增5组真实公共API负面矩阵，覆盖范围、停用人员、重新派单原期限、自报自修禁止自验、文本/评分类型、封禁期取消及通知归属，全部通过。三期限另在独立repair数据库与可控Clock下通过真实core HTTP验证：截止边界、重复投递、9个角色收件对象、同步中禁止取消和正常业务清理。D-06使用真实SMTP421拒收与Mailpit验证8次失败后的持续重试、原记录人工重试、已读独立及M1三类实际邮件，未使用capture模式。
+详情 `sync` 给出待同步状态、尝试次数、最近/下次尝试和通用错误码。物业管理员的 `retry-sync` 只调整原命令，不创建新身份，不抢占仍有效的租约。释放只针对本工单来源；不能直接改 core 表、换来源补单或把 pending 强制改成已完成。
 
-```sh
-python3 tests/integration/run_repair_acceptance.py
-python3 tests/integration/run_repair_deadlines.py
-python3 tests/integration/run_smtp_acceptance.py
-```
+整个 core 不可用时，repair 无法确认授权，返回 503 并保持原工单。只有已经确认授权、后续资源命令暂不可达，才可能进入同步中。这个区别是安全与最终一致性的边界。
 
-运行环境、精确断言与剩余部署边界见[补充证据](../evidence/repair-acceptance.md)。CI显式启用两个隔离数据库suite，并将公共HTTP套件连接到真实Mailpit；任何套件零测试或跳过都会失败。CI执行结果以真实流水线为准，本机通过不等同GitLab已通过。
+## 期限、审计和运行
 
-姓名快照的真实HTTP与既有数据升级证据见[姓名展示回归](../evidence/repair-assignment-name.md)，新测试 `repair_assignment_name_http.py` 由CI公共API套件自动收集。
+持久期限分别为上报 +24 小时、首次派单 +48 小时、每轮完工 +48 小时。超时仅通知，不自动改变状态或释放资源。任务锁与 dedup key 避免重复；返修沿用首次完工期限，每轮验收超时独立去重。`repair_history`、`repair_acceptance`、`repair_rating`、`audit_event` 保留操作证据，运行角色对审计仅 INSERT/SELECT。
 
-## 隔离网络故障验收
+原生默认 8082，公开代理同源转发 `/api/v1/repairs`；会话 Cookie 为 `STUDYROOMSESSION`。本地初始化使用[统一启动](../development/local-setup.md)。配置来自 [application.yml](../../services/repair-service/src/main/resources/application.yml)：
 
-`tests/integration/run_fault_matrix.py` 只使用独立18180–18183端口、独立数据库与稳定运行包副本，提供资源写入断网、恢复、全core授权中断、双侧审计关联与日志敏感值扫描。复现步骤、实际证据与运行包边界见[故障矩阵](../evidence/repair-fault-matrix.md)。资源命令单独不可达时允许已获授权的动作进入同步中；整个core不可达时权限不能确认，返回503并保持原工单，不能跳过授权。
+| 配置 | 含义 |
+| --- | --- |
+| `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | 维修运行角色连接；可由 `REPAIR_DB_URL` / `REPAIR_DB_USER` / `REPAIR_DB_PASSWORD` 覆盖 |
+| `CORE_INTERNAL_URL` | 私有 core HTTP 地址 |
+| `INTERNAL_USERNAME` 与 `INTERNAL_PASSWORD` 或 `INTERNAL_PASSWORD_FILE` | 服务 Basic 身份，值只从 secret 注入 |
+| `COOKIE_SECURE` | 生产 true；本机 HTTP 可 false |
+| `CONTROL_DIR` / `JOBS_PAUSED` | 发布暂停控制；目录内 `jobs-paused` 停止领取新任务 |
+| `RELEASE_ID` / `GIT_COMMIT` | `/api/v1/repairs/version` 的运行身份 |
+
+私有 `/actuator/jobs` 暴露 paused、active、activeRequests，发布等待后台和请求排空；不能公开代理该接口。排空/恢复由[运维手册](../operations/runbook.md)控制。
+
+## 验证与故障定位
+
+按[测试矩阵](../development/testing.md)准备环境和选择入口：RepairPolicy 单元检查状态与职责分离；RepairPersistence 用真实 PG 检查期限、8 线程扫描和事务失败不泄漏 outbox；repair_http 串联双服务检验完整生命周期、多来源叠加、隐私与历史不复活；RepairDeadlineHttp 核对真实通知收件范围；故障测试检验提交后响应丢失仍保留同一命令。
+
+同步长时间不结束，先取详情的 `sync`、响应 requestId 和运行版本，按[日志排障](observability.md)检查 core 可达性与相关 commandId。不得用“重新建一张工单”掩盖原命令状态。独立故障测试和会重启本机 repair 的脚本有不同副作用，执行前必须看测试矩阵。
+
+历史覆盖见[维修验收](../evidence/repair-validation-2026-10-22.md)、[期限与 SMTP](../evidence/repair-acceptance.md)、[姓名升级](../evidence/repair-assignment-name.md)、[网络故障](../evidence/repair-fault-matrix.md)。当前交付身份统一看[交付台账](../evidence/delivery-ledger-2026-10-23.md)，本页不把旧测试数当作当前执行结果。
