@@ -1,0 +1,39 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "af51f7f6e35417eb3d4ce541960486a1380eb8f7",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/evidence/frontend-release-final-v6.md",
+      "additions": {
+        "human": 38
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v6-archive-verification.json",
+      "additions": {
+        "human": 86
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v6-portable-import.json",
+      "additions": {
+        "human": 194
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v6-production-equivalence.json",
+      "additions": {
+        "human": 70
+      }
+    },
+    {
+      "new_path": "docs/evidence/release/final-v6-v5-rollback.json",
+      "additions": {
+        "human": 390
+      }
+    }
+  ]
+}
