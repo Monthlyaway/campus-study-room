@@ -175,9 +175,9 @@ P1 `REQ-AGENT-01`未启动，不计入以上39项，也不用于替代P0验收�
 | 新平台范围 | 已执行证据 | 限制与后续检查 |
 | --- | --- | --- |
 | REQ-ENG-04：环境隔离 | codex-lb 独立 CI 状态、三镜像 test 验证及正式 prod 部署通过，生产持久状态与候选测试分离；部署后 12 次采样的四入口与 5 个容器正常 | 采样窗口无 PR CI 负载，不代表完整共同运行或性能验收 |
-| REQ-ENG-05：GitHub CI | PR #1 / #2 / #3 完整 verify 通过并 rebase merge；PR #3 的 164 ops、真实 PostgreSQL/HTTP、期限邮件/重放及 6 项浏览器验证包含弹窗修复；v0.2.2 正式 verify/publish/deploy 全部成功 | 当前套餐不强制 branch protection，维护流程核对结果不冒充服务端强制门禁；本次新提交按贡献指南由对应 PR Checks 验证 |
+| REQ-ENG-05：GitHub CI | PR #1 / #2 / #3 完整 verify 通过并 rebase merge；PR #3 的 164 ops、真实 PostgreSQL/HTTP、期限邮件/重放及 6 项浏览器验证包含弹窗修复；v0.2.2 正式 verify/publish/deploy 全部成功；仓库公开后 General ruleset 已 active，main 强制 PR、最新基线上的 verify/ci-gate、线性历史且无 bypass | 分支保护设置已由 API 读回；轻量 ci-gate 工作流新增及本次文档的实际完整结论以对应 PR 最新 SHA Checks 为准，未要求第二位人工批准 |
 | REQ-ENG-06：固定版本与推广 | v0.2.2 稳定 Release、6 个资产 digest、3 个已测试 image ID 核对一致，同一 run/attempt 的固定组合正式推广成功 | 新主机生产回退未在本次执行；旧 v0.2.0 部分上传与 v0.2.1 失败独立保留 |
 | REQ-ENG-07：服务器安装与维护 | Linux AMD64 正式部署、HTTPS 版本与课程登录通过；宿主 unit 修正后实际 systemd 备份、正式隔离恢复及 42 表全部 COPY 行比较通过；生成器修复两轮 11 项定向测试与独立复核通过 | 生成器修复的完整结论按贡献指南由对应 PR Checks 确认，旧 v0.2.2 包不重复 install；本次恢复未切换在线库，不扩展到后续恢复点或异机切换 |
 | REQ-ENG-08：安全与隐私 | 公网 IP 证书、外部 TLS 校验、续期 dry-run、CI 报告隐私及 11 个课程账号的真实 HTTPS 登录通过；独立学生/管理员 × 桌面/375px 只读试用、会话属性及双向路由权限通过 | 外部 SMTP 实际收信仍待配置，未在生产重跑写入 E2E |
 
-生产应用与课程登录已有实际结果；备份调度首次失败、宿主修正与恢复成功按各自事实保留，独立UI与12次部署后采样已有证据；后续CI负载不在该窗口内，生成器修复的新提交以PR Checks为准，不由 deploy 成功推断全部完成。课程初始应用凭据按用户授权只在私有仓库的[演示账号](development/demo-accounts.md)维护，基础设施秘密不写入源码或报告。2 核/2 GiB 的串行 CI 成功不代表同机生产容量或原规格性能已验收；后续新证据由[进度](progress.md)和[证据索引](evidence/README.md)串联。
+生产应用与课程登录已有实际结果；备份调度首次失败、宿主修正与恢复成功按各自事实保留，独立UI与12次部署后采样已有证据；后续CI负载不在该窗口内，生成器修复的新提交以PR Checks为准，不由 deploy 成功推断全部完成。课程初始应用凭据曾按用户在私有阶段的授权集中于[演示账号](development/demo-accounts.md)；公开仓库不自动扩大凭据授权，既有账号另按用户确认处理，基础设施秘密不写入源码或报告。2 核/2 GiB 的串行 CI 成功不代表同机生产容量或原规格性能已验收；后续新证据由[进度](progress.md)和[证据索引](evidence/README.md)串联。

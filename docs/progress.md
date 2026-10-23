@@ -2,7 +2,9 @@
 
 [文档首页](README.md) · [39项P0追踪](requirements-traceability.md) · [验收证据](evidence/README.md)
 
-当前最新状态：v0.2.2 正式发布并部署，11 个课程账号、独立桌面/375px 只读 UI、实际备份/隔离恢复的 42 表内容核对通过。部署后 12 次资源采样正常，窗口未覆盖 PR CI 负载；备份生成器修复及本轮文档交由 PR Actions 验证。实际结果与首次 unit 安装失败见[发布记录](evidence/github-production-v0.2.2.md)。
+当前最新状态：仓库已公开，main 的 General 分支保护已启用；本次 `ci-gate` 与文档修改仍须通过对应 PR Actions，不提前记为通过。详见本页末尾与 [ADR 0005](adr/0005-public-repository-protection.md)。
+
+生产交付快照：v0.2.2 正式发布并部署，11 个课程账号、独立桌面/375px 只读 UI、实际备份/隔离恢复的 42 表内容核对通过。部署后 12 次资源采样正常，窗口未覆盖 PR CI 负载；备份生成器修复及本轮文档交由 PR Actions 验证。实际结果与首次 unit 安装失败见[发布记录](evidence/github-production-v0.2.2.md)。
 
 更新时间：2026-10-23。下方 v0.1.0 与 MS0～MS6 表格记录原本机 / ARM64 可迁移交付：P0 的39项需求已验证，v0.1.0已发布，边界见[ADR 0002](adr/0002-delivery-and-gitlab.md)。后续 GitHub / codex-lb / Linux AMD64 的实际进度见本页末尾；不能把历史结果当作新生产环境验收。P1尚未启动。
 
@@ -84,3 +86,9 @@ v0.2.1 浏览器失败已在独立测试环境复现：桌面点击位置在缩�
 另一名 agent 在生产对学生/管理员 × 1440px/375px 的四个独立上下文完成只读试用：登录、刷新、查询、导航、双向路由权限及 Secure/HttpOnly/SameSite=Lax 均通过；手机管理员表格可内部横向滚动到右侧操作列。没有业务写入、JavaScript 或 5xx 错误，浏览器均已关闭。
 
 13:14:20.899763Z–13:19:50.924237Z 的 12 次资源采样中，四公开端点均 200/TLS0、三版本一致，5 个生产容器 healthy、重启和 OOM 为 0。该窗口未覆盖 PR CI，不扩展为同机完整 CI 容量结论。完整绑定、失败与修复、验证范围及私有证据位置见 [v0.2.2 发布记录](evidence/github-production-v0.2.2.md)。本次生成器修复和交付文档按[贡献指南](contributing.md)的 PR 流程验证，完整结论以对应 PR 的 Checks 为准，不在开发目录重复整套门禁。
+
+## 2026-10-23 — 公开仓库与 General 分支保护（REQ-ENG-05/07）
+
+用户将仓库改为 public 并要求启用分支保护。GitHub API 已返回 [General ruleset 25729390](https://github.com/Monthlyaway/campus-study-room/rules/25729390) 为 active，目标 main，无 bypass（当前 owner 为 never）：PR 合入、会话解决、线性历史、仅 rebase、禁止强推/删除，以及来自 GitHub Actions App 15368 的 `verify` 与 `ci-gate`，required checks 使用最新基线策略。人工批准数为 0，不伪造独立审批；外部 fork 工作流审批已设为 `all_external_contributors`。
+
+本次工作流增加 `always()` 的轻量结果门禁，仅当 verify 真正 success 才通过；它在无权限、无 checkout 的 GitHub-hosted runner 执行，完整集成和浏览器测试仍在 codex-lb。设置读回证明配置已生效，不替代本次 PR 最新提交的实际 CI；对应完整结果仍待 PR Checks 确认，开发目录不重复整套检查。现有生产 v0.2.2 与冻结发布报告保持原身份和验证范围。发布器同步适配精确仓库身份与 public 可见性校验，GHCR 三镜像仍要求 Private；这项修改由本次 PR 验证，本次不发布新 tag、不重新部署生产。

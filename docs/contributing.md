@@ -11,9 +11,9 @@
 3. 修改实现及相应契约、生成客户端、迁移和文档。已部署迁移不重写；运行账号不获得 DDL 权限；不直接改 core 表来修复维修同步。
 4. 开发阶段按[测试指南](development/testing.md)只做本次改动必要的针对性验证或缺陷复现，然后提交 PR。完整 `./scripts/check`、真实 PG/HTTP/SMTP 集成和发布浏览器 E2E 交给 codex-lb 上的 GitHub Actions，不在 Mac 或服务器开发目录预先重复整套检查；定位具体 CI 失败或用户明确要求时再做针对性复现。快检 `--unit-only` 不代表完整验收，合入仍须核对最新 SHA 的完整 CI 成功。实际执行、取消与尚未验证的范围分别记录。
 5. 复核差异、生成漂移、链接、敏感内容和输出。只暂存本次文件，使用 Conventional Commits；正文写任务/需求编号与原因，一个逻辑改动一笔提交，不冒充其他模型或人类署名。
-6. 在 codex-lb 的工作分支提交并通过 GitHub PR 合入 main。核对最新 SHA 的完整 CI，使用 rebase merge、默认不 squash。需要更新基线时先 rebase 再验证，不重写 main 历史。专用 runner、同机资源与套餐限制见[GitHub 工作流](operations/github.md)，不能为让检查变绿放宽可信代码边界或跳过 job。
+6. 在 codex-lb 的工作分支提交并通过 GitHub PR 合入 main。核对最新 SHA 的完整 CI，使用 rebase merge、默认不 squash。需要更新基线时先 rebase 再验证，不重写 main 历史。`General` ruleset 要求最新基线上的 `verify`、`ci-gate` 通过并解决评审会话；禁止强推、删除 main 和绕过规则。`ci-gate` 在 GitHub-hosted runner 只检查 verify 结果，不检出代码；完整测试仍在 codex-lb。专用 runner、同机资源与外部 fork 审批边界见[GitHub 工作流](operations/github.md)，不能为让检查变绿放宽可信代码边界或跳过 job。
 
-当前用户已授权本项目在 codex-lb 自主开发、提交、发版、生产上线及最终 PR 合并；操作依据与配置边界见[当前交付 ADR](adr/0004-github-codex-lb-production.md)。不伪造第二位人工审批人，未提供的外部 SMTP 不得报告真实收信已验。
+当前用户已授权本项目在 codex-lb 自主开发、提交、发版、生产上线及最终 PR 合并；操作依据与配置边界见[交付 ADR](adr/0004-github-codex-lb-production.md)和[公开仓库与保护 ADR](adr/0005-public-repository-protection.md)。不伪造第二位人工审批人，未提供的外部 SMTP 不得报告真实收信已验。
 
 ## 文档写给需要完成任务的人
 
@@ -35,7 +35,7 @@
 - 当前指南应准确描述当前源码；删除过期的“仍待验证”时态时，要有真实依据，不能顺便宣称尚未实现的功能已完成。
 - 根目录三份规格保留需求/任务编号和原始约束，入口明确其基线性质及现状映射。新的用户决策通过 ADR 解释，不静默改弱业务要求。
 - 已冻结的 `docs/evidence/` 报告保留字节、日期、版本和失败结果。新的验证新增报告；索引可更新，不把旧结果改标成新版本实测。
-- 私有状态、基础设施密码/令牌、Cookie、CSRF、数据库、浏览器 storageState 不进入文档或截图。用户本轮明确授权的唯一例外是将课程验收的真实初始应用登录账号/密码提交到私有仓库的 `development/demo-accounts.md`，供本人和老师查阅；不包括数据库/服务/平台凭据，也不放宽普通CI日志与artifact限制。其他示例用占位参数或在服务器读取秘密文件，不把真实值放进命令历史。
+- 私有状态、基础设施密码/令牌、Cookie、CSRF、数据库、浏览器 storageState 不进入文档或截图。用户曾在仓库私有阶段授权将课程验收的真实初始应用登录账号/密码提交到 `development/demo-accounts.md`，供本人和老师查阅。仓库公开不自动扩大该授权，不新增或复制真实凭据，既有课程凭据另按用户确认处理；数据库/服务/平台凭据及普通 CI 日志与 artifact 的限制不变。其他示例用占位参数或在服务器读取秘密文件，不把真实值放进命令历史。
 - 本机实例端口和绝对路径放在[当前实例](operations/current-instance.md)，通用安装与开发指南说明默认值和覆盖方式。
 
 ## 文档变更如何验收
