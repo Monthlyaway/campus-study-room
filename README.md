@@ -2,7 +2,7 @@
 
 响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
-**当前状态：R4 本机验收已通过，整体交付尚未完成。** 浏览器6流程、离线导入、兼容演练、正式应用回退、完整性能及真实 core/repair 重启恢复均已通过，[限定范围隐私审计](docs/evidence/runtime-audit-v4.md)已完成。GitLab 后端、前端、集成任务已通过；共享 runner #5186 的 DinD 因挂载权限不足未启动，需要支持 DinD 的隔离执行环境。完整 CI 基础设施问题仍待解决，尚未合入 main 或创建最终 tag。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
+**当前状态：R4 本机验收已通过，整体交付尚未完成。** 浏览器6流程、离线导入、兼容演练、正式应用回退、完整性能及真实 core/repair 重启恢复均已通过，[限定范围隐私审计](docs/evidence/runtime-audit-v4.md)已完成。GitLab 后端、前端、集成任务已通过；共享 runner #5186 的 DinD 挂载失败记录保留。用户授权后，[专用 ARM64 Runner #5666 已注册并启用](docs/evidence/gitlab-runner-registration.md)，仅绑定本项目及受保护引用；真实 Runner TLS、checkout及嵌套目录诊断已通过，完整五 job CI 仍待通过，尚未合入 main 或创建最终 tag。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
 
 R4 已将 CI runner 兼容修正和验收工具修正纳入离线源码，业务代码与 R3 相同。R3 的浏览器、完整性能和真实 core/repair 重启恢复记录仍保留；R4 使用自身运行版本独立复验，结果分别归档。
 

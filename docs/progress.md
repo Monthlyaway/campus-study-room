@@ -55,6 +55,6 @@ R4已将CI环境名称、旧Runner可选探针兼容、性能验收工具版本�
 
 根代理随后取消了683030的container-release job4478863，避免在同一已确认无DinD挂载权限的#5186上重复等待；三个先行PASS保持，完整pipeline应记录为Canceled。挂载权限拒绝的实测来源是诊断pipeline683047/job4478933，不能把被取消任务写为已实际失败。
 
-后续`098d8a2`已准备精确受保护分支工作流与专用ARM64 Runner标签，新增10项配置回归，当前全Python运维回归122项通过。隔离VM、Runner程序和未启用服务配置已完成，本地TLS正反探针及嵌套目录通过；尚未注册或启用Runner，等待用户对持续执行权限的确认。[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)成功解析全部五个阻断job，但没有运行真实pipeline，不替代完整发布或MR最新SHA门禁。R4包与后续CI/文档提交的源码边界已独立核对并记录。
+后续`098d8a2`已准备精确受保护分支工作流与专用ARM64 Runner标签，新增10项配置回归，当前全Python运维回归122项通过。本地TLS正反探针及嵌套目录通过；用户明确授权后，2026-10-23[专用Runner #5666已注册并启用](evidence/gitlab-runner-registration.md)：17.8.5/linux-arm64，项目锁定、Protected开启、untagged关闭，来宾服务enabled/active/running。原main保护保持，仅为两条确切工作分支新增Maintainers/no-force保护，受保护tag规则仍为0。诊断提交`2b3c32f`的pipeline683461/job4481126已在Runner5666通过（43秒、排队1秒），实际helper拉取、checkout、双端ARM64/TLS和只读嵌套marker均通过；可选service helper的No HOST or PORT警告保留，未执行业务build，完整五job CI仍待通过；[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)解析全部五个阻断job，不替代真实发布或MR最新SHA门禁。R4包与后续CI/文档提交的源码边界已独立核对并记录，main与最终tag继续待闭环。
 
 既有Docker test 18082/邮件18027和原生开发8000为分离的旧运行环境，不标记为R4。另一服务器、正式TLS/外部邮箱未实测，按ADR保留限制。

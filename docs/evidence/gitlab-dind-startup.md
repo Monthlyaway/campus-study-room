@@ -1,8 +1,10 @@
-# GitLab 容器发布门禁：DinD 启动阻塞与待审批方案
+# GitLab 容器发布门禁：DinD 诊断与隔离 Runner 进展
 
-对应 REQ-ENG-05。核验日期：2026-10-22 UTC（北京时间 2026-10-23）。本文记录真实诊断结果并提供可审核方案。本次文档任务没有创建 VM、Runner 或认证令牌，没有修改共享 Runner 权限，也没有把诊断流水线计作交付门禁通过。用户已选择先完成本机与可迁移交付：后续先准备可逆的本机独立 ARM64 VM，待隔离环境和配置具备可审阅结果后，再确认注册项目专用 Runner 这一持久访问授权。当前 VM 内 Runner 已安装但尚未注册或启动，方案尚未接入 GitLab。
+对应 REQ-ENG-05。当前状态更新于2026-10-23：用户已明确授权，主代理已在本机 `studyroom-ci` 专用 ARM64 VM 注册并启用项目 Runner **5666**。Runner 17.8.5、项目锁定、Protected开启、untagged关闭，来宾服务已enabled/active/running；精确授权范围、配置纠正、截图与凭据处理见[实际注册启用记录](gitlab-runner-registration.md)。**真实 Runner 诊断pipeline683461/job4481126已通过；完整五job发布流水线、main与最终tag仍未闭环。**
 
-## 已发生的三轮诊断
+以下诊断、方案与安装段落保留2026-10-22 UTC的注册前历史；其中“待授权”“尚未注册/启动”描述当时状态，不代表当前状态。原共享 Runner 的权限失败及R4流水线取消事实不因新Runner启用而改写。
+
+## 历史：共享 Runner 的三轮诊断
 
 以下 job 日志由主代理在实际 GitLab 页面读取并转交；诊断分支为 `ycy/ci-container-check`，与交付分支分离，未创建 MR、未合入。
 
@@ -125,11 +127,11 @@ check_interval = 3
 
 如果提供的是现有专用 Runner，同样先取得允许使用和隔离能力说明，再从第 2 步验证；不能仅凭标签绕过第 1 步的边界核对。
 
-## 本机只读盘点与当前状态
+## 历史：注册前的本机只读盘点
 
 `command -v gitlab-runner` 返回 `/opt/homebrew/bin/gitlab-runner`，`gitlab-runner --version` 返回 18.8.0、revision `9ffb4aa0`、`darwin/arm64`。方案盘点时 `colima` 和 `limactl` 均未在当前 PATH 找到，尚无已核验可用的 Colima/Lima 安装或本机专用 Linux ARM64 VM；这不排除其他位置有未接入 PATH 的文件。本次文档任务没有安装、注册、启动这些组件，也没有读取本机 Runner 令牌配置。随后独立代理已按授权准备 Colima 0.10.3 / Lima 2.2.1 隔离环境，并验证来宾 Runner 17.8.5 二进制与版本；详细核验保存在私有 `.local/ci-runner-preparation/runner-service-verification.json`。来宾配置目录 root0700、只有 root0600 模板，没有真实 `config.toml`、`.runner_system_id` 或令牌；systemd 单元校验通过但仍 disabled/inactive，无 Runner 进程，未 register/start/enable。这是安装就绪，不是已注册 Runner 或远端执行成功。
 
-## 本机准备及最小探针已完成，尚未注册 GitLab Runner
+## 历史：注册前已完成本机准备及最小探针
 
 独立准备任务已完成上述 ARM64 VM 与 Runner 17.8.5 安装，Runner 仍 disabled/inactive、无真实配置或认证令牌、无运行进程。安装核验见本机私有 [runner-service-verification.json](../../.local/ci-runner-preparation/runner-service-verification.json)；这些文件不随公共源码制品分发。
 
@@ -140,3 +142,7 @@ check_interval = 3
 探针仅 DinD 服务使用 privileged，CLI 与 marker 容器不使用特权；没有挂载 Mac 目录或宿主 socket、没有 published port，默认 Docker context 前后仍为 desktop-linux。收尾仅停止精确归属的探针容器，运行中探针容器为 0，4 个卷及 2 个网络保留。该结果验证本机 VM 的 DinD/TLS/嵌套路径能力，不验证 Runner 注册、GitLab 调度、真实 checkout/应用构建或 MR 最新 SHA 门禁；远端完整发布项仍待授权后运行。
 
 本地应用与可迁移交付的既有验收继续独立成立；当前远端容器发布门禁尚未通过：诊断任务失败，完整 R4 的容器任务已取消，必须在获准且可用的基础设施上完成真实运行。本轮只准备上述 CI 配置、配置回归和运维文档，未推送、注册 Runner、修改 GitLab 设置或共享 Runner 权限；也未把 Runner 的注册与真实执行写成已完成。
+
+## 当前后续
+
+注册前计划中的授权、注册和启用已于2026-10-23完成，见[Runner #5666 实际记录](gitlab-runner-registration.md)。该Runner上的真实checkout/TLS/只读嵌套marker诊断pipeline683461/job4481126已通过，用时43秒；可选service helper的No HOST or PORT警告和原始日志仍保留，详见链接记录。接下来仍须完成交付提交的五job流水线及MR最新SHA门禁，诊断没有执行业务build。
