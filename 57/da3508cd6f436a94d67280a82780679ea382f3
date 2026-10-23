@@ -1,0 +1,103 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "57da3508cd6f436a94d67280a82780679ea382f3",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/architecture/images/README.md",
+      "additions": {
+        "human": 88
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/application-schema-rollback.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/business-data-relations.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/deployment-topology.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/final-approval-transaction.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/repair-resource-synchronization.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/repair-state-machine.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/reservation-transaction.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "new_path": "docs/architecture/images/session-authorization.svg",
+      "additions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/architecture/README.md",
+      "new_path": "docs/architecture/README.md",
+      "additions": {
+        "human": 10
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/architecture/data-consistency.md",
+      "new_path": "docs/architecture/data-consistency.md",
+      "additions": {
+        "human": 48
+      },
+      "deletions": {
+        "human": 6
+      }
+    },
+    {
+      "old_path": "docs/architecture/security.md",
+      "new_path": "docs/architecture/security.md",
+      "additions": {
+        "human": 8
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/reviews/documentation-2026-10-23.md",
+      "new_path": "docs/reviews/documentation-2026-10-23.md",
+      "additions": {
+        "human": 4
+      },
+      "deletions": {
+        "human": 2
+      }
+    }
+  ]
+}
