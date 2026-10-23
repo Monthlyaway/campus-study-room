@@ -18,6 +18,11 @@ import tempfile
 ROOT = Path(__file__).resolve().parent.parent
 REPOSITORY = 'Monthlyaway/campus-study-room'
 REGISTRY = 'ghcr.io/monthlyaway/campus-study-room-'
+OWNER = REPOSITORY.split('/', 1)[0]
+SOURCE_URL = 'https://github.com/' + REPOSITORY
+OCI_SOURCE = 'org.opencontainers.image.source'
+OCI_REVISION = 'org.opencontainers.image.revision'
+OCI_VERSION = 'org.opencontainers.image.version'
 RELEASES = Path('/home/ubuntu/Deployments/campus-study-room/releases')
 PRODUCTION_STATE = Path('/home/ubuntu/.local/state/campus-study-room/prod')
 CHECKS = {'three-images-built', 'fresh-test-deployment', 'private-endpoint-smoke',
@@ -66,10 +71,31 @@ def private_repository():
 
 def package_private(name, *, missing=False):
     package = api('users/Monthlyaway/packages/container/campus-study-room-' + name, missing=missing)
-    if package is not None and (package.get('visibility') != 'private'
-            or (package.get('repository') or {}).get('full_name') != REPOSITORY):
-        raise RuntimeError('Package must be private and linked to the intended repository: ' + name)
+    if package is None:
+        return None
+    if (not isinstance(package, dict) or package.get('visibility') != 'private'
+            or package.get('name') != 'campus-study-room-' + name
+            or package.get('package_type') != 'container'
+            or not isinstance(package.get('owner'), dict)
+            or package['owner'].get('login') != OWNER):
+        raise RuntimeError('Package must have the expected private container identity: ' + name)
+    # GHCR can omit repository from its REST response. Bind source identity to
+    # the tested immutable images separately; reject a conflicting link if sent.
+    if 'repository' in package and (not isinstance(package['repository'], dict)
+            or package['repository'].get('full_name') != REPOSITORY):
+        raise RuntimeError('Package repository association does not match: ' + name)
     return package
+
+
+def verify_image_labels(manifest):
+    expected = {OCI_SOURCE: SOURCE_URL, OCI_REVISION: manifest['commit'],
+                OCI_VERSION: manifest['releaseId']}
+    for name, info in manifest['images'].items():
+        # Inspect the tested ID, never a mutable local or registry tag.
+        labels = json.loads(subprocess.check_output(['docker', 'image', 'inspect', '--format',
+                            '{{json .Config.Labels}}', info['id']], text=True))
+        if not isinstance(labels, dict) or any(labels.get(key) != value for key, value in expected.items()):
+            raise RuntimeError('Tested image source, revision or version labels do not match: ' + name)
 
 
 @contextlib.contextmanager
@@ -125,6 +151,7 @@ def publish(args):
     manifest = ops.verify_manifest(args.manifest)
     evidence = json.loads(args.evidence.read_text())
     validate_evidence(manifest, evidence, sha(args.manifest), os.environ)
+    verify_image_labels(manifest)
     actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if actual != manifest['commit'] or subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip():
         raise RuntimeError('Publishing requires the clean tested checkout')
@@ -308,6 +335,7 @@ def deploy(args):
             run(['docker', 'pull', info['ref']], env=docker_env)
             if ops.image_id(info['ref']) != info['id']:
                 raise RuntimeError('Downloaded release image identity mismatch')
+        verify_image_labels(manifest)
     if not (PRODUCTION_STATE / 'compose.env').exists():
         raise RuntimeError('Initialize and configure the production state before deployment')
     os.environ['STUDYROOM_STATE_DIR'] = str(PRODUCTION_STATE)
