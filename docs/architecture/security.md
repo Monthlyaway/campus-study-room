@@ -10,7 +10,12 @@ core 执行登录，Spring Session JDBC 把会话保存在 `session.SPRING_SESSI
 
 共享的 [SessionPrincipal][principal] 只有 `userId`、`authVersion`、`authenticatedAt`，具有稳定序列化标识，不保存角色实体或权限快照。两服务共享的是身份格式；repair 不实现独立登录，也不从 core 业务表读取密码或权限。
 
-```mermaid
+![会话与跨服务授权](images/session-authorization.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：会话与跨服务授权</summary>
+
+```text
 sequenceDiagram
   participant B as 浏览器
   participant C as core-service
@@ -28,6 +33,8 @@ sequenceDiagram
   C-->>R: 当前账号与范围裁决
   R-->>B: 结果或拒绝
 ```
+
+</details>
 
 [AuthController][auth] 在登录成功后轮换 session ID 并清除旧 CSRF；客户端需要刷新 token。除内部独立服务认证链外，公开写请求受 CSRF 保护，使用 `X-CSRF-TOKEN`；业务写请求还需要幂等键，状态操作携带 `expectedVersion`。这三个值分别解决跨站伪造、重复提交和过期状态，不能互相替代。
 

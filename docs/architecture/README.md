@@ -8,7 +8,12 @@
 
 系统有三个应用镜像：web、core、repair。core 集中管理身份、主数据、座位预约 M1、整室申请 M2 和资源占用；repair 管理维修 M3，通过内部 HTTP 请 core 封禁或释放教室。PostgreSQL 保存业务、共享会话和持久任务，Mailpit 接收本地验收邮件。
 
-```mermaid
+![应用与部署拓扑](images/deployment-topology.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：应用与部署拓扑</summary>
+
+```text
 flowchart LR
   browser[浏览器] -->|同源 HTTP| web[web：Nginx + React SPA]
   operator[本机运维] -->|回环端口| mail[Mailpit]
@@ -26,6 +31,8 @@ flowchart LR
     migrate --> session
   end
 ```
+
+</details>
 
 三个 schema 位于同一个 PostgreSQL 实例。web 与 Mailpit 同时连接 `access` 网络；core、repair、PostgreSQL 和迁移程序只连接 `private`。图中的 migration-runner 复用 core 镜像，以独立数据库账号运行，完成即退出，不是第三个常驻后端。拓扑真值是 [Compose](../../infra/compose/compose.yml) 和 [Nginx 路由](../../infra/compose/nginx.conf)。
 
@@ -86,3 +93,5 @@ OpenAPI 模式检查证明格式与合同相符，不能替代授权、并发和
 - 要增加角色、改变数据范围或共享登录：读 [身份与安全](security.md)。
 - 要定位开发和验证入口：读 [后端开发](../development/backend.md)、[前端开发](../development/frontend.md)。
 - 要在另一台机器安装或恢复：读 [安装指南](../operations/installation.md)、[运维手册](../operations/runbook.md)。
+
+- 要更新架构图：读 [图片来源与重新导出](images/README.md)。

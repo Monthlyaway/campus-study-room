@@ -8,7 +8,12 @@
 
 core 的 `resource_claim` 是占用账本：M1 对应座位，M2 对应整室时段，M3 对应整室维修封禁。账本的 `(source_type, source_id)` 唯一；`released_at` 标记释放，历史来源不被改写成另一笔业务。房间行锁下做冲突检查，而不是靠前端或者“查询可用”来保证互斥。
 
-```mermaid
+![业务数据与资源占用关系](images/business-data-relations.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：业务数据与资源占用关系</summary>
+
+```text
 flowchart LR
   reservation[reservation：M1] -. 来源 M1 与业务 ID .-> claim[resource_claim]
   application[room_application：M2] -. 来源 M2 与业务 ID .-> claim
@@ -18,6 +23,8 @@ flowchart LR
   command[processed_command：命令与结果] -. 去重记录 .-> source
   room[room / seat] --> claim
 ```
+
+</details>
 
 虚线是业务来源或调用关系，不是数据库外键。尤其 repair 的工单 ID、房间 ID、用户 ID 不建立跨业务 schema 外键。core 内部实体间的外键、唯一约束及索引见 [core DDL](../../db/migration/core/V20261022000100__core_schema.sql)。
 
@@ -29,7 +36,12 @@ repair 的聚合围绕工单展开：[repair DDL](../../db/migration/repair/V202
 
 业务时间使用 `Asia/Shanghai`，API 时间必须带偏移，区间为 `[start, end)`；开始严格晚于当前时间、结束受 14 天边界约束，且按整点小时覆盖完整开放时段。最长时长取创建时配置快照。具体边界判断在 [DomainPolicy][policy]。
 
-```mermaid
+![创建预约的事务链路](images/reservation-transaction.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：创建预约的事务链路</summary>
+
+```text
 sequenceDiagram
   participant U as 浏览器
   participant C as CoreController
@@ -53,6 +65,8 @@ sequenceDiagram
   C-->>U: 响应
 ```
 
+</details>
+
 用户 guard 把同一学生跨房间的竞争串行化；房间锁让该房间内座位、整室申请和维修统一竞争。任一校验或数据库写入失败，业务与成功幂等记录一起回滚。[BookingService][booking] 先用标量查房间 ID，持房间锁后才加载业务实体，避免等待锁之前的 ORM 缓存状态被继续使用。
 
 预约状态从 `RESERVED` 开始；在 `[start, start+15min)` 签到后为 `CHECKED_IN`，到结束时间为 `COMPLETED`。未签到到限为 `NO_SHOW` 并创建一次违约；正常取消为 `CANCELLED`。维修把受影响的未开始/未签到预约取消、已签到预约转为 `INTERRUPTED`，不创建维修违约。
@@ -61,7 +75,12 @@ sequenceDiagram
 
 整室申请提交后为 `PENDING`，不预占资源。第一级通过只是推进步骤；第二级通过才申请整室占用。此时可能已被其他预约或维修占用，所以“第一级已通过”不能承诺最终成功。
 
-```mermaid
+![最终审批的原子提交](images/final-approval-transaction.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：最终审批的原子提交</summary>
+
+```text
 sequenceDiagram
   participant U as 第二级审批人
   participant A as ApplicationService
@@ -81,13 +100,20 @@ sequenceDiagram
   end
 ```
 
+</details>
+
 [ApplicationService][application] 使用同一个事务落审批动作、步骤和占用。申请人不能自批，同一人不能完成两级；到截止仍待审批则 `EXPIRED`，拒绝为 `REJECTED`，撤销或维修影响为 `CANCELLED`，批准后的申请到结束时间转 `COMPLETED`。拥有多个角色也不能绕过这些条件。
 
 ### 维修：本地状态与远端资源分阶段确认
 
 开始维修时，repair 先保存 `BLOCK_PENDING` 和 BLOCK outbox，再由 worker 投递到 core；确认 core 返回来源状态 `ACTIVE` 后，工单才转 `IN_REPAIR`。验收通过后同理先进入 `RELEASE_PENDING`，确认 `RELEASED` 才转 `CLOSED`。这里没有跨服务数据库事务。
 
-```mermaid
+![维修资源同步链路](images/repair-resource-synchronization.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：维修资源同步链路</summary>
+
+```text
 sequenceDiagram
   participant U as 维修人员
   participant R as repair-service
@@ -107,9 +133,16 @@ sequenceDiagram
   Note over R,C: 响应丢失时保留原命令重试，core 重放结果
 ```
 
+</details>
+
 [RepairService][repairservice] 负责本地事务，[RepairWorker][worker] 的领取事务已在 HTTP 前结束，网络等待不持有该投递的数据库锁。确认时核对当前租约和工单资源版本。资源接口恢复后重试原命令；人工“重试同步”也不创建新资源来源。若整个 core 不可用，repair 无法验证会话/权限，用户动作先被拒绝；只有资源链路故障且授权可用时，用户动作才能形成等待同步记录。详见 [安全失败行为](security.md)。
 
-```mermaid
+![维修工单状态机](images/repair-state-machine.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：维修工单状态机</summary>
+
+```text
 stateDiagram-v2
   [*] --> SUBMITTED
   SUBMITTED --> ASSIGNED: 指派
@@ -125,6 +158,8 @@ stateDiagram-v2
   CANCELLED --> [*]
   CLOSED --> [*]
 ```
+
+</details>
 
 评分只附加到已关闭工单，不增加新状态。HTTP 成功或工单 `CLOSED` 仅说明该动作/该来源已处理，不保证房间当前可用：另一个维修来源或管理员停用仍可阻止使用。维修只释放自身来源，不恢复已经取消的预约或申请。
 
@@ -170,11 +205,18 @@ repair outbox 同样有持久重试、120 秒租约和第 8 次后的持续告�
 
 初始化也有不同用途：`reference` 写角色/权限等基础字典；`demo` 仅在 local/dev/test 写演示账号与资源；`bootstrap` 初始化首个系统管理员。演示数据不能混入正式部署，种子不代替 schema 迁移。数据库账号权限见 [安全指南](security.md)。
 
-```mermaid
+![应用与数据库版本回退边界](images/application-schema-rollback.svg)
+
+<details>
+<summary>查看或编辑 Mermaid 源码：应用与数据库版本回退边界</summary>
+
+```text
 flowchart LR
   A[发布 A：应用 A / schema A] -->|增量迁移并升级| B[发布 B：应用 B / schema B]
   B -->|具备匹配兼容证明后回退应用| C[应用 A / schema B]
 ```
+
+</details>
 
 `current-release.json` 记录最后成功应用组合，`schema-release.json` 记录实际数据库结构身份。应用回退只切换 web/core/repair，不执行数据库降级；所以两份状态可能不同。迁移按 schema 分别执行，失败时前面的迁移可能已提交，`pending-release` 必须保留用于恢复，不能清空文件掩盖实际状态。
 
