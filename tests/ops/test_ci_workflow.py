@@ -1,6 +1,10 @@
 """Exercise trusted-event boundaries and the actual GitHub promotion graph."""
 import importlib.util
+import os
 import re
+import subprocess
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -38,13 +42,67 @@ class TrustedEventTest(unittest.TestCase):
 class WorkflowPromotionTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls): cls.source=(ROOT/'.github/workflows/ci.yml').read_text()
-    def test_all_actions_are_pinned_and_hosted_jobs_are_absent(self):
+    def job_source(self, name):
+        match = re.search(
+            rf"(?ms)^  {re.escape(name)}:\n(.*?)(?=^  [A-Za-z0-9_-]+:\n|\Z)",
+            self.source,
+        )
+        self.assertIsNotNone(match, f"Missing workflow job {name}")
+        return match.group(1)
+
+    def test_business_jobs_use_dedicated_runner_and_actions_are_pinned(self):
         for action in re.findall(r'uses: (\S+)',self.source):
             self.assertRegex(action,r'^[\w/-]+@[0-9a-f]{40}$')
-        self.assertEqual(3,self.source.count('runs-on: [self-hosted, Linux, X64, campus-study-room]'))
+        for name in ("verify", "publish", "deploy"):
+            with self.subTest(job=name):
+                self.assertIn(
+                    "    runs-on: [self-hosted, Linux, X64, campus-study-room]\n",
+                    self.job_source(name),
+                )
         self.assertNotIn('pull_request_target:',self.source)
         self.assertNotIn('continue-on-error',self.source)
         self.assertNotIn('--unit-only',self.source)
+    def test_required_gate_is_always_scheduled_without_repository_access(self):
+        gate = self.job_source("ci-gate")
+        for directive in (
+            "name: ci-gate", "needs: verify", "if: always()",
+            "runs-on: ubuntu-latest", "permissions: {}", "timeout-minutes: 2",
+        ):
+            self.assertIn(f"    {directive}\n", gate)
+        self.assertNotIn("uses:", gate)
+        self.assertNotIn("checkout", gate.lower())
+        self.assertNotRegex(gate, r"\bsecrets(?:\.|\[)")
+        self.assertEqual(["needs.verify.result"], [
+            expression.strip()
+            for expression in re.findall(r"\$\{\{(.*?)\}\}", gate)
+        ])
+        self.assertIn("          VERIFY_RESULT: ${{ needs.verify.result }}\n", gate)
+        self.assertIn("        shell: bash\n", gate)
+        self.assertEqual(1, len(re.findall(r"(?m)^      - ", gate)))
+
+    def test_required_gate_executes_actual_script_and_rejects_non_success(self):
+        gate = self.job_source("ci-gate")
+        match = re.search(
+            r"(?m)^        run: \|\n((?:^          .*\n|^\n)+)",
+            gate,
+        )
+        self.assertIsNotNone(match, "Required gate must contain its inline shell")
+        script = textwrap.dedent(match.group(1))
+        with tempfile.TemporaryDirectory() as empty_checkout:
+            for result in ("success", "failure", "cancelled", "skipped", "", "unknown"):
+                with self.subTest(verify_result=result):
+                    process = subprocess.run(
+                        ["bash", "--noprofile", "--norc", "-e", "-o", "pipefail", "-c", script],
+                        cwd=empty_checkout,
+                        env={"PATH": os.defpath, "VERIFY_RESULT": result},
+                        text=True, capture_output=True, timeout=5,
+                    )
+                    self.assertEqual(
+                        0 if result == "success" else 1,
+                        process.returncode,
+                        process.stdout + process.stderr,
+                    )
+
     def test_real_gates_block_publish_and_no_cancellation_of_deployment(self):
         for command in ['./scripts/check','python3 scripts/ci-release.py','python3 scripts/github-preflight.py']:
             self.assertIn('run: '+command,self.source)
