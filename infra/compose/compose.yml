@@ -7,7 +7,8 @@ services:
       POSTGRES_USER: studyroom_bootstrap
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     entrypoint: [/bin/sh, /opt/studyroom/postgres-entrypoint.sh]
-    command: [postgres]
+    command: [postgres, -c, "shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}", -c, "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}"]
+    mem_limit: ${POSTGRES_MEMORY_LIMIT:-0}
     secrets: [postgres_password, core_db_password, repair_db_password, migration_db_password]
     volumes:
       - postgres-data:/var/lib/postgresql
@@ -22,6 +23,7 @@ services:
     networks: [private]
   mailpit:
     image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387}
+    mem_limit: ${MAILPIT_MEMORY_LIMIT:-0}
     environment:
       MP_DATABASE: /data/mailpit.db
       MP_MAX_MESSAGES: 1000
@@ -38,8 +40,12 @@ services:
       dockerfile: infra/compose/Dockerfile.backend
       args:
         SERVICE: core-service
+        RELEASE_ID: ${RELEASE_ID:-development}
+        RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
     command: [migrate]
+    mem_limit: ${MIGRATION_MEMORY_LIMIT:-0}
     environment:
+      JAVA_OPTS: ${MIGRATION_JAVA_OPTS:--XX:MaxRAMPercentage=70}
       DB_URL: jdbc:postgresql://postgres:5432/studyroom
       DB_USERNAME: studyroom_migration
       ENV_NAME: ${ENV_NAME:-local}
@@ -58,7 +64,12 @@ services:
       dockerfile: infra/compose/Dockerfile.backend
       args:
         SERVICE: core-service
+        RELEASE_ID: ${RELEASE_ID:-development}
+        RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
+    mem_limit: ${CORE_MEMORY_LIMIT:-0}
     environment:
+      JAVA_OPTS: ${APP_JAVA_OPTS:--XX:MaxRAMPercentage=70}
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: ${CORE_DB_POOL_SIZE:-20}
       DB_URL: jdbc:postgresql://postgres:5432/studyroom
       DB_USERNAME: studyroom_core
       ENV_NAME: ${ENV_NAME:-local}
@@ -99,7 +110,12 @@ services:
       dockerfile: infra/compose/Dockerfile.backend
       args:
         SERVICE: repair-service
+        RELEASE_ID: ${RELEASE_ID:-development}
+        RELEASE_COMMIT: ${RELEASE_COMMIT:-working-tree}
+    mem_limit: ${REPAIR_MEMORY_LIMIT:-0}
     environment:
+      JAVA_OPTS: ${APP_JAVA_OPTS:--XX:MaxRAMPercentage=70}
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: ${REPAIR_DB_POOL_SIZE:-10}
       DB_URL: jdbc:postgresql://postgres:5432/studyroom
       DB_USERNAME: studyroom_repair
       ENV_NAME: ${ENV_NAME:-local}
@@ -132,6 +148,7 @@ services:
       retries: 30
       start_period: 30s
   web:
+    mem_limit: ${WEB_MEMORY_LIMIT:-0}
     image: ${WEB_IMAGE:-studyroom-web:development}
     build:
       context: ../..

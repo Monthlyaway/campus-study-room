@@ -21,9 +21,9 @@ with open(directory / "initialization.lock", "a") as initialization_lock:
     fcntl.flock(initialization_lock, fcntl.LOCK_EX)
     secret_dir = directory / "secrets"
     secret_dir.mkdir(exist_ok=True, mode=0o700)
-    for name in ["postgres_password", "core_db_password", "repair_db_password", "migration_db_password", "internal_password", "checkin_key", "demo_password"]:
+    for name in ["postgres_password", "core_db_password", "repair_db_password", "migration_db_password", "internal_password", "checkin_key", "demo_password", "admin_password"]:
         path = secret_dir / name
-        if env == "prod" and name == "demo_password":
+        if (env == "prod" and name == "demo_password") or (env != "prod" and name == "admin_password"):
             continue
         if not path.exists():
             value = base64.b64encode(secrets.token_bytes(32)).decode() if name == "checkin_key" else secrets.token_urlsafe(36)
@@ -35,9 +35,15 @@ with open(directory / "initialization.lock", "a") as initialization_lock:
         config.write_text("\n".join([
             f"ENV_NAME={env}", f"COMPOSE_PROJECT_NAME=studyroom-{env}", f"STUDYROOM_STATE_DIR={directory}",
             f"WEB_PORT={ports[0]}", f"DB_PORT={ports[1]}", f"MAIL_UI_PORT={ports[2]}", f"SMTP_PORT_HOST={ports[3]}",
-            "BIND_ADDRESS=127.0.0.1", f"PUBLIC_BASE_URL=http://localhost:{ports[0]}",
-            "RELEASE_ID=development", "RELEASE_COMMIT=working-tree", "COOKIE_SECURE=false", "MAIL_MODE=smtp",
-            "SMTP_HOST=mailpit", "SMTP_PORT=1025", "SMTP_FROM=study@studyroom.test", "JOBS_ENABLED=true", ""
+            "BIND_ADDRESS=127.0.0.1", "PUBLIC_BASE_URL=" if env == "prod" else f"PUBLIC_BASE_URL=http://localhost:{ports[0]}",
+            "RELEASE_ID=development", "RELEASE_COMMIT=working-tree", "COOKIE_SECURE=true" if env == "prod" else "COOKIE_SECURE=false", "MAIL_MODE=smtp",
+            "SMTP_HOST=mailpit", "SMTP_PORT=1025", "SMTP_FROM=study@studyroom.test", "JOBS_ENABLED=true",
+            *(["ADMIN_USERNAME=", "ADMIN_EMAIL=", "CORE_MEMORY_LIMIT=512m", "REPAIR_MEMORY_LIMIT=448m",
+               "POSTGRES_MEMORY_LIMIT=256m", "MAILPIT_MEMORY_LIMIT=96m", "WEB_MEMORY_LIMIT=64m",
+               "MIGRATION_MEMORY_LIMIT=384m", "POSTGRES_SHARED_BUFFERS=64MB", "POSTGRES_MAX_CONNECTIONS=40",
+               "CORE_DB_POOL_SIZE=6", "REPAIR_DB_POOL_SIZE=6",
+               "APP_JAVA_OPTS=-Xms64m -Xmx192m -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=32m -XX:ReservedCodeCacheSize=48m -Xss512k -XX:+ExitOnOutOfMemoryError",
+               "MIGRATION_JAVA_OPTS=-Xms32m -Xmx128m -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError"] if env == "prod" else []), ""
         ]))
         os.chmod(config, 0o600)
     print(f"Environment {env}: {directory}")
