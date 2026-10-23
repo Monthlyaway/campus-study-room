@@ -1,0 +1,149 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "b5fa5796516f97bde17baa2dd9089d9cb139ef35",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/README.md",
+      "additions": {
+        "human": 52
+      }
+    },
+    {
+      "new_path": "docs/adr/README.md",
+      "additions": {
+        "human": 13
+      }
+    },
+    {
+      "new_path": "docs/contributing.md",
+      "additions": {
+        "human": 51
+      }
+    },
+    {
+      "new_path": "docs/evidence/README.md",
+      "additions": {
+        "human": 80
+      }
+    },
+    {
+      "new_path": "docs/evidence/delivery-ledger-2026-10-23.md",
+      "additions": {
+        "human": 73
+      }
+    },
+    {
+      "new_path": "docs/modules/README.md",
+      "additions": {
+        "human": 20
+      }
+    },
+    {
+      "new_path": "docs/reference/README.md",
+      "additions": {
+        "human": 40
+      }
+    },
+    {
+      "new_path": "docs/reviews/documentation-2026-10-23.md",
+      "additions": {
+        "human": 86
+      }
+    },
+    {
+      "old_path": "01_PRD.md",
+      "new_path": "01_PRD.md",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "old_path": "02_Technical_Design.md",
+      "new_path": "02_Technical_Design.md",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "old_path": "03_Development_Milestones.md",
+      "new_path": "03_Development_Milestones.md",
+      "additions": {
+        "human": 23
+      }
+    },
+    {
+      "old_path": "AGENTS.md",
+      "new_path": "AGENTS.md",
+      "additions": {
+        "human": 11
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md",
+      "additions": {
+        "human": 27
+      },
+      "deletions": {
+        "human": 128
+      }
+    },
+    {
+      "old_path": "docs/adr/0001-module-and-shared-layer-ownership.md",
+      "new_path": "docs/adr/0001-module-and-shared-layer-ownership.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/adr/0003-readable-project-naming.md",
+      "new_path": "docs/adr/0003-readable-project-naming.md",
+      "additions": {
+        "human": 3
+      },
+      "deletions": {
+        "human": 1
+      }
+    },
+    {
+      "old_path": "docs/ethics-and-risks.md",
+      "new_path": "docs/ethics-and-risks.md",
+      "additions": {
+        "human": 2
+      }
+    },
+    {
+      "old_path": "docs/progress.md",
+      "new_path": "docs/progress.md",
+      "additions": {
+        "human": 21
+      },
+      "deletions": {
+        "human": 51
+      }
+    },
+    {
+      "old_path": "docs/requirements-traceability.md",
+      "new_path": "docs/requirements-traceability.md",
+      "additions": {
+        "human": 4
+      }
+    },
+    {
+      "old_path": "docs/team.md",
+      "new_path": "docs/team.md",
+      "additions": {
+        "human": 10
+      }
+    }
+  ]
+}
