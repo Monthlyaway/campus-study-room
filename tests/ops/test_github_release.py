@@ -143,14 +143,29 @@ class GitHubReleaseTest(unittest.TestCase):
         with patch.object(release, 'api', return_value=package):
             self.assertEqual(package, release.package_private('core'))
 
-    def test_private_repository_identity_is_still_required(self):
-        with patch.object(release, 'api', return_value={'private': True, 'full_name': release.REPOSITORY}):
-            release.private_repository()
-        for repo in ({'private': False, 'full_name': release.REPOSITORY},
-                     {'private': True, 'full_name': 'someone/another-repo'}):
-            with self.subTest(repo=repo), patch.object(release, 'api', return_value=repo):
-                with self.assertRaises(RuntimeError):
-                    release.private_repository()
+    def test_public_repository_identity_is_required(self):
+        # Current GitHub REST metadata after the owner made this repository public.
+        repository = {'private': False, 'visibility': 'public', 'full_name': release.REPOSITORY}
+        with patch.object(release, 'api', return_value=repository) as request:
+            release.public_repository()
+            request.assert_called_once_with('repos/' + release.REPOSITORY)
+        for change in ({'full_name': 'someone/campus-study-room'},
+                       {'full_name': 'Monthlyaway/another-repo'},
+                       {'private': True, 'visibility': 'private'},
+                       {'private': True}, {'private': 0}, {'visibility': 'private'},
+                       {'visibility': 'internal'}):
+            with self.subTest(change=change), patch.object(release, 'api', return_value={**repository, **change}):
+                with self.assertRaisesRegex(RuntimeError, 'expected public repository'):
+                    release.public_repository()
+        for field in repository:
+            incomplete = {key: value for key, value in repository.items() if key != field}
+            with self.subTest(missing=field), patch.object(release, 'api', return_value=incomplete):
+                with self.assertRaisesRegex(RuntimeError, 'expected public repository'):
+                    release.public_repository()
+        for malformed in (None, [], 'public'):
+            with self.subTest(malformed=malformed), patch.object(release, 'api', return_value=malformed):
+                with self.assertRaisesRegex(RuntimeError, 'expected public repository'):
+                    release.public_repository()
 
     def test_all_tested_image_ids_require_source_commit_and_version_labels(self):
         manifest = self.image_manifest()
@@ -222,7 +237,7 @@ class GitHubReleaseTest(unittest.TestCase):
             with patch.object(release, 'ops_module', return_value=SimpleNamespace(verify_manifest=lambda path: manifest)), \
                     patch.dict(os.environ, self.env, clear=True), \
                     patch.object(release.subprocess, 'check_output', side_effect=checked), \
-                    patch.object(release, 'run') as mutate, patch.object(release, 'private_repository'), \
+                    patch.object(release, 'run') as mutate, patch.object(release, 'public_repository'), \
                     patch.object(release, 'api', side_effect=[None, self.package()]):
                 with self.assertRaisesRegex(RuntimeError, 'Immutable package tag already exists: core:v0.2.0'):
                     release.publish(args)
