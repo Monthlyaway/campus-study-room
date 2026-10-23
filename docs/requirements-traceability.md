@@ -1,12 +1,12 @@
 # P0 需求、实现与验收追踪
 
-更新时间：2026-10-23（R4本机浏览器、离线导入、兼容回退、完整性能/SQL与真实重启验收已通过；R4统一审计已完成，GitLab完整正门禁/main/tag待闭环）。本表逐条保留 [PRD](../01_PRD.md) 的 **39 个 P0 REQ**，并关联 [技术方案](../02_Technical_Design.md)、[milestone](../03_Development_Milestones.md)。测试通过只证明其实际断言；一个有关联的测试通过，不等于整条 TC 或阶段门禁通过。当前仍有明确缺口与未执行验收，**尚不能声明全部 P0 完成**。
+更新时间：2026-10-23（V5本机浏览器、正式离线导入、同schema回退/恢复及限定隐私审计已通过；完整性能/SQL与真实恢复保留R4运行身份。GitLab完整正门禁、main、tag/Release及最终源码绑定包仍待闭环）。本表逐条保留 [PRD](../01_PRD.md) 的 **39 个 P0 REQ**，并关联 [技术方案](../02_Technical_Design.md)、[milestone](../03_Development_Milestones.md)。测试通过只证明其实际断言；一个有关联的测试通过，不等于整条 TC 或阶段门禁通过。剩余工程门禁尚未闭合，**尚不能声明全部 P0 完成**。
 
 用户调整的交付边界见 [ADR 0002](adr/0002-delivery-and-gitlab.md)：GitLab 取代 GitHub Actions；用户授权自主提交和本地发版；正式公网/TLS、外部SMTP实际收信、正式服务器生产发布待后续目标信息。业务、权限、并发、数据保护要求不缩减。本表中的“部分验证”表示已有运行证据但尚欠该 TC 的具体子场景；“缺口”表示已经识别实现或交付不足；“待执行”不能视为通过。
 
 ## 状态口径与当前候选
 
-39项由31条业务需求（D 7、M1 7、M2 5、M3 8、X 4）和8条工程需求组成。表中 `VERIFIED` 表示该行列明的TC行为已有实际证据；不将旧版通过自动绑定到新镜像。`IN_PROGRESS` 保留具体未完成项。31条业务需求已具备实际行为证据；M1真实停机补偿、M3重复报修加载竞态及派单时间精度均已验证。R3限定范围隐私扫描已归档；R4本机既定验收及统一审计也已完成，限定范围已知秘密0命中。工程待项集中在GitLab完整正门禁/main/tag，原39项范围不扩大。当前运行源码固定为R4 `3012051f06c601e6c22a03e50d9d307a3054d1d9`；后续工具、文档与证据提交的HEAD不等于运行镜像版本。
+39项由31条业务需求（D 7、M1 7、M2 5、M3 8、X 4）和8条工程需求组成。表中 `VERIFIED` 表示该行列明的TC行为已有实际证据；不将旧版通过自动绑定到新镜像。`IN_PROGRESS` 保留具体未完成项。31条业务需求已具备实际行为证据；M1真实停机补偿、M3重复报修加载竞态及派单时间精度均已验证。当前本机运行V5 `r-20261023T001633-e95b025`，源码为 `e95b025de6f03c393d8ad32063ed51b2cbf7babe`；V5浏览器、正式导入及回退/恢复均已通过。依据[242份生产及构建输入与R4一致](evidence/release/final-v5-production-equivalence.json)，完整性能/SQL和core/repair恢复继续引用R4原报告，不改标为V5实测，也不声称镜像ID相同。当前CI候选为 `11803dac1fe221d79fd14333c4801c6f76a922cb`，本次文档以其为修改基线；该源码HEAD、工作区后续文档和本机运行HEAD分别记录。原39项范围不扩大，最终MR、成功pipeline、tag/Release和源码绑定包仍待门禁闭合。
 
 - B `66f2b92`：新隔离离线安装及真实浏览器6/6通过；随后补充375px历史再次预约、拒绝理由与终态页面通过。
 - R1 `14b9813`：首轮浏览器5/6；确认按钮实际可访问名称被残留loading图标污染。`3350d5b`显式设置稳定aria-label/aria-busy，独立代码审查确认未削弱业务校验，浏览器恢复精确角色定位。
@@ -18,9 +18,14 @@
 - R4 `3012051` / `r-20261022T170200-3012051`：已包含支持工具`4a83b6e`的CI/身份门禁/采集器与真实规模修正；[浏览器6/6](evidence/frontend-release-v4.md)和privacy1/1、[414源码/五镜像正式导入](evidence/release/v4-portable-import.json)、[两原会话/三业务兼容](evidence/release/v4-compatibility.json)及[正式回退](evidence/release/v4-actual-rollback.json)均实际通过。A/B/R3/R4四清单与R4五镜像arm64包保留；R3原证据未改名。
 - R4[完整性能/SQL/repair恢复](evidence/performance.md)与[core真实恢复](evidence/core/restart-recovery-v4.md)通过：62892请求，读p95 231.914ms/写390.488ms，5xx/传输/意外4xx为0；repair20任务20.393秒，core首12.860秒/全10任务14.057秒及65秒无重复。保留历史100002条，之后core合成夹具增至100003。[R4统一源码/运行审计](evidence/runtime-audit-v4.md)已完成，限定范围已知秘密0命中。
 - GitLab pipeline683030：backend4478860通过4分10秒、frontend4478861通过1分20秒、integration4478862通过15分56秒；112ops、18HTTP、9组真实PG、27期限收件人及已提交响应丢失重放均执行。**三job通过不等于pipeline通过**：共享Runner #5186的官方DinD entrypoint报挂载权限拒绝、无法挂载`/sys/kernel/security`，daemon未启动，需要支持DinD的隔离环境；container-release与完整正门禁未闭环。
+- V5 `e95b025`：正式离线入口核对[442份源码/五镜像/三版本](evidence/release/final-v5-portable-import.json)，原7份秘密及三类业务完整行保持；[浏览器6/6与privacy1/1](evidence/frontend-release-final-v5.md)通过，97.599秒，无跳过或重试。[V5→R4→V5正式回退/恢复](evidence/release/final-v5-r4-rollback.json)在独立兼容环境保留两原会话、三类业务完整行、schema与原秘密，最终恢复V5。该轮两版schema相同，原R4→B结构演进证据仍单独保留。
+- 用户已明确授权，专用[Runner5666实际注册启用](evidence/gitlab-runner-registration.md)，Protected/项目锁定/拒绝untagged，17.8.5/linux-arm64。真实诊断pipeline683461/job4481126通过43秒，双端Docker28.5.2、Compose2.40.3、TLS与嵌套只读checkout均通过；可选service-helper警告按原日志保留。诊断不等于完整应用流水线。
+- V5 [pipeline683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462)的backend/frontend/integration均PASS；integration4481129约15分10秒，122项ops、27个期限收件人断言及9份JUnit报告均执行/产出。container-release4481130在官方Alpine HTTPS CDN安装Python/Git时发生TLS EOF/超时，FAILED且未执行业务构建，package跳过。[CI-only HTTPS镜像修正](evidence/gitlab-alpine-mirror.md)保留五job、needs、TLS和包签名验证。候选 `11803dac` 的[pipeline683500](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683500)在本次更新时运行中；尚无完整通过结果，也不预先作为后续文档提交或最终发布提交的成功证据。
 - GitLab负面合并门禁：[MR !2](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/2)使用独立分支`ycy/ci-negative-gate`的故意失败JUnit提交`d6a4d29`，pipeline 682968已因预期测试失败，非Draft页面明确阻止合并，integration/container-release/package均跳过。已关闭测试MR，破坏提交不在交付分支历史中；见[负向门禁证据](evidence/gitlab-negative-gate.md)。
 
 [R4统一运行审计](evidence/runtime-audit-v4.md)覆盖97份冻结运行输入（含13份应用及过程日志）与30份源码增量，对184个已知私有值、741种形式匹配均为0；HTML内嵌ZIP已解码检查。应用日志快照截至2026-10-22 17:24:41 UTC，源码收尾范围与精确时刻见[机器结果](evidence/runtime-audit-v4.json)。远端GitLab日志、日志截止后的活动和后续文件改动均不在本次快照范围。
+
+[V5限定隐私审计](evidence/runtime-audit-final-v5.md)在2026-10-23 00:26:37 UTC冻结128份输入，对129个实际已知值、513种形式为0命中；[提交前限定补扫](evidence/precommit-final-v5-supplement.json)在00:39:29 UTC覆盖14份当时待提交文件和7份指定CI/归档元数据，共21份输入，同一已知值集合0命中。两轮范围分别冻结，PNG只做原始字节匹配；本审计未读取VM内Runner token，不将较早的独立token扫描扩展到新增文件。后续CI/main/tag日志及本次追踪表新增字节不在这些旧快照内。
 
 ## 实现与证据索引
 
@@ -92,14 +97,14 @@
 
 | REQ / milestone | 状态 | 实现 | 已执行证据 | 当前状态与剩余验收 |
 | --- | --- | --- | --- | --- |
-| REQ-ENG-01 / T00-01、T60-01 | IN_PROGRESS | [协作规则](../AGENTS.md)、[分工](team.md)、本表 | 分模块连续commit与agent实测记录；原规格与ADR已入库 | 逐REQ实现/TC/逻辑commit已有索引；最终成功pipeline、MR、tag、manifest绑定待闭环。独立agent审核不冒充人工签字，用户授权边界不改 |
+| REQ-ENG-01 / T00-01、T60-01 | IN_PROGRESS | [协作规则](../AGENTS.md)、[分工](team.md)、本表 | 分模块连续commit与agent实测记录；原规格与ADR已入库 | 逐REQ实现/TC/逻辑commit已有索引；[MR !1](https://code.agibot.com/yangchunyu/campus-study-room/-/merge_requests/1)尚待完整门禁。V5运行manifest与本机验收已归档，最终成功pipeline、main提交、tag/Release及最终包绑定待闭环。独立agent审核不冒充人工签字，用户授权边界不改 |
 | REQ-ENG-02 / T00-02、T50-02 | VERIFIED | [HTTP测试][core-http]、[PG测试][core-test]、[反证][mutation]、浏览器证据 | 真实PG与两个进程HTTP、3项变异均业务断言失败且恢复通过，独立桌面/手机 | 默认完整check与三项反证通过；R3历史保留，[R4浏览器6/6及privacy1/1](evidence/frontend-release-v4.md)通过。[R4性能/SQL](evidence/performance.md)62892请求/读p95 231.914ms/写390.488ms/零错误，repair20任务20.393秒；[core恢复](evidence/core/restart-recovery-v4.md)首12.860秒/全10任务14.057秒及65秒去重。完整远端部署门禁仍归ENG-05 |
 | REQ-ENG-03 / T00-04、T50-04 | VERIFIED | [迁移程序][migration]、[版本SQL](../db/migration) | 空库迁移/reference/demo、重复seed；新增SELF纠正迁移在原库后应用，未改原迁移 | [A/B及R3历史演练](evidence/release/README.md)保留；[R4→B正式回退](evidence/release/v4-actual-rollback.json)已核对operator_note扩展、两原会话、三业务及实际Flyway历史不变。R4清单与回退目标已绑定，tag仍由ENG-06闭环 |
 | REQ-ENG-04 / T00-03、T00-04、T50-05 | VERIFIED | [环境与发布脚本][ops]、[GitLab CI][ci] | local与隔离PG套件使用不同数据库；独立test Compose安装由根代理执行 | 独立test/portable/check项目使用分离源码/数据库/会话/卷和随机秘密；[默认check](evidence/core/default-check.md)确认原native进程不变。`8b8a3d3`统一12个legacy入口锁；`247b02d`使原生build/migrate/copy全生命周期按环境→workspace顺序持锁，真实无关PID拒绝和异常释放通过 |
-| REQ-ENG-05 / T00-05、T50-05 | IN_PROGRESS | [GitLab CI][ci]、[全仓检查](../scripts/check) | [默认完整check](evidence/core/default-check.md)实际exit0，18 HTTP/65 PG/27收件人及响应丢失重放；CI调用相同函数与清单 | **未闭环：** pipeline683030的backend4478860、frontend4478861、integration4478862均PASS（4m10s/1m20s/15m56s）；112ops、18HTTP、9组PG、27收件人及响应丢失重放实际执行。共享Runner #5186官方DinD entrypoint挂载权限拒绝、无法挂载/sys/kernel/security，daemon未启动；需支持DinD的隔离环境，不能将三job通过写成完整pipeline成功。Fast-forward、不squash及成功门禁已配置，[负面MR !2](evidence/gitlab-negative-gate.md)阻断已验证；完整正门禁及main整套自动更新仍待完成 |
-| REQ-ENG-06 / T00-06、T50-04～06 | IN_PROGRESS | [发布/回退][ops]、[版本API][controller] | 不可变组合校验与错误manifest的ops单测；本地版本接口实现 | [A/B及R3历史机制演练](evidence/release/README.md)保留；R4已包含工具修正的完整源码，五镜像包实际导入、[兼容证明](evidence/release/v4-compatibility.json)与[正式回退](evidence/release/v4-actual-rollback.json)通过。A/B/R3/R4清单和组合留存；本机发版验收完成，最终tag、GitLab/main与归档绑定仍待闭环 |
+| REQ-ENG-05 / T00-05、T50-05 | IN_PROGRESS | [GitLab CI][ci]、[全仓检查](../scripts/check) | [默认完整check](evidence/core/default-check.md)实际exit0，18 HTTP/65 PG/27收件人及响应丢失重放；CI调用相同函数与清单 | **未闭环：** 专用[Runner5666已获授权并实际启用，真实TLS/checkout诊断通过](evidence/gitlab-runner-registration.md)。V5 pipeline683462的backend/frontend/integration已PASS，122ops、27收件人断言及9份JUnit报告已执行/产出；container-release4481130因Alpine HTTPS CDN安装失败而FAILED，业务构建未执行，package跳过。CI-only镜像修正后的11803dac/pipeline683500当前运行中，不预报成功。Fast-forward、不squash及成功门禁已配置，[负面MR !2](evidence/gitlab-negative-gate.md)阻断已验证；完整正门禁及main自动整套部署/E2E仍待完成。历史共享Runner失败保留，不混作当前结果 |
+| REQ-ENG-06 / T00-06、T50-04～06 | IN_PROGRESS | [发布/回退][ops]、[版本API][controller] | 不可变组合校验与错误manifest的ops单测；本地版本接口实现 | [A/B及R3历史机制演练](evidence/release/README.md)保留；R4结构兼容证明和正式回退通过。V5五镜像包正式导入及[V5→R4→V5正式回退/恢复](evidence/release/final-v5-r4-rollback.json)已通过，A/B/R3/R4/V5清单和组合留存。当前本机验收完成，拟发布运输包不等于正式发布；最终成功CI/main、tag/Release、最终源码与发行包绑定仍待闭环，正式prod按ADR延期 |
 | REQ-ENG-07 / T00-03、T60-02 | VERIFIED | [安装入口](../install.sh)、[部署脚本][ops] | 根代理已完成本机独立test Compose首次安装；前端生产入口独立复核 | [B新隔离安装](evidence/release/portable-install.json)、[R3历史导入](evidence/release/final-portable-import.json)及[R4正式导入](evidence/release/v4-portable-import.json)通过；R4核对414源码/完整权限、五镜像/三版本、原7秘密及业务行摘要保持，浏览器6/6。目标无Git/Java/Node；本机ARM64同daemon、复用既有状态条件明确，不冒称另一服务器/断网/全新空库 |
-| REQ-ENG-08 / T00-01、T50-01 | IN_PROGRESS | [安全][security]、[伦理记录](ethics-and-risks.md) | HTTP CSRF/越权拒绝、Cookie HttpOnly/SameSite配置，维修公平处理PG；非真实学生测试数据 | 签到码/权限/CSRF、聚合统计与[伦理记录](ethics-and-risks.md)已有证据；R3浏览器隐私反证与实际secret/当日码报告扫描通过。[源码审计](evidence/final-source-audit.md)387文件/404历史blob对140实际值563变体命中0；[R3运行审计](evidence/final-runtime-audit.md)116份运行产物与收尾412份源码/文档补扫0命中，范围/截止及远端CI日志排除均明确。[R4统一源码/运行产物审计](evidence/runtime-audit-v4.md)已完成，限定范围已知秘密0命中；远端CI日志不在范围内，正式HTTPS按ADR延期 |
+| REQ-ENG-08 / T00-01、T50-01 | IN_PROGRESS | [安全][security]、[伦理记录](ethics-and-risks.md) | HTTP CSRF/越权拒绝、Cookie HttpOnly/SameSite配置，维修公平处理PG；非真实学生测试数据 | 签到码/权限/CSRF、聚合统计与[伦理记录](ethics-and-risks.md)已有证据；R3/R4原源码及运行审计保留各自范围。V5真实浏览器隐私反证1/1通过；[V5限定审计](evidence/runtime-audit-final-v5.md)128输入、129已知值/513形式为0命中；[提交前补扫](evidence/precommit-final-v5-supplement.json)另覆盖当时14源码/证据文件和7指定CI/归档产物，21输入0命中。PNG非OCR，未读取Runner token，较早独立token扫描不扩展到未来输入。最终CI/main/tag新增产物尚待有限收尾，当前行不预报完成；正式HTTPS按ADR延期 |
 
 ## 无REQ编号但仍属于验收基线的项目
 
@@ -115,16 +120,16 @@
 
 ## 最终候选的有限闭环清单
 
-1. **本机R4验收已完成。** 运行提交3012051和三镜像清单精确绑定，包含后续工具修正；完整浏览器、privacy、导入、兼容回退、性能/SQL与repair/core恢复均来自R4真实执行。R3和早期失败证据保留，不倒改版本，也不因CI待解抹掉本机事实。
-2. **真实数据与历史边界保留。** R4负载保留100002条历史，core合成恢复后100003；原数据不删，原报告不回填。375px实时签到仍属于14b→R2跨版本链，后续INTERRUPTED不伪称COMPLETED；不重复无变动测试以扩张交付范围。
-3. **GitLab正反门禁。** pipeline683030三个先行job已通过，但共享Runner #5186的DinD挂载权限拒绝使daemon未启动，完整pipeline尚未成功。需支持DinD的隔离环境闭合容器发布；保留失败阻断合并/部署证据，不以本机通过或三个job通过替代。
-4. **main与tag。** 完整同提交pipeline通过后按Fast-forward、不squash合main，核对web/core/repair整套test自动更新与关键E2E，再把最终tag、MR、pipeline和已验manifest对应。当前尚未合main/tag。
-5. **发行留存。** A/B/R3/R4及五镜像包、对应源码按版本留存，R4离线安装和两原会话/三业务回退已验证；至少三套组合要求已有留存证据，后续不得覆盖旧包。正式服务器/TLS/外部邮箱、异机或AMD64按ADR保留边界。
-6. **审计与最终追踪。** [R4统一源码/报告/限定日志审计](evidence/runtime-audit-v4.md)已完成，限定范围及机器结果已关联原39条；GitLab/main/tag仍按独立证据闭环。此处为审计完成后的状态索引更新，新增字节不属于该已冻结审计快照，不伪造远端日志或人工签字。
+1. **本机V5验收已完成。** 运行源码e95b025及实际三镜像清单绑定，浏览器6/6、privacy1/1、442源码/五镜像导入及V5→R4→V5正式回退/恢复均来自本轮执行。R4完整性能/SQL和core/repair恢复保留原身份，有242份生产及构建输入等价依据；不因CI-only与文档变更重复要求性能验收，也不把旧结果改标为新镜像实测。
+2. **真实数据与历史边界保留。** R4负载保留100002条历史，core合成恢复后100003；原数据不删，原报告不回填。375px实时签到仍属于14b→R2跨版本链，后续INTERRUPTED不伪称COMPLETED。V5回退新增独立API夹具后只读核对，旧夹具和证明均保留。
+3. **GitLab正反门禁。** 专用Runner5666已授权启用并实际诊断通过。V5 pipeline683462三个先行job通过，container-release在Alpine安装阶段失败且未执行业务构建。11803dac的pipeline683500正在执行完整五job，镜像修正不改变门禁；需等待真实结果，不能用诊断、安装探针或三个job通过替代完整成功。后续提交必须绑定自己的结果，当前pipeline不提前称为最终成功。
+4. **main与tag/Release。** 完整同提交pipeline通过后按Fast-forward、不squash合main，核对web/core/repair整套test自动更新与关键E2E，再把最终tag、MR、pipeline、manifest及最终源码绑定包对应。当前尚未合main/tag或创建正式Release，拟发布文件名不代表已发布。
+5. **发行与范围。** A/B/R3/R4/V5清单及五镜像包按版本留存，超过至少三套组合要求；不得覆盖旧包。V5是本机ARM64实际安装与回退证据，不能冒称异机或AMD64验收。正式服务器、公网TLS、外部SMTP实际收信及正式prod独立批准按[ADR 0002](adr/0002-delivery-and-gitlab.md)留待目标信息；不伪造人工验收、课程成员或历史流程签字。
+6. **最终追踪与隐私收口。** 39条REQ已有实现/任务/行为测试索引；V5限定审计及21文件提交前补扫已完成。门禁闭合后补齐最终MR/commit、成功pipeline、tag/Release、manifest及包的精确关联，并对之后新收取的CI/main/tag产物做限定补扫。此处为旧审计后的状态更新，当前字节不冒称已被旧快照覆盖，ENG-01/05/06/08只按实际完成结果更新。
 
 P1 `REQ-AGENT-01` 未启动，不计入以上39项，也不用于替代P0验收。
 
-ENG-05补充证据：`098d8a2`的精确受保护分支工作流与专用ARM64标签经本地122项运维回归及[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)通过，实际模拟保留五个阻断job。隔离VM与本地DinD/TLS已验证，Runner注册及启用仍待用户确认持续执行权限；真实完整pipeline、MR最新SHA、main自动部署与最终tag仍未完成。以上不改变39项需求状态，不将配置模拟计作完整发布成功。
+ENG-05补充证据：`098d8a2`的受保护精确分支工作流与专用ARM64标签经当轮122项运维回归及[GitLab服务端默认分支模拟](evidence/gitlab-config-validation.md)通过；其后用户已授权Runner5666注册启用，pipeline683461/job4481126真实诊断通过。11803dac的CI-only修正只替换Alpine HTTPS镜像前缀，124项ops及固定镜像实际安装探针通过，五个阻断job/needs/TLS/签名验证未变，见[安装失败与修正](evidence/gitlab-alpine-mirror.md)。当前pipeline683500仍在运行；本地配置/安装验证不替代完整GitLab门禁，也不为后续提交作通过证明。
 
 [auth]: ../services/core-service/src/main/java/com/campus/studyroom/core/AuthController.java
 [security]: ../services/core-service/src/main/java/com/campus/studyroom/core/SecurityConfiguration.java

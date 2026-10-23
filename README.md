@@ -2,7 +2,7 @@
 
 响应式校园资源系统：个人自习座位预约、教室申请与两级审批、报修维修与验收。面向学生的手机流程与面向管理员的桌面工作台共用一套权限和资源裁决。
 
-**当前状态：最终 V5 本机验收已通过，整体交付尚未完成。** V5 的浏览器6流程、五镜像离线导入、正式回退与恢复均通过，[限定范围隐私审计](docs/evidence/runtime-audit-final-v5.md)为0命中。当前提交的 [GitLab pipeline 683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462) 已结束：后端、前端、集成通过，容器任务在从官方Alpine HTTPS CDN安装Python/Git时遭遇TLS EOF/超时而失败，尚未开始业务构建，打包任务跳过。完整流水线、main 合入、最终 tag 和正式 release 仍待完成。用户授权的[专用 ARM64 Runner #5666](docs/evidence/gitlab-runner-registration.md)仅绑定本项目及受保护引用。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
+**当前状态：最终 V5 本机验收已通过，整体交付尚未完成。** V5 的浏览器6流程、五镜像离线导入、正式回退与恢复均通过，[限定范围隐私审计](docs/evidence/runtime-audit-final-v5.md)为0命中。本机V5源码的 [GitLab pipeline 683462](https://code.agibot.com/yangchunyu/campus-study-room/-/pipelines/683462) 已结束：后端、前端、集成通过，容器任务在从官方Alpine HTTPS CDN安装Python/Git时遭遇TLS EOF/超时而失败，尚未开始业务构建，打包任务跳过。完整流水线、main 合入、最终 tag 和正式 release 仍待完成。用户授权的[专用 ARM64 Runner #5666](docs/evidence/gitlab-runner-registration.md)仅绑定本项目及受保护引用。进展见 [docs/progress.md](docs/progress.md)，版本与运维证据见[发布演练](docs/evidence/release/README.md)。
 
 V5 的完整源码包含后续 CI、测试和文档修正；[242份生产及构建输入](docs/evidence/release/final-v5-production-equivalence.json)与R4的路径、字节和Git权限模式一致。因此保留R4完整性能、SQL及真实core/repair恢复的原版本证据，不把它们改标成V5重跑结果，也不声称两版镜像ID相同。R3、R4及更早失败记录分别保留。
 
@@ -17,7 +17,7 @@ V5 的完整源码包含后续 CI、测试和文档修正；[242份生产及构�
 
 ## 本地安装入口
 
-需要 Docker Engine/Desktop、Compose v2、Python 3.10+。推荐至少 4 vCPU / 8 GiB。
+需要 Docker Engine/Desktop、Compose v2、Python 3.10+。以下源码获取步骤还需要Git及该GitLab仓库的SSH读取权限；应用编译在容器内完成。推荐至少 4 vCPU / 8 GiB。
 
 ```sh
 git clone git@code.agibot.com:yangchunyu/campus-study-room.git
@@ -36,6 +36,44 @@ cd campus-study-room
 需要自动备份时使用 `./install.sh local --schedule-backups`，或在已有环境运行 `./scripts/schedule-backup install local`。调度器每天生成校验过的备份，成功后保留最近七天；macOS 使用 launchd，Linux 使用 systemd，详情见[发布运维](docs/modules/release-operations.md)。
 
 演示账号仅允许 local/dev/test。生产不导入演示数据；正式服务器、域名和 SMTP 接入按用户选择留待后续。数据库和服务内部接口不发布到公网。
+
+## 无Git离线安装
+
+从可信渠道取得同一版本的 `.tar.gz` 和 `.tar.gz.sha256` 文件。以下示例安装全新的`local`环境，默认应用18080、Mailpit18025；已有环境升级应把 `STUDYROOM_STATE_DIR` 指向其原状态目录，保留原环境名和Compose项目。两个新目录的父目录须存在，目标目录须尚不存在；先替换四个绝对路径，再执行：
+
+```sh
+set -eu
+studyroom_download_dir=/absolute/path/to/downloads
+studyroom_unpack_dir=/absolute/path/to/new-unpack-directory
+studyroom_source_dir=/absolute/path/to/new-source-directory
+export STUDYROOM_STATE_DIR=/absolute/path/to/persistent-local-state
+studyroom_package=campus-study-room-v0.1.0-linux-arm64
+
+cd "$studyroom_download_dir"
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum -c "$studyroom_package.tar.gz.sha256"
+else
+  shasum -a 256 -c "$studyroom_package.tar.gz.sha256"
+fi
+mkdir "$studyroom_unpack_dir"
+tar -xzf "$studyroom_package.tar.gz" -C "$studyroom_unpack_dir"
+studyroom_bundle_dir="$studyroom_unpack_dir/$studyroom_package"
+cd "$studyroom_bundle_dir"
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum -c SHA256SUMS
+else
+  shasum -a 256 -c SHA256SUMS
+fi
+cat INSTALL.md
+mkdir "$studyroom_source_dir"
+tar -xzf source.tar.gz -C "$studyroom_source_dir"
+# 如需更改端口，先单独执行以下 local 命令，不要照抄模块说明中的 test：
+# "$studyroom_source_dir/scripts/init-env" local --directory "$STUDYROOM_STATE_DIR"
+# 再按模块说明编辑该状态目录的 compose.env 端口，最后执行下面的 import local。
+"$studyroom_source_dir/scripts/import-release" local "$studyroom_bundle_dir"
+```
+
+包内`INSTALL.md`给出默认`test`示例；本段显式选择`local`。密码在上述固定状态目录的 `secrets/demo_password`，账号与源码安装相同。不运行`install.sh`或`build-release`，无需Git、Java、Node或依赖下载。该包仅支持linux/arm64；不同架构须使用对应平台包。端口预配置、升级和回退见[离线安装说明](docs/modules/portable-release.md)。
 
 ## 原生开发
 
@@ -72,13 +110,23 @@ PostgreSQL 18 使用 core、repair、session 三个 schema；运行账号无 DDL
 
 [项目仓库](https://code.agibot.com/yangchunyu/campus-study-room)使用 GitLab CI/CD，不使用 GitHub Actions。用户已授权自主分阶段提交和发布；每个逻辑改动独立 commit，验收结果随提交更新。合入 main 使用 Fast-forward merge，必要时先 rebase 并重新验证；默认不 squash，保留提交记录且不生成 merge commit。GitLab 要求 pipeline 成功，skipped 不视为成功。该 GitLab 实例未启用内置容器 registry，本地发行采用校验过的不可变镜像组合与离线镜像包，服务器可配置自备 registry。
 
+下例升级上方源码安装的同一`local`环境。替换为当前干净源码checkout和**首次安装时的原状态目录**；换源码目录时不要跟着新建状态目录。已有发布清单的环境使用`deploy`或离线`import-release`升级，不能再用`install.sh`覆盖：
+
 ```sh
-./scripts/build-release r-YYYYMMDDTHHMMSS-commit
-./scripts/deploy test .local/releases/RELEASE_ID/manifest.json
-./scripts/backup test
-./scripts/rollback test .local/releases/PREVIOUS_ID/manifest.json
-./scripts/export-release .local/releases/RELEASE_ID/manifest.json
+set -eu
+studyroom_repo=/absolute/path/to/current-source-checkout
+export STUDYROOM_STATE_DIR=/absolute/path/to/original-source-checkout/.local/local
+studyroom_release_id=r-YYYYMMDDTHHMMSS-commit
+cd "$studyroom_repo"
+./scripts/build-release "$studyroom_release_id"
+./scripts/backup local
+./scripts/deploy local "$studyroom_repo/.local/releases/$studyroom_release_id/manifest.json"
+./scripts/export-release "$studyroom_repo/.local/releases/$studyroom_release_id/manifest.json"
 ```
+
+仅需要回退时，在同一源码目录、同一`STUDYROOM_STATE_DIR`和`local`环境下，执行 `./scripts/rollback local /absolute/path/to/previous/manifest.json`。保留旧清单及其三应用镜像；跨schema回退还需与实际数据库匹配的兼容证明，详见[回退门禁](docs/modules/release-operations.md)。
+
+本页19282现有实例实际使用`test`，原状态目录是 `/Users/agiuser/Codes/campus-study-room/.local/portable-install`；维护该实例须将 `STUDYROOM_STATE_DIR` 设为此目录，对`backup`、`deploy`、`import-release`、`rollback`使用`test`，保持其中已有项目名、19282/19227端口及秘密。`build-release`内部使用`local`构建配置，须在绑定该`test`状态目录之前另行构建；离线导入直接使用包内镜像，不运行构建。
 
 发布构建要求干净且已提交的 checkout。回退只更换整套应用，保留数据库结构与业务数据；禁止 `docker compose down -v`。[V5→R4→V5正式回退与恢复](docs/evidence/release/final-v5-r4-rollback.json)已在独立环境通过，原2个会话、3类业务及完整行摘要保持，未降级数据库。R4→B的[兼容演练](docs/evidence/release/v4-compatibility.json)及[正式回退](docs/evidence/release/v4-actual-rollback.json)、R3→B历史结果仍保留原身份，不与本次同schema演练混用。
 

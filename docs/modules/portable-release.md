@@ -32,17 +32,48 @@
 
 ## 离线导入
 
-从可信来源取得完整目录，在发布包目录执行：
+可以取得完整`portable/`目录，或取得README所列单一运输归档及其`.sha256`。单一归档的真实顶层目录是`campus-study-room-v0.1.0-linux-arm64/`，里面才是`INSTALL.md`、`SHA256SUMS`和`source.tar.gz`；先完成外层校验与解包。下面下载与解包路径须替换为绝对路径，新解包目录的父目录须存在，目标本身不能已存在：
 
 ```sh
-sha256sum -c SHA256SUMS
-# macOS 可改用 shasum -a 256 -c SHA256SUMS
-mkdir campus-study-room
-tar -xzf source.tar.gz -C campus-study-room
-./campus-study-room/scripts/import-release test .
+set -eu
+studyroom_download_dir=/absolute/path/to/downloads
+studyroom_unpack_dir=/absolute/path/to/new-unpack-directory
+studyroom_package=campus-study-room-v0.1.0-linux-arm64
+cd "$studyroom_download_dir"
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum -c "$studyroom_package.tar.gz.sha256"
+else
+  shasum -a 256 -c "$studyroom_package.tar.gz.sha256"
+fi
+mkdir "$studyroom_unpack_dir"
+tar -xzf "$studyroom_package.tar.gz" -C "$studyroom_unpack_dir"
+studyroom_bundle_dir="$studyroom_unpack_dir/$studyroom_package"
 ```
 
-这些命令不需要 `.git`。导入器默认核对自身所在源码目录；如果从已有可信安装器运行，也可用 `--source-dir /srv/campus-study-room-release` 将包内源码解到新目录。已存在目录只允许与归档中每个文件及可执行权限一致，不覆盖修改后的源码；目录内现有 `.local` 等运行状态不参与源码摘要，也不会被删除。升级时建议使用新源码目录和固定 `STUDYROOM_STATE_DIR`。
+若取得的本来就是完整目录，则仅设置 `studyroom_bundle_dir=/absolute/path/to/portable`，无需以上外层解包。接着校验包内文件、读取安装说明并解包源码。以下为首次`test`安装，默认应用18082、Mailpit18027；新源码目录的父目录须存在，目标本身不能已存在：
+
+```sh
+set -eu
+studyroom_source_dir=/absolute/path/to/new-source-directory
+export STUDYROOM_STATE_DIR=/absolute/path/to/persistent-test-state
+cd "$studyroom_bundle_dir"
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum -c SHA256SUMS
+else
+  shasum -a 256 -c SHA256SUMS
+fi
+cat INSTALL.md
+mkdir "$studyroom_source_dir"
+tar -xzf source.tar.gz -C "$studyroom_source_dir"
+# 如需更改端口，先执行本节末尾的预配置步骤，再执行导入。
+"$studyroom_source_dir/scripts/import-release" test "$studyroom_bundle_dir"
+```
+
+这些命令不需要`.git`。密码在固定状态目录的 `secrets/demo_password`，演示账号与[README](../../README.md#本地安装入口)相同。首次安装前，若主机已有同名`test`环境，选择其原状态目录进行升级，或先配置独立Compose项目和端口再建立另一套环境，不能只换状态目录而复用原项目/数据卷。
+
+导入器默认核对自身所在源码目录；如果从已有可信安装器运行，也可用 `--source-dir /absolute/path/to/new-source-directory` 将包内源码解到**尚不存在**的新目录，不要提前`mkdir`空目录。已存在目录仅用于核对已解包的完整源码，不覆盖修改后的文件；源码目录内现有`.local`等运行状态不参与源码摘要，也不会删除。
+
+升级时使用新版本的源码与完整包，同时继续使用原环境名、绝对`STUDYROOM_STATE_DIR`和其中的Compose项目。例如原环境为`test`，将上述状态目录替换为原路径后执行新源码的`import-release test`；它沿用正式部署门禁并备份已有数据库。不要对发布环境运行`install.sh`，也不要用`import-release`重新导入旧包来绕过回退检查。需要回退时，保留当前已验证源码、旧版三应用镜像与清单，在同一状态目录下执行 `"$studyroom_source_dir/scripts/rollback" test /absolute/path/to/previous/manifest.json`；跨schema回退须先具备[实际兼容证明](release-operations.md#状态与门禁)。回退不会降级数据库或删除秘密/数据卷。
 
 导入按顺序执行：
 
@@ -55,7 +86,13 @@ tar -xzf source.tar.gz -C campus-study-room
 
 校验和能发现传输损坏与组件不一致，不是签名，也不能证明整个包的发布者身份。应使用可信传输渠道，并保留可信发布清单。导入前校验失败不会加载镜像或创建环境；加载后镜像身份不匹配不会开始部署。
 
-当前命令支持 `local`、`dev`、`test`；`prod` 沿用现有正式环境门禁，不在此模块绕过。默认 `test` 页面为 `http://localhost:18082`，演示密码在目标状态目录 `secrets/demo_password`。需要更改监听端口时，先用解包源码的 `scripts/init-env test` 生成目标配置，再修改该环境的 `compose.env`，然后运行导入。
+当前命令支持`local`、`dev`、`test`；`prod`明确拒绝。需要预配置监听端口时，在上述导入命令之前、源码解包之后执行：
+
+```sh
+"$studyroom_source_dir/scripts/init-env" test --directory "$STUDYROOM_STATE_DIR"
+```
+
+`init-env`不自动读取`STUDYROOM_STATE_DIR`，因此这里必须显式传`--directory`。编辑该目录的`compose.env`，同步设置`WEB_PORT`、`MAIL_UI_PORT`及`PUBLIC_BASE_URL`；新建第二套同名环境还须使用不同的`COMPOSE_PROJECT_NAME`，而升级必须保留原项目名。随后再执行上面的导入命令。当前19282/19227实例是独立`test`环境，原状态目录为 `/Users/agiuser/Codes/campus-study-room/.local/portable-install`；维护它应复用该目录，不套用首次安装的默认端口或新状态目录。
 
 ## 运行镜像与离线保证
 

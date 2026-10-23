@@ -1,0 +1,182 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "scanStartedAt": "2026-10-23T00:39:29.546266+00:00",
+  "cutoffAt": "2026-10-23T00:39:29.958014+00:00",
+  "sourceHeadCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "scope": "Bounded precommit supplement: current unstaged/staged tracked diffs plus nonignored untracked files, and seven explicitly requested retained artifacts. Current bytes only; no full repository or history rescan.",
+  "sourceFiles": {
+    "count": 14,
+    "paths": [
+      ".gitlab-ci.yml",
+      "AGENTS.md",
+      "README.md",
+      "docs/evidence/frontend-release-final-v5.md",
+      "docs/evidence/gitlab-alpine-mirror.md",
+      "docs/evidence/release/README.md",
+      "docs/evidence/release/final-v5-portable-import.json",
+      "docs/evidence/release/final-v5-production-equivalence.json",
+      "docs/evidence/release/final-v5-r4-rollback.json",
+      "docs/evidence/runtime-audit-final-v5.json",
+      "docs/evidence/runtime-audit-final-v5.md",
+      "docs/progress.md",
+      "tests/browser/REVIEW.md",
+      "tests/ops/test_ci_workflow.py"
+    ],
+    "includesFrozenMirrorDocument": true,
+    "includesUncommittedWorkingEvidence": true,
+    "workingBytesNotClaimedAsHeadContents": true
+  },
+  "explicitArtifacts": {
+    "count": 7,
+    "paths": [
+      "output/gitlab/alpine-mirror-ops-tests.log",
+      "output/gitlab/alpine-mirror-probe.json",
+      "output/gitlab/alpine-mirror-probe.log",
+      "output/gitlab/final-feature-container-alpine-failed.png",
+      "output/gitlab/final-feature-container-alpine-failed.txt",
+      "output/gitlab/final-feature-integration.txt",
+      "output/release-final-v5/archive-verification.json"
+    ]
+  },
+  "inventory": {
+    "uniqueFileCount": 21,
+    "totalBytes": 338528,
+    "files": {
+      ".gitlab-ci.yml": {
+        "bytes": 5873,
+        "sha256": "5301bcabd094baa403abef4a4b6a17f18d7b0c02aa7e507d7abd18012253c9d9"
+      },
+      "AGENTS.md": {
+        "bytes": 4161,
+        "sha256": "9e0cc7e68018792aba8d362134128a1b37b10774dd524d0f9cf57cc7cef8a5fc"
+      },
+      "README.md": {
+        "bytes": 10427,
+        "sha256": "d845e161a44eee6a8c96d74d8de96c43ccd7b4a85d63e2771b35e3733cf71701"
+      },
+      "docs/evidence/frontend-release-final-v5.md": {
+        "bytes": 5304,
+        "sha256": "c99541a7681016666207151d3b6fb690d101f09d9265ef7fa382e86bf86f05fe"
+      },
+      "docs/evidence/gitlab-alpine-mirror.md": {
+        "bytes": 3352,
+        "sha256": "2fc1de506142ce99698e2594d3f6ab4678a5b514eb9ec48e1eb96de7efff082a"
+      },
+      "docs/evidence/release/README.md": {
+        "bytes": 12974,
+        "sha256": "eddb3a7dcabd2f3ce0f8f394552346c80249adddba06b76aae7b9af1e04cad01"
+      },
+      "docs/evidence/release/final-v5-portable-import.json": {
+        "bytes": 6839,
+        "sha256": "6df83e75d6436bde7342d3605e5f5e30ddaa044236dca001f0b6f8dd07425a9c"
+      },
+      "docs/evidence/release/final-v5-production-equivalence.json": {
+        "bytes": 1320,
+        "sha256": "04c1725898169014af9ba51800e0565b6b538be308b87b32f599788cbc38af59"
+      },
+      "docs/evidence/release/final-v5-r4-rollback.json": {
+        "bytes": 12774,
+        "sha256": "74654fe060341ce5d24d267e3f2ac42dd00da4405e96b2a434fd9a8df9003a65"
+      },
+      "docs/evidence/runtime-audit-final-v5.json": {
+        "bytes": 43662,
+        "sha256": "6a4db5da2535668bff5a6660838e65cd3d7327f0ab79c63951fd262b2e20213a"
+      },
+      "docs/evidence/runtime-audit-final-v5.md": {
+        "bytes": 2268,
+        "sha256": "26f9e3624fc37e3f31252664b2daa24356bf7c1b1a5e01c4f6b68afc5888c1d3"
+      },
+      "docs/progress.md": {
+        "bytes": 14084,
+        "sha256": "70ab271b77ff635655a4d3ccd38f45d131838a5a65e3be18ec136cb48ab6ca41"
+      },
+      "output/gitlab/alpine-mirror-ops-tests.log": {
+        "bytes": 21983,
+        "sha256": "42a7c68245483336130377bb0efde8eb8e0791a2baf61183ba9de3b0d154cc30"
+      },
+      "output/gitlab/alpine-mirror-probe.json": {
+        "bytes": 1675,
+        "sha256": "3bff6b6f69f7b2673a05a8e9eb5d6d400e0fd78b4dbf15c1cd432efb8f976e1d"
+      },
+      "output/gitlab/alpine-mirror-probe.log": {
+        "bytes": 1107,
+        "sha256": "4bece3940ab7a90f17ad2d6ec170d4b3c74e1eccdb326c25a42e36e9dd0c2452"
+      },
+      "output/gitlab/final-feature-container-alpine-failed.png": {
+        "bytes": 116450,
+        "sha256": "4e94b92103721a3403876e5113e5eee1294238723e99f73d34ce7119dd94efd3"
+      },
+      "output/gitlab/final-feature-container-alpine-failed.txt": {
+        "bytes": 5305,
+        "sha256": "ae1db9006f7dfd29b1fd480fa9d5ef92e389f47cbd786efd2fff8104d18c97fd"
+      },
+      "output/gitlab/final-feature-integration.txt": {
+        "bytes": 36540,
+        "sha256": "50d894105087e2587e8ebf066cab3e954b27953ef8f9b6b729266dfe8e693b00"
+      },
+      "output/release-final-v5/archive-verification.json": {
+        "bytes": 3394,
+        "sha256": "5b25dd98872a4cbb3f395c4c901c734284f31817b140dd13d3edb49dbdeff7bd"
+      },
+      "tests/browser/REVIEW.md": {
+        "bytes": 14903,
+        "sha256": "fc5b479229e0f53fb941ce26f29d7798e0935747250ea460e37e58c4a0a8aa94"
+      },
+      "tests/ops/test_ci_workflow.py": {
+        "bytes": 14133,
+        "sha256": "ac3d860fb1826e00002b051e2018d3a83b67cfa842305bb421b2909e6b9db76d"
+      }
+    },
+    "inputBytesUnchangedDuringScan": true,
+    "sourceFileSetUnchangedDuringScan": true,
+    "headUnchangedDuringScan": true
+  },
+  "knownValueScan": {
+    "collectorMethod": "Same bounded local secrets and fixture-cookie collection/encoding method as the existing final V5 audit; its main routine was not called and prior reports were not modified.",
+    "privateSourceCount": 44,
+    "privateSourceKinds": {
+      "local-secret-file": 35,
+      "private-fixture-cookie": 8,
+      "private-previous-fault-known-values": 1
+    },
+    "knownValueCount": 129,
+    "encodingVariantCount": 513,
+    "matchingPaths": [],
+    "secretValuesOrTheirHashesEmitted": false,
+    "credentialValuesReadOnlyInProcessMemory": true,
+    "forms": [
+      "raw UTF-8",
+      "standard and URL-safe Base64 with/without padding",
+      "lower/upper hexadecimal",
+      "URL and form encoding",
+      "JSON escape",
+      "HTML escape",
+      "printable decoded cookie/session values"
+    ]
+  },
+  "archiveScan": {
+    "archiveCount": 0,
+    "memberCount": 0,
+    "archives": [],
+    "unreadableArchives": []
+  },
+  "runnerBoundary": {
+    "vmAccessed": false,
+    "tokenRead": false,
+    "runnerCredentialConfigRead": false,
+    "newerArtifactsNotClaimedCoveredByPriorTokenScan": true
+  },
+  "selfReportCheck": {
+    "knownSecretMatches": 0
+  },
+  "limitations": [
+    "Only known local values and listed encoding forms were matched; unknown secrets are outside this proof.",
+    "PNG input received raw-byte matching only, without OCR or new browser access.",
+    "Only the seven listed retained artifacts were included; no new process, VM or application logs were collected.",
+    "The distribution archive itself was not unpacked or rescanned in this supplement; only its verification metadata was included.",
+    "No tests, build, browser, deployment, rollback or service operation was executed.",
+    "Future files or edits after this cutoff are outside this frozen snapshot.",
+    "File SHA256 values identify listed source/evidence bytes, never secret values or private credential fixtures."
+  ]
+}
