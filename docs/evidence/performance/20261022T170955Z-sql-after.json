@@ -1,0 +1,722 @@
+[
+  {
+    "query": "select count(*) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id) page_count",
+    "calls": 15599,
+    "total_exec_time": 259806.70531599905,
+    "rows": 15599,
+    "shared_blks_read": 308,
+    "shared_blks_hit": 11201142,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select count(*) from (select s.id,s.id seat_id,s.room_id,s.code,s.has_power,r.name room_name,r.code room_code,b.name building_name,c.name campus_name,r.building_id,b.campus_id,$1 available from core.room r join core.seat s on s.room_id=r.id and s.enabled join core.building b on b.id=r.building_id and b.enabled join core.campus c on c.id=b.campus_id and c.enabled join core.app_user u on u.id=$2 where r.enabled and (r.department_id is null or r.department_id=u.department_id) and not exists(select $3 from generate_series($4($2 as timestamptz),$5($3 as timestamptz)-interval $6,interval $7) requested_hour where not exists(select $8 from core.opening_rule opening where opening.room_id=r.id and opening.weekday=extract($9 from requested_hour at time zone $10) and opening.start_minute<=extract($11 from requested_hour at time zone $12)*$13 and opening.end_minute>=(extract($14 from requested_hour at time zone $15)+$16)*$17)) and not exists(select $18 from core.resource_claim claim where claim.room_id=r.id and (claim.seat_id is null or claim.seat_id=s.id) and claim.released_at is null and claim.start_at<$19 and (claim.end_at is null or claim.end_at>$20)) and not exists(select $21 from core.reservation own where own.user_id=$22 and own.status in($23 /*, ... */) and own.start_at<$24 and own.end_at>$25) order by r.code,s.code) page_count",
+    "calls": 15604,
+    "total_exec_time": 82683.89246499975,
+    "rows": 15604,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 920693,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select cast(row_to_json(q) as text) from (select s.id,s.id seat_id,s.room_id,s.code,s.has_power,r.name room_name,r.code room_code,b.name building_name,c.name campus_name,r.building_id,b.campus_id,$1 available from core.room r join core.seat s on s.room_id=r.id and s.enabled join core.building b on b.id=r.building_id and b.enabled join core.campus c on c.id=b.campus_id and c.enabled join core.app_user u on u.id=$2 where r.enabled and (r.department_id is null or r.department_id=u.department_id) and not exists(select $3 from generate_series($4($2 as timestamptz),$5($3 as timestamptz)-interval $6,interval $7) requested_hour where not exists(select $8 from core.opening_rule opening where opening.room_id=r.id and opening.weekday=extract($9 from requested_hour at time zone $10) and opening.start_minute<=extract($11 from requested_hour at time zone $12)*$13 and opening.end_minute>=(extract($14 from requested_hour at time zone $15)+$16)*$17)) and not exists(select $18 from core.resource_claim claim where claim.room_id=r.id and (claim.seat_id is null or claim.seat_id=s.id) and claim.released_at is null and claim.start_at<$19 and (claim.end_at is null or claim.end_at>$20)) and not exists(select $21 from core.reservation own where own.user_id=$22 and own.status in($23 /*, ... */) and own.start_at<$24 and own.end_at>$25) order by r.code,s.code limit $26 offset $27) q",
+    "calls": 15604,
+    "total_exec_time": 60989.32625700008,
+    "rows": 312080,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 312080,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT json_build_object($1,extract($2 FROM clock_timestamp()),$3,(SELECT count(*) FROM pg_locks WHERE NOT granted),$4,coalesce((SELECT max(extract($5 FROM clock_timestamp()-waitstart)) FROM pg_locks WHERE NOT granted),$6),$7,(SELECT deadlocks FROM pg_stat_database WHERE datname=current_database()),$8,(SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() AND state=$9),$10,(SELECT count(*) FROM core.scheduled_task WHERE status<>$11 AND due_at<clock_timestamp()),$12,(SELECT count(*) FROM repair.scheduled_task WHERE status<>$13 AND due_at<clock_timestamp()),$14,(SELECT count(*) FROM core.notification WHERE status<>$15))",
+    "calls": 129,
+    "total_exec_time": 51325.586851,
+    "rows": 129,
+    "shared_blks_read": 1452,
+    "shared_blks_hit": 859716,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select cast(row_to_json(q) as text) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.user_id=$1 order by r.start_at desc,r.id limit $2 offset $3) q",
+    "calls": 15599,
+    "total_exec_time": 40690.95849699984,
+    "rows": 311980,
+    "shared_blks_read": 2,
+    "shared_blks_hit": 442636,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+    "calls": 109239,
+    "total_exec_time": 23817.492888999906,
+    "rows": 218478,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 1459078,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+    "calls": 62415,
+    "total_exec_time": 20592.092273999704,
+    "rows": 62415,
+    "shared_blks_read": 156,
+    "shared_blks_hit": 1430205,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.audit_event (action,actor_id,actor_type,after_json,before_json,created_at,object_id,object_type,reason,request_id,room_id,source_id,source_type,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+    "calls": 31204,
+    "total_exec_time": 7678.313515000013,
+    "rows": 31204,
+    "shared_blks_read": 3303,
+    "shared_blks_hit": 217642,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.reservation (cancel_reason,checked_in_at,config_version,created_at,end_at,ended_at,max_duration_hours,room_id,seat_id,start_at,status,updated_at,user_id,version,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)",
+    "calls": 7801,
+    "total_exec_time": 7028.696398999981,
+    "rows": 7801,
+    "shared_blks_read": 39,
+    "shared_blks_hit": 189958,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ae1_0.id,ae1_0.auth_version,ae1_0.created_at,ae1_0.department_id,ae1_0.display_name,ae1_0.email,ae1_0.enabled,ae1_0.password_hash,ae1_0.school_no,ae1_0.updated_at,ae1_0.username,ae1_0.version from core.app_user ae1_0 where ae1_0.id=$1",
+    "calls": 117008,
+    "total_exec_time": 6887.9478869999375,
+    "rows": 117008,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 351024,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.resource_claim (created_by,created_request_id,end_at,release_request_id,released_at,room_id,seat_id,source_id,source_type,source_version,start_at,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+    "calls": 7801,
+    "total_exec_time": 6884.652449000003,
+    "rows": 7801,
+    "shared_blks_read": 2983,
+    "shared_blks_hit": 125304,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select distinct pe1_0.code from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id where ure1_0.user_id=$1 and re1_0.enabled=$2 order by pe1_0.code",
+    "calls": 23424,
+    "total_exec_time": 6387.687672000062,
+    "rows": 304512,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 164025,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.scheduled_task (attempts,dedup_key,due_at,last_error_code,lease_owner,lease_until,next_attempt_at,source_id,source_type,status,task_type,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+    "calls": 31204,
+    "total_exec_time": 6063.953304000009,
+    "rows": 31204,
+    "shared_blks_read": 210,
+    "shared_blks_hit": 314721,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ste1_0.id,ste1_0.attempts,ste1_0.dedup_key,ste1_0.due_at,ste1_0.last_error_code,ste1_0.lease_owner,ste1_0.lease_until,ste1_0.next_attempt_at,ste1_0.source_id,ste1_0.source_type,ste1_0.status,ste1_0.task_type from core.scheduled_task ste1_0 where ste1_0.id=$1",
+    "calls": 31204,
+    "total_exec_time": 5166.595174000006,
+    "rows": 0,
+    "shared_blks_read": 3050,
+    "shared_blks_hit": 90562,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where r1_0.id=$1 for no key update of r1_0",
+    "calls": 15621,
+    "total_exec_time": 5016.632261999968,
+    "rows": 15621,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 31242,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT S.PRIMARY_ID, S.SESSION_ID, S.CREATION_TIME, S.LAST_ACCESS_TIME, S.MAX_INACTIVE_INTERVAL, SA.ATTRIBUTE_NAME, SA.ATTRIBUTE_BYTES\nFROM session.SPRING_SESSION S\nLEFT JOIN session.SPRING_SESSION_ATTRIBUTES SA ON S.PRIMARY_ID = SA.SESSION_PRIMARY_ID\nWHERE S.SESSION_ID = $1",
+    "calls": 15591,
+    "total_exec_time": 4803.877794999966,
+    "rows": 31182,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 132814,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "BEGIN READ ONLY",
+    "calls": 155994,
+    "total_exec_time": 4581.6930040001125,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select aee1_0.id,aee1_0.action,aee1_0.actor_id,aee1_0.actor_type,aee1_0.after_json,aee1_0.before_json,aee1_0.created_at,aee1_0.object_id,aee1_0.object_type,aee1_0.reason,aee1_0.request_id,aee1_0.room_id,aee1_0.source_id,aee1_0.source_type from core.audit_event aee1_0 where aee1_0.id=$1",
+    "calls": 31204,
+    "total_exec_time": 4499.859560000014,
+    "rows": 0,
+    "shared_blks_read": 1606,
+    "shared_blks_hit": 92006,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "UPDATE session.SPRING_SESSION\nSET SESSION_ID = $1, LAST_ACCESS_TIME = $2, MAX_INACTIVE_INTERVAL = $3, EXPIRY_TIME = $4, PRINCIPAL_NAME = $5\nWHERE PRIMARY_ID = $6",
+    "calls": 15591,
+    "total_exec_time": 4496.930159999997,
+    "rows": 15591,
+    "shared_blks_read": 40,
+    "shared_blks_hit": 291423,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select id from core.scheduled_task where status<>$2 and next_attempt_at<=$1 order by case when task_type=$3 then $4 else $5 end,due_at,id limit $6",
+    "calls": 12,
+    "total_exec_time": 3900.5790460000007,
+    "rows": 0,
+    "shared_blks_read": 203,
+    "shared_blks_hit": 77139,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.idempotency_record (actor_id,actor_type,canonical_path,created_at,expires_at,http_status,key,method,request_hash,response_data_json,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
+    "calls": 15602,
+    "total_exec_time": 3684.2752289999903,
+    "rows": 15602,
+    "shared_blks_read": 61,
+    "shared_blks_hit": 101152,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ste1_0.id from core.scheduled_task ste1_0 where ste1_0.dedup_key=$1 fetch first $2 rows only",
+    "calls": 31204,
+    "total_exec_time": 3593.012975999987,
+    "rows": 0,
+    "shared_blks_read": 2902,
+    "shared_blks_hit": 90710,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "update core.reservation set cancel_reason=$1,checked_in_at=$2,config_version=$3,created_at=$4,end_at=$5,ended_at=$6,max_duration_hours=$7,room_id=$8,seat_id=$9,start_at=$10,status=$11,updated_at=$12,user_id=$13,version=$14 where id=$15 and version=$16",
+    "calls": 7801,
+    "total_exec_time": 3585.3719689999903,
+    "rows": 7801,
+    "shared_blks_read": 20,
+    "shared_blks_hit": 134181,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ie1_0.id,ie1_0.actor_id,ie1_0.actor_type,ie1_0.canonical_path,ie1_0.created_at,ie1_0.expires_at,ie1_0.http_status,ie1_0.key,ie1_0.method,ie1_0.request_hash,ie1_0.response_data_json from core.idempotency_record ie1_0 where ie1_0.actor_type=$1 and ie1_0.actor_id=$2 and ie1_0.method=$3 and ie1_0.canonical_path=$4 and ie1_0.key=$5",
+    "calls": 15621,
+    "total_exec_time": 3319.085240999999,
+    "rows": 0,
+    "shared_blks_read": 2197,
+    "shared_blks_hit": 44666,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select count(rse1_0.id)>$6 from core.user_role ure1_0 join core.role re1_0 on re1_0.id=ure1_0.role_id join core.role_permission rpe1_0 on rpe1_0.role_id=re1_0.id join core.permission pe1_0 on pe1_0.id=rpe1_0.permission_id join core.user_role_scope rse1_0 on rse1_0.user_role_id=ure1_0.id where ure1_0.user_id=$1 and re1_0.enabled=$7 and pe1_0.code=$2 and (rse1_0.scope_type=$8 or (rse1_0.scope_type=$9 and rse1_0.room_id=$3) or (rse1_0.scope_type=$10 and rse1_0.department_id=$4) or (rse1_0.scope_type=$11 and $5=$12))",
+    "calls": 15611,
+    "total_exec_time": 3211.0747520000054,
+    "rows": 15611,
+    "shared_blks_read": 4,
+    "shared_blks_hit": 93902,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select cast(row_to_json(q) as text) from (select r.*,s.code seat_code,s.has_power,rm.name room_name,rm.code room_code from core.reservation r join core.seat s on s.id=r.seat_id join core.room rm on rm.id=r.room_id where r.id=$1) q",
+    "calls": 15602,
+    "total_exec_time": 3114.9449209999934,
+    "rows": 15602,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 125679,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "update core.resource_claim set created_by=$1,created_request_id=$2,end_at=$3,release_request_id=$4,released_at=$5,room_id=$6,seat_id=$7,source_id=$8,source_type=$9,source_version=$10,start_at=$11 where id=$12",
+    "calls": 7801,
+    "total_exec_time": 3093.371614000002,
+    "rows": 7801,
+    "shared_blks_read": 322,
+    "shared_blks_hit": 118463,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ro1_0.id,ro1_0.accept_due_at,ro1_0.acceptance_round,ro1_0.accepted_at,ro1_0.assign_due_at,ro1_0.assigned_at,ro1_0.assigned_by,ro1_0.assigned_to,ro1_0.assigned_to_name,ro1_0.closed_at,ro1_0.created_at,ro1_0.description,ro1_0.first_assigned_at,ro1_0.last_work_note,ro1_0.reporter_id,ro1_0.resource_version,ro1_0.room_id,ro1_0.status,ro1_0.submitted_at,ro1_0.title,ro1_0.updated_at,ro1_0.version,ro1_0.work_completed_at,ro1_0.work_due_at from repair.repair_order ro1_0 where ro1_0.reporter_id=$1 order by ro1_0.submitted_at desc,ro1_0.id offset $2 rows fetch first $3 rows only",
+    "calls": 15591,
+    "total_exec_time": 2855.2169150000095,
+    "rows": 109136,
+    "shared_blks_read": 4,
+    "shared_blks_hit": 78007,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select count(se1_0.id) from core.seat se1_0 where se1_0.room_id=$1 and se1_0.enabled=$2",
+    "calls": 15591,
+    "total_exec_time": 2333.493882000013,
+    "rows": 15591,
+    "shared_blks_read": 4,
+    "shared_blks_hit": 56919,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ore1_0.id,ore1_0.end_minute,ore1_0.room_id,ore1_0.start_minute,ore1_0.weekday from core.opening_rule ore1_0 where ore1_0.room_id=$1 order by ore1_0.weekday,ore1_0.start_minute",
+    "calls": 15591,
+    "total_exec_time": 2004.7420090000064,
+    "rows": 109137,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 31296,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select re1_0.id,re1_0.cancel_reason,re1_0.checked_in_at,re1_0.config_version,re1_0.created_at,re1_0.end_at,re1_0.ended_at,re1_0.max_duration_hours,re1_0.room_id,re1_0.seat_id,re1_0.start_at,re1_0.status,re1_0.updated_at,re1_0.user_id,re1_0.version from core.reservation re1_0 where re1_0.id=$1",
+    "calls": 7801,
+    "total_exec_time": 2001.7708860000075,
+    "rows": 0,
+    "shared_blks_read": 1457,
+    "shared_blks_hit": 21946,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select r1_0.id,r1_0.building_id,r1_0.code,r1_0.department_id,r1_0.enabled,r1_0.name,r1_0.version from core.room r1_0 where r1_0.id=$1",
+    "calls": 31202,
+    "total_exec_time": 1667.644417000004,
+    "rows": 31202,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 31202,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ie1_0.id,ie1_0.actor_id,ie1_0.actor_type,ie1_0.canonical_path,ie1_0.created_at,ie1_0.expires_at,ie1_0.http_status,ie1_0.key,ie1_0.method,ie1_0.request_hash,ie1_0.response_data_json from core.idempotency_record ie1_0 where ie1_0.id=$1",
+    "calls": 15602,
+    "total_exec_time": 1599.5007250000072,
+    "rows": 0,
+    "shared_blks_read": 256,
+    "shared_blks_hit": 33163,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select bg1_0.user_id from core.booking_guard bg1_0 where bg1_0.user_id=$1 for no key update of bg1_0",
+    "calls": 7820,
+    "total_exec_time": 1520.8230220000048,
+    "rows": 7820,
+    "shared_blks_read": 7,
+    "shared_blks_hit": 31273,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ce1_0.id,ce1_0.created_by,ce1_0.created_request_id,ce1_0.end_at,ce1_0.release_request_id,ce1_0.released_at,ce1_0.room_id,ce1_0.seat_id,ce1_0.source_id,ce1_0.source_type,ce1_0.source_version,ce1_0.start_at from core.resource_claim ce1_0 where ce1_0.id=$1",
+    "calls": 7801,
+    "total_exec_time": 1504.337591000003,
+    "rows": 0,
+    "shared_blks_read": 1462,
+    "shared_blks_hit": 21941,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select $2 from pg_advisory_xact_lock(hashtextextended($1,$3))",
+    "calls": 46865,
+    "total_exec_time": 1088.898337000003,
+    "rows": 46865,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select sce1_0.key,sce1_0.updated_at,sce1_0.updated_by,sce1_0.value_json,sce1_0.version from core.system_config sce1_0 where sce1_0.key=$1",
+    "calls": 23424,
+    "total_exec_time": 1069.020960000003,
+    "rows": 23424,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 23424,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ce1_0.id,ce1_0.created_by,ce1_0.created_request_id,ce1_0.end_at,ce1_0.release_request_id,ce1_0.released_at,ce1_0.room_id,ce1_0.seat_id,ce1_0.source_id,ce1_0.source_type,ce1_0.source_version,ce1_0.start_at from core.resource_claim ce1_0 where ce1_0.source_type=$1 and ce1_0.source_id=$2",
+    "calls": 7801,
+    "total_exec_time": 922.5436019999987,
+    "rows": 7801,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 31204,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "update core.notification set attempts=$1,channel=$2,created_at=$3,dedup_key=$4,due_at=$5,event_type=$6,last_error_code=$7,lease_owner=$8,lease_until=$9,next_attempt_at=$10,payload_json=$11,read_at=$12,recipient_id=$13,room_id=$14,sent_at=$15,source_id=$16,source_type=$17,status=$18,version=$19 where id=$20 and version=$21",
+    "calls": 40,
+    "total_exec_time": 643.302368,
+    "rows": 40,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 759,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select be1_0.id,be1_0.campus_id,be1_0.code,be1_0.enabled,be1_0.name,be1_0.version from core.building be1_0 where be1_0.id=$1",
+    "calls": 15591,
+    "total_exec_time": 593.3583560000018,
+    "rows": 15591,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 15591,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select count(ce1_0.id)>$6 from core.resource_claim ce1_0 where ce1_0.room_id=$1 and ce1_0.released_at is null and ce1_0.start_at<$2 and (ce1_0.end_at is null or ce1_0.end_at>$3) and ($4 is null or ce1_0.seat_id is null or ce1_0.seat_id=$5)",
+    "calls": 7820,
+    "total_exec_time": 591.3053780000018,
+    "rows": 7820,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 23035,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "BEGIN READ ONLY",
+    "calls": 15591,
+    "total_exec_time": 558.505692000002,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select re1_0.room_id from core.reservation re1_0 where re1_0.id=$1",
+    "calls": 7801,
+    "total_exec_time": 510.60084599999965,
+    "rows": 7801,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 31204,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select re1_0.id from core.reservation re1_0 where re1_0.user_id=$1 and re1_0.status in ($2 /*, ... */) and re1_0.start_at<$3 and re1_0.end_at>$4 fetch first $5 rows only",
+    "calls": 7820,
+    "total_exec_time": 506.9570560000025,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 23307,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ce1_0.id,ce1_0.code,ce1_0.enabled,ce1_0.name,ce1_0.version from core.campus ce1_0 where ce1_0.id=$1",
+    "calls": 15591,
+    "total_exec_time": 494.66985299999885,
+    "rows": 15591,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 15591,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select cre1_0.id,cre1_0.version from core.config_revision cre1_0 where cre1_0.id=$1 for share of cre1_0",
+    "calls": 7820,
+    "total_exec_time": 447.27403700000167,
+    "rows": 7820,
+    "shared_blks_read": 1,
+    "shared_blks_hit": 15639,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.notification (attempts,channel,created_at,dedup_key,due_at,event_type,last_error_code,lease_owner,lease_until,next_attempt_at,payload_json,read_at,recipient_id,room_id,sent_at,source_id,source_type,status,version,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)",
+    "calls": 20,
+    "total_exec_time": 441.50591399999996,
+    "rows": 20,
+    "shared_blks_read": 2,
+    "shared_blks_hit": 417,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select re1_0.id,re1_0.cancel_reason,re1_0.checked_in_at,re1_0.config_version,re1_0.created_at,re1_0.end_at,re1_0.ended_at,re1_0.max_duration_hours,re1_0.room_id,re1_0.seat_id,re1_0.start_at,re1_0.status,re1_0.updated_at,re1_0.user_id,re1_0.version from core.reservation re1_0 where re1_0.id=$1 for no key update of re1_0",
+    "calls": 7801,
+    "total_exec_time": 440.99187499999925,
+    "rows": 7801,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 39005,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT coalesce(json_agg(json_build_object($1,a.object_id,$2,extract($3 FROM min_created))),$4) FROM (SELECT object_id,min(created_at) min_created FROM repair.audit_event WHERE action=$5 AND object_id IN(SELECT md5($6||n)::uuid FROM generate_series($7,$8) n) GROUP BY object_id) a",
+    "calls": 129,
+    "total_exec_time": 424.68991999999974,
+    "rows": 129,
+    "shared_blks_read": 5,
+    "shared_blks_hit": 640,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ore1_0.id,ore1_0.end_minute,ore1_0.room_id,ore1_0.start_minute,ore1_0.weekday from core.opening_rule ore1_0 where ore1_0.room_id=$1",
+    "calls": 7820,
+    "total_exec_time": 419.8234370000011,
+    "rows": 54740,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 15640,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select rr1_0.id,rr1_0.comment,rr1_0.created_at,rr1_0.order_id,rr1_0.reporter_id,rr1_0.score from repair.repair_rating rr1_0 where rr1_0.order_id in ($1 /*, ... */)",
+    "calls": 15591,
+    "total_exec_time": 275.5532509999993,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select se1_0.room_id from core.seat se1_0 where se1_0.id=$1",
+    "calls": 7820,
+    "total_exec_time": 257.2922729999993,
+    "rows": 7820,
+    "shared_blks_read": 1,
+    "shared_blks_hit": 23459,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "BEGIN",
+    "calls": 187332,
+    "total_exec_time": 221.03725700000246,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select se1_0.id,se1_0.code,se1_0.enabled,se1_0.has_power,se1_0.room_id,se1_0.version from core.seat se1_0 where se1_0.id=$1",
+    "calls": 7820,
+    "total_exec_time": 209.22567500000002,
+    "rows": 7820,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 23460,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ne1_0.id from core.notification ne1_0 where ne1_0.dedup_key=$1 fetch first $2 rows only",
+    "calls": 20,
+    "total_exec_time": 190.63691499999996,
+    "rows": 0,
+    "shared_blks_read": 6,
+    "shared_blks_hit": 54,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "update repair.outbox_command set attempts=$1,command_type=$2,created_at=$3,last_attempt_at=$4,last_error_code=$5,lease_owner=$6,lease_until=$7,next_attempt_at=$8,order_id=$9,payload_hash=$10,payload_json=$11,request_id=$12,source_version=$13,status=$14,updated_at=$15,version=$16 where command_id=$17 and version=$18",
+    "calls": 40,
+    "total_exec_time": 136.856168,
+    "rows": 40,
+    "shared_blks_read": 6,
+    "shared_blks_hit": 472,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ne1_0.id,ne1_0.attempts,ne1_0.channel,ne1_0.created_at,ne1_0.dedup_key,ne1_0.due_at,ne1_0.event_type,ne1_0.last_error_code,ne1_0.lease_owner,ne1_0.lease_until,ne1_0.next_attempt_at,ne1_0.payload_json,ne1_0.read_at,ne1_0.recipient_id,ne1_0.room_id,ne1_0.sent_at,ne1_0.source_id,ne1_0.source_type,ne1_0.status,ne1_0.version from core.notification ne1_0 where ne1_0.id=$1",
+    "calls": 20,
+    "total_exec_time": 97.320082,
+    "rows": 0,
+    "shared_blks_read": 24,
+    "shared_blks_hit": 36,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select oc1_0.command_id from repair.outbox_command oc1_0 where (oc1_0.status='PENDING' and oc1_0.next_attempt_at<=$1) or (oc1_0.status='LEASED' and oc1_0.lease_until<=$2) order by oc1_0.next_attempt_at fetch first $3 rows only",
+    "calls": 11,
+    "total_exec_time": 92.83170799999999,
+    "rows": 20,
+    "shared_blks_read": 75,
+    "shared_blks_hit": 66,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into repair.outbox_command (attempts,command_type,created_at,last_attempt_at,last_error_code,lease_owner,lease_until,next_attempt_at,order_id,payload_hash,payload_json,request_id,source_version,status,updated_at,version,command_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)",
+    "calls": 20,
+    "total_exec_time": 77.61966699999999,
+    "rows": 20,
+    "shared_blks_read": 18,
+    "shared_blks_hit": 242,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select cast(row_to_json(q) as text) from (select distinct u.id from core.app_user u join core.user_role ur on ur.user_id=u.id join core.role r on r.id=ur.role_id where u.enabled and r.enabled and (r.code=$2 or (r.code=$3 and $1=$4))) q",
+    "calls": 20,
+    "total_exec_time": 59.73987399999999,
+    "rows": 20,
+    "shared_blks_read": 32,
+    "shared_blks_hit": 748,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "BEGIN",
+    "calls": 31248,
+    "total_exec_time": 30.65543000000056,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 0,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into repair.audit_event (action,actor_id,actor_type,after_json,before_json,created_at,object_id,object_type,reason,request_id,room_id,source_id,source_type,id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+    "calls": 20,
+    "total_exec_time": 21.955247999999994,
+    "rows": 20,
+    "shared_blks_read": 5,
+    "shared_blks_hit": 96,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select oc1_0.command_id,oc1_0.attempts,oc1_0.command_type,oc1_0.created_at,oc1_0.last_attempt_at,oc1_0.last_error_code,oc1_0.lease_owner,oc1_0.lease_until,oc1_0.next_attempt_at,oc1_0.order_id,oc1_0.payload_hash,oc1_0.payload_json,oc1_0.request_id,oc1_0.source_version,oc1_0.status,oc1_0.updated_at,oc1_0.version from repair.outbox_command oc1_0 where oc1_0.command_id=$1 for no key update of oc1_0",
+    "calls": 40,
+    "total_exec_time": 11.551295999999999,
+    "rows": 40,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 143,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "insert into core.processed_command (http_status,payload_hash,processed_at,result_json,command_id) values ($1,$2,$3,$4,$5)",
+    "calls": 20,
+    "total_exec_time": 11.227250999999999,
+    "rows": 20,
+    "shared_blks_read": 2,
+    "shared_blks_hit": 49,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ro1_0.id,ro1_0.accept_due_at,ro1_0.acceptance_round,ro1_0.accepted_at,ro1_0.assign_due_at,ro1_0.assigned_at,ro1_0.assigned_by,ro1_0.assigned_to,ro1_0.assigned_to_name,ro1_0.closed_at,ro1_0.created_at,ro1_0.description,ro1_0.first_assigned_at,ro1_0.last_work_note,ro1_0.reporter_id,ro1_0.resource_version,ro1_0.room_id,ro1_0.status,ro1_0.submitted_at,ro1_0.title,ro1_0.updated_at,ro1_0.version,ro1_0.work_completed_at,ro1_0.work_due_at from repair.repair_order ro1_0 where ro1_0.id=$1 for no key update of ro1_0",
+    "calls": 40,
+    "total_exec_time": 10.539628,
+    "rows": 40,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 240,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT c.oid, a.attnum, a.attname, c.relname, n.nspname, a.attnotnull OR (t.typtype = $1 AND t.typnotnull), a.attidentity != $2 OR pg_catalog.pg_get_expr(d.adbin, d.adrelid) LIKE $3 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON (c.relnamespace = n.oid) JOIN pg_catalog.pg_attribute a ON (c.oid = a.attrelid) JOIN pg_catalog.pg_type t ON (a.atttypid = t.oid) LEFT JOIN pg_catalog.pg_attrdef d ON (d.adrelid = a.attrelid AND d.adnum = a.attnum) JOIN (SELECT $4 AS oid , $5 AS attnum) vals ON (c.oid = vals.oid AND a.attnum = vals.attnum) where c.oid in ($6)",
+    "calls": 9,
+    "total_exec_time": 8.506293,
+    "rows": 9,
+    "shared_blks_read": 4,
+    "shared_blks_hit": 131,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select pce1_0.command_id,pce1_0.http_status,pce1_0.payload_hash,pce1_0.processed_at,pce1_0.result_json from core.processed_command pce1_0 where pce1_0.command_id=$1",
+    "calls": 40,
+    "total_exec_time": 8.482578,
+    "rows": 0,
+    "shared_blks_read": 1,
+    "shared_blks_hit": 39,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select oc1_0.command_id,oc1_0.attempts,oc1_0.command_type,oc1_0.created_at,oc1_0.last_attempt_at,oc1_0.last_error_code,oc1_0.lease_owner,oc1_0.lease_until,oc1_0.next_attempt_at,oc1_0.order_id,oc1_0.payload_hash,oc1_0.payload_json,oc1_0.request_id,oc1_0.source_version,oc1_0.status,oc1_0.updated_at,oc1_0.version from repair.outbox_command oc1_0 where oc1_0.command_id=$1",
+    "calls": 20,
+    "total_exec_time": 7.627459000000001,
+    "rows": 0,
+    "shared_blks_read": 1,
+    "shared_blks_hit": 19,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "update repair.scheduled_task set attempts=$1,created_at=$2,cycle=$3,dedup_key=$4,due_at=$5,last_error_code=$6,lease_owner=$7,lease_until=$8,next_attempt_at=$9,source_id=$10,source_type=$11,status=$12,task_type=$13,version=$14 where id=$15 and version=$16",
+    "calls": 20,
+    "total_exec_time": 6.142583999999999,
+    "rows": 20,
+    "shared_blks_read": 4,
+    "shared_blks_hit": 279,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select dt1_0.id from repair.scheduled_task dt1_0 where (dt1_0.status='PENDING' and dt1_0.next_attempt_at<=$1) or (dt1_0.status='LEASED' and dt1_0.lease_until<=$2) order by dt1_0.next_attempt_at fetch first $3 rows only",
+    "calls": 11,
+    "total_exec_time": 5.540290999999999,
+    "rows": 20,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 55,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select * from core.notification where ((status in ($1 /*, ... */) and next_attempt_at<=$2) or (status=$3 and lease_until<=$4)) order by next_attempt_at,id limit $5 for update skip locked",
+    "calls": 11,
+    "total_exec_time": 3.6315419999999996,
+    "rows": 20,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 66,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ne1_0.id,ne1_0.attempts,ne1_0.channel,ne1_0.created_at,ne1_0.dedup_key,ne1_0.due_at,ne1_0.event_type,ne1_0.last_error_code,ne1_0.lease_owner,ne1_0.lease_until,ne1_0.next_attempt_at,ne1_0.payload_json,ne1_0.read_at,ne1_0.recipient_id,ne1_0.room_id,ne1_0.sent_at,ne1_0.source_id,ne1_0.source_type,ne1_0.status,ne1_0.version from core.notification ne1_0 where ne1_0.id=$1 for no key update of ne1_0",
+    "calls": 20,
+    "total_exec_time": 3.6284190000000005,
+    "rows": 20,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 137,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "INSERT INTO repair.scheduled_task(id,task_type,source_type,source_id,dedup_key,cycle,due_at,status,next_attempt_at,created_at)\n    SELECT md5($1||n)::uuid,$2,$3,r.id,$4||r.id,$5,r.assign_due_at,$6,r.assign_due_at,r.created_at FROM generate_series($7,$8) n JOIN repair.repair_order r ON r.id=md5($9||n)::uuid",
+    "calls": 1,
+    "total_exec_time": 1.611375,
+    "rows": 20,
+    "shared_blks_read": 7,
+    "shared_blks_hit": 304,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select ra1_0.id,ra1_0.action,ra1_0.actor_id,ra1_0.actor_type,ra1_0.after_json,ra1_0.before_json,ra1_0.created_at,ra1_0.object_id,ra1_0.object_type,ra1_0.reason,ra1_0.request_id,ra1_0.room_id,ra1_0.source_id,ra1_0.source_type from repair.audit_event ra1_0 where ra1_0.id=$1",
+    "calls": 20,
+    "total_exec_time": 1.473918,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 100,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select count(*) from core.app_user where id=$1 and enabled",
+    "calls": 40,
+    "total_exec_time": 1.40975,
+    "rows": 40,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 120,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "select dt1_0.id,dt1_0.attempts,dt1_0.created_at,dt1_0.cycle,dt1_0.dedup_key,dt1_0.due_at,dt1_0.last_error_code,dt1_0.lease_owner,dt1_0.lease_until,dt1_0.next_attempt_at,dt1_0.source_id,dt1_0.source_type,dt1_0.status,dt1_0.task_type,dt1_0.version from repair.scheduled_task dt1_0 where dt1_0.id=$1 for no key update of dt1_0",
+    "calls": 20,
+    "total_exec_time": 1.325378,
+    "rows": 20,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 120,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "WITH rows AS (SELECT n,md5($1||n)::uuid id,clock_timestamp()+interval $2 due FROM generate_series($3,$4) n)\n    INSERT INTO repair.repair_order(id,reporter_id,room_id,title,description,status,submitted_at,assign_due_at,created_at,updated_at)\n    SELECT id,md5($5||n)::uuid,md5($6||n)::uuid,$7,$8,$9,due-interval $10,due,due-interval $11,due-interval $12 FROM rows",
+    "calls": 1,
+    "total_exec_time": 1.26775,
+    "rows": 20,
+    "shared_blks_read": 9,
+    "shared_blks_hit": 309,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "DELETE FROM session.SPRING_SESSION\nWHERE EXPIRY_TIME < $1",
+    "calls": 6,
+    "total_exec_time": 0.9690409999999999,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 38,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "DELETE FROM session.SPRING_SESSION\nWHERE EXPIRY_TIME < $1",
+    "calls": 6,
+    "total_exec_time": 0.158584,
+    "rows": 0,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 38,
+    "temp_blks_written": 0
+  },
+  {
+    "query": "SELECT json_agg(json_build_object($1,r.id,$2,extract($3 FROM r.assign_due_at))) FROM generate_series($4,$5) n JOIN repair.repair_order r ON r.id=md5($6||n)::uuid",
+    "calls": 1,
+    "total_exec_time": 0.127375,
+    "rows": 1,
+    "shared_blks_read": 0,
+    "shared_blks_hit": 5,
+    "temp_blks_written": 0
+  }
+]

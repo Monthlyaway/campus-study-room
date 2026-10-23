@@ -1,0 +1,269 @@
+{
+  "runId": "20261022T125715Z",
+  "dataBefore": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100000,
+    "reservations": 101068,
+    "claims": 101068,
+    "historicalTasks": 200000
+  },
+  "dataAfter": {
+    "accounts": 1000,
+    "rooms": 20,
+    "seats": 1000,
+    "historicalReservations": 100000,
+    "reservations": 111865,
+    "claims": 111865,
+    "historicalTasks": 200000
+  },
+  "warmupSeconds": 60,
+  "measurementSeconds": 300,
+  "concurrency": 20,
+  "readRatio": 0.8000397930760048,
+  "requests": 90468,
+  "throughputPerSecond": 301.56,
+  "serverErrors": 0,
+  "serverErrorRate": 0.0,
+  "transportErrors": 0,
+  "unexpected4xx": 0,
+  "groups": {
+    "read": {
+      "requests": 72378,
+      "status": {
+        "200": 72378
+      },
+      "successful": 72378,
+      "p50Ms": 43.044582998845726,
+      "p95Ms": 153.50079201743938,
+      "p99Ms": 321.494583011372,
+      "maxMs": 1277.4894169997424
+    },
+    "write": {
+      "requests": 18090,
+      "status": {
+        "201": 9049,
+        "200": 9041
+      },
+      "successful": 18090,
+      "p50Ms": 66.23825000133365,
+      "p95Ms": 252.9349579999689,
+      "p99Ms": 497.8552079992369,
+      "maxMs": 1301.8376249819994
+    },
+    "availability": {
+      "requests": 18094,
+      "status": {
+        "200": 18094
+      },
+      "successful": 18094,
+      "p50Ms": 56.4932499837596,
+      "p95Ms": 176.7850420146715,
+      "p99Ms": 350.2477920264937,
+      "maxMs": 1025.7810000039171
+    },
+    "repair-history": {
+      "requests": 18091,
+      "status": {
+        "200": 18091
+      },
+      "successful": 18091,
+      "p50Ms": 48.472416994627565,
+      "p95Ms": 176.49374998291023,
+      "p99Ms": 383.7494160106871,
+      "maxMs": 1277.4894169997424
+    },
+    "reservation-cancel": {
+      "requests": 9041,
+      "status": {
+        "200": 9041
+      },
+      "successful": 9041,
+      "p50Ms": 52.782374987145886,
+      "p95Ms": 188.2399590103887,
+      "p99Ms": 409.4553329923656,
+      "maxMs": 1121.7218749807216
+    },
+    "reservation-create": {
+      "requests": 9049,
+      "status": {
+        "201": 9049
+      },
+      "successful": 9049,
+      "p50Ms": 84.78433400159702,
+      "p95Ms": 288.8449999736622,
+      "p99Ms": 571.6797920176759,
+      "maxMs": 1301.8376249819994
+    },
+    "reservation-history": {
+      "requests": 18097,
+      "status": {
+        "200": 18097
+      },
+      "successful": 18097,
+      "p50Ms": 37.30845800600946,
+      "p95Ms": 132.89708297816105,
+      "p99Ms": 296.83895900961943,
+      "maxMs": 1162.5458749767859
+    },
+    "room-detail": {
+      "requests": 18096,
+      "status": {
+        "200": 18096
+      },
+      "successful": 18096,
+      "p50Ms": 31.162459024926648,
+      "p95Ms": 116.68620802811347,
+      "p99Ms": 242.8245409973897,
+      "maxMs": 997.6447079970967
+    }
+  },
+  "deadlineProbes": [
+    {
+      "id": "c11b7934-e196-48ee-9601-2ece04d2032d",
+      "dueEpoch": 1792673963.337165,
+      "firstObservedEpoch": 1792673991.970922,
+      "auditEpoch": 1792673989.983887,
+      "observedDelaySeconds": 28.63375687599182
+    },
+    {
+      "id": "249295d4-ba14-2eb3-e394-884a29af6546",
+      "dueEpoch": 1792673963.3385,
+      "firstObservedEpoch": 1792673991.9709172,
+      "auditEpoch": 1792673990.703715,
+      "observedDelaySeconds": 28.63241720199585
+    },
+    {
+      "id": "eda0f7c0-99bb-6953-5400-e233d8affca9",
+      "dueEpoch": 1792673963.338515,
+      "firstObservedEpoch": 1792673991.970923,
+      "auditEpoch": 1792673990.942916,
+      "observedDelaySeconds": 28.632407903671265
+    },
+    {
+      "id": "2e9924e3-b213-1576-764e-6d830303fee2",
+      "dueEpoch": 1792673963.338528,
+      "firstObservedEpoch": 1792673991.970918,
+      "auditEpoch": 1792673991.062103,
+      "observedDelaySeconds": 28.632390022277832
+    },
+    {
+      "id": "f7a0f608-47ef-f851-dbf1-ab835c3885fb",
+      "dueEpoch": 1792673963.338536,
+      "firstObservedEpoch": 1792673991.970925,
+      "auditEpoch": 1792673991.175267,
+      "observedDelaySeconds": 28.632389068603516
+    },
+    {
+      "id": "9eea648c-be3e-2bc3-db54-36cc6ba25b85",
+      "dueEpoch": 1792673963.338541,
+      "firstObservedEpoch": 1792673991.970921,
+      "auditEpoch": 1792673991.251659,
+      "observedDelaySeconds": 28.63238000869751
+    },
+    {
+      "id": "7e580bbd-5614-d250-1f15-5970f3128be4",
+      "dueEpoch": 1792673963.338546,
+      "firstObservedEpoch": 1792673991.970919,
+      "auditEpoch": 1792673991.313997,
+      "observedDelaySeconds": 28.632372856140137
+    },
+    {
+      "id": "c114ca1e-2496-101e-b11f-aa4d4173605b",
+      "dueEpoch": 1792673963.338551,
+      "firstObservedEpoch": 1792673991.970921,
+      "auditEpoch": 1792673991.362153,
+      "observedDelaySeconds": 28.632369995117188
+    },
+    {
+      "id": "eaa80cc8-a2f3-dc54-d446-137acb321d84",
+      "dueEpoch": 1792673963.338569,
+      "firstObservedEpoch": 1792673991.970923,
+      "auditEpoch": 1792673991.416847,
+      "observedDelaySeconds": 28.632354021072388
+    },
+    {
+      "id": "395836d3-0685-a8f5-fbed-9339f5c89262",
+      "dueEpoch": 1792673963.338575,
+      "firstObservedEpoch": 1792673991.970918,
+      "auditEpoch": 1792673991.529125,
+      "observedDelaySeconds": 28.63234305381775
+    },
+    {
+      "id": "0f3e8734-9d39-34d1-9f52-e748aa8fecaf",
+      "dueEpoch": 1792673963.33858,
+      "firstObservedEpoch": 1792673991.9709141,
+      "auditEpoch": 1792673991.568992,
+      "observedDelaySeconds": 28.632334232330322
+    },
+    {
+      "id": "678995a3-5ab9-20f6-3f28-c2bb25941a2a",
+      "dueEpoch": 1792673963.338586,
+      "firstObservedEpoch": 1792673991.970919,
+      "auditEpoch": 1792673991.671679,
+      "observedDelaySeconds": 28.632332801818848
+    },
+    {
+      "id": "aba9c21a-9b33-6258-4ae6-f83c40b50a87",
+      "dueEpoch": 1792673963.338592,
+      "firstObservedEpoch": 1792673991.970921,
+      "auditEpoch": 1792673991.71425,
+      "observedDelaySeconds": 28.632328987121582
+    },
+    {
+      "id": "f0cdfb58-55aa-d97e-d9b6-52edee1dc6f1",
+      "dueEpoch": 1792673963.338605,
+      "firstObservedEpoch": 1792673991.9709241,
+      "auditEpoch": 1792673991.756803,
+      "observedDelaySeconds": 28.63231921195984
+    },
+    {
+      "id": "8549d3d4-dbc4-0341-0d6a-1f21d4e7c6b5",
+      "dueEpoch": 1792673963.338611,
+      "firstObservedEpoch": 1792673993.763417,
+      "auditEpoch": 1792673991.88886,
+      "observedDelaySeconds": 30.424806118011475
+    },
+    {
+      "id": "d7ef8273-1fdf-d401-7f49-0e64300d4549",
+      "dueEpoch": 1792673963.338616,
+      "firstObservedEpoch": 1792673993.763419,
+      "auditEpoch": 1792673991.996451,
+      "observedDelaySeconds": 30.424803018569946
+    },
+    {
+      "id": "edb34c60-b0ae-5b65-b1ff-bfddb07e2094",
+      "dueEpoch": 1792673963.338621,
+      "firstObservedEpoch": 1792673993.7634199,
+      "auditEpoch": 1792673992.073209,
+      "observedDelaySeconds": 30.4247989654541
+    },
+    {
+      "id": "c0db453d-8743-b7cf-833e-aa9c59a314e9",
+      "dueEpoch": 1792673963.338626,
+      "firstObservedEpoch": 1792673993.7634182,
+      "auditEpoch": 1792673992.135946,
+      "observedDelaySeconds": 30.424792289733887
+    },
+    {
+      "id": "6ef8ae04-6869-56b5-adc8-1c2a21833541",
+      "dueEpoch": 1792673963.338632,
+      "firstObservedEpoch": 1792673993.763416,
+      "auditEpoch": 1792673992.155922,
+      "observedDelaySeconds": 30.424783945083618
+    },
+    {
+      "id": "65129973-92a0-5989-676c-22d0c42fccf3",
+      "dueEpoch": 1792673963.338637,
+      "firstObservedEpoch": 1792673993.763414,
+      "auditEpoch": 1792673992.184337,
+      "observedDelaySeconds": 30.424776792526245
+    }
+  ],
+  "contentionPassed": true,
+  "lockSamples": 168,
+  "lockWaitSamples": 0,
+  "maxLockWaitSeconds": 0,
+  "passed": true
+}

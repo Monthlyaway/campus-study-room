@@ -1,0 +1,248 @@
+{
+  "success": 1,
+  "conflicts": 19,
+  "activeClaims": 1,
+  "passed": true,
+  "requests": [
+    {
+      "user": 0,
+      "status": 409,
+      "seconds": 0.42522495798766613,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 1,
+      "status": 409,
+      "seconds": 0.3204706249816809,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 2,
+      "status": 409,
+      "seconds": 0.5138752910133917,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 3,
+      "status": 409,
+      "seconds": 0.17605825001373887,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 4,
+      "status": 409,
+      "seconds": 0.23297250000177883,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 5,
+      "status": 409,
+      "seconds": 0.353852750005899,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 6,
+      "status": 409,
+      "seconds": 0.22539704199880362,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 7,
+      "status": 409,
+      "seconds": 0.21461799999815412,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 8,
+      "status": 409,
+      "seconds": 0.1837734580039978,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 9,
+      "status": 409,
+      "seconds": 0.4776257499761414,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 10,
+      "status": 409,
+      "seconds": 0.34227875000215136,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 11,
+      "status": 409,
+      "seconds": 0.37848375001340173,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 12,
+      "status": 409,
+      "seconds": 0.2783424590015784,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 13,
+      "status": 409,
+      "seconds": 0.24142616600147448,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 14,
+      "status": 409,
+      "seconds": 0.2514502920093946,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 15,
+      "status": 201,
+      "seconds": 0.16335954199894331,
+      "data": {
+        "id": "f6f10e8f-560b-414b-9f27-0af409b1c2a1",
+        "userId": "976c35e5-d642-74e1-3376-47e30bb0976a",
+        "roomId": "b04e218d-d220-e362-628f-ae8daf41dda2",
+        "seatId": "a69914de-29ed-4c20-7a03-cf72faa47429",
+        "startAt": "2026-10-25T06:00:00+00:00",
+        "endAt": "2026-10-25T07:00:00+00:00",
+        "status": "RESERVED",
+        "checkedInAt": null,
+        "cancelReason": null,
+        "endedAt": null,
+        "configVersion": 0,
+        "maxDurationHours": 4,
+        "version": 0,
+        "createdAt": "2026-10-22T16:29:38.680097+00:00",
+        "updatedAt": "2026-10-22T16:29:38.680097+00:00",
+        "operatorNote": null,
+        "seatCode": "50",
+        "hasPower": false,
+        "roomName": "\u6027\u80fd\u6559\u5ba419",
+        "roomCode": "PERF-19",
+        "allowedActions": [
+          "cancel"
+        ]
+      },
+      "error": null
+    },
+    {
+      "user": 16,
+      "status": 409,
+      "seconds": 0.3002067920169793,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 17,
+      "status": 409,
+      "seconds": 0.1983386670181062,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 18,
+      "status": 409,
+      "seconds": 0.2586030410020612,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    },
+    {
+      "user": 19,
+      "status": 409,
+      "seconds": 0.45890291599789634,
+      "data": null,
+      "error": {
+        "details": {},
+        "code": "RESERVATION_CONFLICT",
+        "message": "\u8be5\u65f6\u6bb5\u8d44\u6e90\u5df2\u88ab\u5360\u7528\uff0c\u8bf7\u5237\u65b0\u540e\u91cd\u9009"
+      }
+    }
+  ]
+}

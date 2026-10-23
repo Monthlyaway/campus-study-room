@@ -1,0 +1,18 @@
+FROM maven:3.9.11-eclipse-temurin-21@sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237 AS build
+WORKDIR /build
+COPY pom.xml .
+COPY modules modules
+COPY services services
+COPY tools tools
+COPY db db
+RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp -DskipTests package
+
+FROM eclipse-temurin:21.0.12.1_1-jre-noble@sha256:35501d3f93173b420ac9001658eb68157e813316b865087e345c187fca422c4c
+ARG SERVICE=core-service
+RUN groupadd --gid 10001 studyroom && useradd --uid 10001 --gid studyroom --no-create-home studyroom
+WORKDIR /app
+COPY --from=build /build/services/${SERVICE}/target/*.jar /app/application.jar
+COPY --from=build /build/tools/migration-runner/target/*.jar /app/migration.jar
+COPY --chmod=755 infra/compose/entrypoint.sh /app/entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["/app/entrypoint.sh"]

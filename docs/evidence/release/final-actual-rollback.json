@@ -1,0 +1,85 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-22T16:25:32.093533+00:00",
+  "fromRelease": "r-20261022T161900-3c7a93c",
+  "toRelease": "r-20261022T132000-66f2b928550f",
+  "targetCommit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "originalSessions": 2,
+  "retainedCancelledBusinessRecords": 3,
+  "expandedColumnRetained": "repair.repair_order.assigned_to_name",
+  "database": {
+    "postgresVersion": "180006",
+    "migrations": [
+      {
+        "schema": "core",
+        "installed_rank": 1,
+        "version": "20261022000100",
+        "description": "core schema",
+        "type": "SQL",
+        "script": "V20261022000100__core_schema.sql",
+        "checksum": -2040106863,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 2,
+        "version": "20261022130000",
+        "description": "self role scope",
+        "type": "SQL",
+        "script": "V20261022130000__self_role_scope.sql",
+        "checksum": -892298813,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 3,
+        "version": "20261022143000",
+        "description": "reservation history index",
+        "type": "SQL",
+        "script": "V20261022143000__reservation_history_index.sql",
+        "checksum": 1340263816,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 4,
+        "version": "20261022150000",
+        "description": "reservation operator note",
+        "type": "SQL",
+        "script": "V20261022150000__reservation_operator_note.sql",
+        "checksum": 383066205,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 1,
+        "version": "20261022120000",
+        "description": "repair domain",
+        "type": "SQL",
+        "script": "V20261022120000__repair_domain.sql",
+        "checksum": 662384302,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 2,
+        "version": "20261022160000",
+        "description": "assigned worker name snapshot",
+        "type": "SQL",
+        "script": "V20261022160000__assigned_worker_name_snapshot.sql",
+        "checksum": -1184161627,
+        "success": true
+      },
+      {
+        "schema": "session",
+        "installed_rank": 1,
+        "version": "20261022000000",
+        "description": "spring session",
+        "type": "SQL",
+        "script": "V20261022000000__spring_session.sql",
+        "checksum": -174758120,
+        "success": true
+      }
+    ]
+  }
+}

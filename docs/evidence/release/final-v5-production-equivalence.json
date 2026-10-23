@@ -1,0 +1,39 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-23T00:16:33.736871+00:00",
+  "baselineCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "candidateCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "releaseId": "r-20261023T001633-e95b025",
+  "result": "passed",
+  "verifiedProductionAndBuildInputs": 242,
+  "scope": {
+    "prefixes": [
+      "apps/",
+      "services/",
+      "modules/",
+      "tools/",
+      "db/",
+      "infra/",
+      "scripts/",
+      "contracts/"
+    ],
+    "files": [
+      ".dockerignore",
+      ".mvn/wrapper/maven-wrapper.properties",
+      ".node-version",
+      "docs/dependency-baseline.json",
+      "install.sh",
+      "mvnw",
+      "pom.xml"
+    ]
+  },
+  "pathSetBytesAndGitModesUnchanged": true,
+  "changedInputPaths": [],
+  "inventorySha256": "a9292b5d5939712c64d257d02bb560c431ddc5a0db4ad9023d2fa04f1170fc75",
+  "limitations": [
+    "Release metadata embedded in web/version.json intentionally identifies the new candidate; production source equivalence does not assert identical OCI image IDs.",
+    "CI, tests, operational documentation and release evidence are outside this production-input equivalence set and remain covered by their own checks."
+  ],
+  "manifestSha256": "0808e170ccd518d11f7bf699a0c1b81e28f89d7baa8694c403f3c18b08452400",
+  "productionInputCount": 242
+}

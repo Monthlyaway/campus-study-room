@@ -1,0 +1,9 @@
+{
+  "accounts": 1000,
+  "rooms": 20,
+  "seats": 1000,
+  "historicalReservations": 100000,
+  "reservations": 100000,
+  "claims": 100000,
+  "historicalTasks": 200000
+}

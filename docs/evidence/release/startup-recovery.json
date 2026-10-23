@@ -1,0 +1,22 @@
+{
+  "result": "passed",
+  "checkedAt": "2026-10-22T13:45:49.890745+00:00",
+  "fault": "Disconnect candidate core from its isolated private network during startup",
+  "candidate": "r-20261022T132000-66f2b928550f",
+  "restored": "r-20261022T131500-6c9c47359404",
+  "deployExitCode": 1,
+  "elapsedSeconds": 121.9,
+  "recovery": {
+    "result": "passed",
+    "manifestSha256": "b2ab306d62a0875c3c09c1a96fe22d996a43433abaabe7f40726ad27a8cb8df5",
+    "releaseId": "r-20261022T131500-6c9c47359404",
+    "databaseSha256": "6efca332072363810892bc3e4b8f5d25cc8312c4fef794fa032dcad08aa5bbe2"
+  },
+  "checks": {
+    "threeImageIdsAndVersions": true,
+    "databaseAndExpandedColumnPreserved": true,
+    "publicEntryReopened": true,
+    "businessRecordsRetained": true,
+    "failedAttemptArchived": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "httpStatus": 503,
+  "errorCode": "AUTHORIZATION_UNAVAILABLE",
+  "before": [
+    {
+      "status": "ASSIGNED",
+      "version": 1,
+      "resource_version": 0,
+      "history_count": 2,
+      "audit_count": 2
+    }
+  ],
+  "after": [
+    {
+      "status": "ASSIGNED",
+      "version": 1,
+      "resource_version": 0,
+      "history_count": 2,
+      "audit_count": 2
+    }
+  ],
+  "blockCommands": 0
+}

@@ -1,0 +1,121 @@
+{
+  "result": "passed",
+  "environment": "test",
+  "project": "studyroom-portable-install",
+  "backupFile": "20261022T153710676520Z.dump",
+  "sha256": "950a7f972936ebca870e955aa9fb80dce8c5bf440d1d129a3fd033d222900325",
+  "formatVersion": 2,
+  "releaseCommit": "66f2b928550f50d89fe39ed23057beefd66f39cd",
+  "database": {
+    "postgresVersion": "180006",
+    "migrations": [
+      {
+        "schema": "core",
+        "installed_rank": 1,
+        "version": "20261022000100",
+        "description": "core schema",
+        "type": "SQL",
+        "script": "V20261022000100__core_schema.sql",
+        "checksum": -2040106863,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 2,
+        "version": "20261022130000",
+        "description": "self role scope",
+        "type": "SQL",
+        "script": "V20261022130000__self_role_scope.sql",
+        "checksum": -892298813,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 3,
+        "version": "20261022143000",
+        "description": "reservation history index",
+        "type": "SQL",
+        "script": "V20261022143000__reservation_history_index.sql",
+        "checksum": 1340263816,
+        "success": true
+      },
+      {
+        "schema": "core",
+        "installed_rank": 4,
+        "version": "20261022150000",
+        "description": "reservation operator note",
+        "type": "SQL",
+        "script": "V20261022150000__reservation_operator_note.sql",
+        "checksum": 383066205,
+        "success": true
+      },
+      {
+        "schema": "repair",
+        "installed_rank": 1,
+        "version": "20261022120000",
+        "description": "repair domain",
+        "type": "SQL",
+        "script": "V20261022120000__repair_domain.sql",
+        "checksum": 662384302,
+        "success": true
+      },
+      {
+        "schema": "session",
+        "installed_rank": 1,
+        "version": "20261022000000",
+        "description": "spring session",
+        "type": "SQL",
+        "script": "V20261022000000__spring_session.sql",
+        "checksum": -174758120,
+        "success": true
+      }
+    ]
+  },
+  "backupBytes": 136969,
+  "permissions": "0600",
+  "scheduler": "macOS launchd",
+  "firstSchedulerExitCode": 0,
+  "dailyDuplicateSkipped": true,
+  "retentionDays": 7,
+  "retentionEvidence": "temporary checked/corrupt/new/partial fixture tests; not seven elapsed days",
+  "linuxScheduler": "definition test only",
+  "previousVerification": {
+    "backupFile": "20261022T151804503895Z.dump",
+    "sha256": "6377ff277e04215c3856eec973144bb5307ee37bf9b936701b9d826c7cbdec72",
+    "backupBytes": 136969
+  },
+  "validation": {
+    "archiveTocReadable": true,
+    "fullArchiveDecoded": true
+  },
+  "integrityRegression": {
+    "verifiedAt": "2026-10-22T15:37:12.343103+00:00",
+    "opsTests": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "invalidDailyCases": 15,
+      "symlinkCases": 4
+    },
+    "actualForceBackup": true,
+    "sharedEnvironmentLock": true,
+    "oldDumpCountPreserved": 2,
+    "allOldDumpHashesUnchanged": true,
+    "newBackupAndMetadataPermissions": "0600",
+    "verifiedDailySkipAfterForce": true,
+    "truncatedInMemoryBytes": 64,
+    "truncationResults": {
+      "toc": {
+        "exitCode": 0,
+        "unexpectedEndOfFile": false
+      },
+      "fullDecode": {
+        "exitCode": 1,
+        "unexpectedEndOfFile": true
+      }
+    },
+    "originalNewDumpHashUnchanged": true,
+    "liveDatabaseModified": false,
+    "backupVolumesRemoved": false
+  }
+}

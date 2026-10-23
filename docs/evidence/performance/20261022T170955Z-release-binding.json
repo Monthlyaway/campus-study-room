@@ -1,0 +1,63 @@
+{
+  "releaseId": "r-20261022T170200-3012051",
+  "releaseCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "manifestSource": ".local/releases/r-20261022T170200-3012051/manifest.json",
+  "manifest": {
+    "bytes": 1934,
+    "sha256": "b24dc2ae24c6dea3ca159290602741fe546793082a896c18a16b1b2ac1f936f6"
+  },
+  "manifestCanonicalSha256": "d565e066b00157838e3572b5e3511d34df2e352f22b363b4654a1124cbe6f148",
+  "observedImagesBefore": {
+    "core": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+    "repair": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+    "web": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4"
+  },
+  "observedImagesAfterCoreRecovery": {
+    "core": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+    "repair": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+    "web": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4"
+  },
+  "manifestImages": {
+    "core": "sha256:6fe4c49586b83adb33fbc5a456c71e21e66d6ce5bb6d1cea462e907de782488d",
+    "repair": "sha256:afb5b70bce1b13ec703c2451b0e1ad369bc6443ef6fd818d0feeaea82c906fe4",
+    "web": "sha256:6bcda0a92239bfaf2c365c6962c9085e260e267c068f39e50cd281fe2d5988a4"
+  },
+  "allImageIdsMatch": true,
+  "observedVersionsBefore": {
+    "web": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "core": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "repair": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    }
+  },
+  "observedVersionsAfterRepairAndCoreRecovery": {
+    "web": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "core": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    },
+    "repair": {
+      "releaseId": "r-20261022T170200-3012051",
+      "commit": "3012051f06c601e6c22a03e50d9d307a3054d1d9"
+    }
+  },
+  "allVersionApisMatchBeforeAndAfterRecovery": true,
+  "collectorCheckoutCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "testScriptsMatchReleaseSource": {
+    "tests/performance/environment.py": true,
+    "tests/performance/run.py": true,
+    "tests/performance/inspect_queries.py": true,
+    "tests/integration/core_restart_recovery.py": true
+  },
+  "postRecoveryObservedAt": "2026-10-22T17:20:22.367265+00:00"
+}

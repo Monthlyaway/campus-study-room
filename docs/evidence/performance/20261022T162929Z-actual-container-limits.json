@@ -1,0 +1,37 @@
+[
+  {
+    "service": "core",
+    "image": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+    "cpuSet": "0-3",
+    "memory": 2147483648,
+    "memorySwap": 2147483648
+  },
+  {
+    "service": "mailpit",
+    "image": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+    "cpuSet": "0-3",
+    "memory": 536870912,
+    "memorySwap": 536870912
+  },
+  {
+    "service": "postgres",
+    "image": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+    "cpuSet": "0-3",
+    "memory": 3221225472,
+    "memorySwap": 3221225472
+  },
+  {
+    "service": "repair",
+    "image": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+    "cpuSet": "0-3",
+    "memory": 2147483648,
+    "memorySwap": 2147483648
+  },
+  {
+    "service": "web",
+    "image": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+    "cpuSet": "0-3",
+    "memory": 536870912,
+    "memorySwap": 536870912
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "verifiedAt": "2026-10-22",
+  "java": "21.0.12.1",
+  "springBoot": "4.1.1",
+  "maven": "3.9.11",
+  "node": "24.22.1",
+  "docker": "28.5.2",
+  "compose": "2.40.3",
+  "images": {
+    "postgres": "postgres:18.6-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+    "java": "eclipse-temurin:21.0.12.1_1-jre-noble@sha256:35501d3f93173b420ac9001658eb68157e813316b865087e345c187fca422c4c",
+    "node": "node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205",
+    "nginx": "nginx:1.30.6-alpine3.24@sha256:c59d1f8b1e0e42da75be973424cd72e23f7f8adfb54e982f4d1cd0216a5a5576",
+    "maven": "maven:3.9.11-eclipse-temurin-21@sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237",
+    "registry": "registry:3.0.0@sha256:6c5666b861f3505b116bb9aa9b25175e71210414bd010d92035ff64018f9457e",
+    "mailpit": "axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387"
+  },
+  "sources": [
+    "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/4.1.1/",
+    "https://nodejs.org/dist/v24.22.1/",
+    "https://hub.docker.com/v2/repositories/library/postgres/tags/18.6-bookworm",
+    "https://hub.docker.com/v2/repositories/library/eclipse-temurin/tags/21.0.12.1_1-jre-noble",
+    "https://hub.docker.com/v2/repositories/library/node/tags/24.22.1-bookworm-slim",
+    "https://hub.docker.com/v2/repositories/library/nginx/tags/1.30.6-alpine3.24"
+  ],
+  "validation": "Official artifact availability verified; full build/startup checks are tracked in docs/evidence. Frontend exact dependency versions are pinned by apps/web/package.json and pnpm-lock.yaml."
+}

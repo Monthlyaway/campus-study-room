@@ -1,0 +1,333 @@
+{
+  "formatVersion": 1,
+  "startedAt": "2026-10-22T16:48:08.312427+00:00",
+  "completedAt": "2026-10-22T16:48:13.064651+00:00",
+  "result": "passed",
+  "sourceHeadCommit": "d8352b21a78e24bb4bcd79178e130359ccf601cd",
+  "releaseCandidateCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "releaseId": "r-20261022T161900-3c7a93c",
+  "sourceScope": {
+    "trackedAndNewDocumentationFiles": 411,
+    "trackedFileCount": 389,
+    "sourceInventorySha256": "036731a9c249a2b46f417187419c39b8622a4960489f0f95df06c1b1934e633d",
+    "workingTreeIncluded": true,
+    "newDocumentationIncluded": true,
+    "sourceChangedDuringScan": [],
+    "headUnchangedDuringScan": true,
+    "applicationAndRuntimeProductionFilesMatchCandidate": true,
+    "excludedSelfReports": [
+      "docs/evidence/final-runtime-audit.json",
+      "docs/evidence/final-runtime-audit.md"
+    ],
+    "oldSourceAuditPreserved": true
+  },
+  "runtimeScope": {
+    "frozenArtifactGroups": [
+      {
+        "path": "output/browser-release-final",
+        "files": 69,
+        "bytes": 8603763
+      },
+      {
+        "path": "output/browser-room-options-race",
+        "files": 5,
+        "bytes": 125988
+      },
+      {
+        "path": "output/performance/20261022T162929Z",
+        "files": 13,
+        "bytes": 20113090
+      },
+      {
+        "path": "output/performance/core-recovery-20261022T163632Z-0b832ad5",
+        "files": 5,
+        "bytes": 22648
+      },
+      {
+        "path": "output/performance/core-recovery-20261022T163826Z-22ec28db",
+        "files": 8,
+        "bytes": 32036
+      }
+    ],
+    "collectedLogs": [
+      {
+        "path": "output/final-runtime-audit/portable-install-core.log",
+        "environment": "portable-install",
+        "service": "core",
+        "imageId": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+        "bytes": 154350
+      },
+      {
+        "path": "output/final-runtime-audit/portable-install-repair.log",
+        "environment": "portable-install",
+        "service": "repair",
+        "imageId": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+        "bytes": 43970
+      },
+      {
+        "path": "output/final-runtime-audit/portable-install-web.log",
+        "environment": "portable-install",
+        "service": "web",
+        "imageId": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+        "bytes": 124908
+      },
+      {
+        "path": "output/final-runtime-audit/performance-core.log",
+        "environment": "performance",
+        "service": "core",
+        "imageId": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+        "bytes": 47977672
+      },
+      {
+        "path": "output/final-runtime-audit/performance-repair.log",
+        "environment": "performance",
+        "service": "repair",
+        "imageId": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+        "bytes": 8336198
+      },
+      {
+        "path": "output/final-runtime-audit/performance-web.log",
+        "environment": "performance",
+        "service": "web",
+        "imageId": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+        "bytes": 18816735
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-actual-rollback.log",
+        "source": "output/release-final-v3-actual-rollback.log",
+        "bytes": 2353
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-build.log",
+        "source": "output/release-final-v3-build.log",
+        "bytes": 21170
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-compatibility.log",
+        "source": "output/release-final-v3-compatibility.log",
+        "bytes": 8412
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-deploy.log",
+        "source": "output/release-final-v3-deploy.log",
+        "bytes": 4162
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-export.log",
+        "source": "output/release-final-v3-export.log",
+        "bytes": 98
+      },
+      {
+        "path": "output/final-runtime-audit/release-final-v3-import.log",
+        "source": "output/release-final-v3-import.log",
+        "bytes": 4058
+      },
+      {
+        "path": "output/final-runtime-audit/performance-final-v3-queries.log",
+        "source": "output/performance-final-v3-queries.log",
+        "bytes": 241
+      },
+      {
+        "path": "output/final-runtime-audit/performance-final-v3-refresh.log",
+        "source": "output/performance-final-v3-refresh.log",
+        "bytes": 3546
+      },
+      {
+        "path": "output/final-runtime-audit/performance-final-v3-run.log",
+        "source": "output/performance-final-v3-run.log",
+        "bytes": 8715
+      }
+    ],
+    "collectedLogCount": 15,
+    "dockerLogCutoffUtc": "2026-10-22T16:48:08.822749Z",
+    "artifactFileCount": 116,
+    "artifactInventorySha256": "5ed16e036f38378e83cafd74c4f93a68ccc1c94cb9ea84d06da74353282fb2c2",
+    "artifactsChangedDuringScan": [],
+    "remoteGitLabLogsIncluded": false,
+    "packageSummaryIncluded": true
+  },
+  "runningVersions": {
+    "portable-install": {
+      "web": {
+        "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+        "releaseId": "r-20261022T161900-3c7a93c",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+        "releaseId": "r-20261022T161900-3c7a93c",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+        "releaseId": "r-20261022T161900-3c7a93c",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      }
+    },
+    "performance": {
+      "web": {
+        "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+        "releaseId": "r-20261022T161900-3c7a93c",
+        "metadataMatchesCandidate": true,
+        "imageIdMatchesCandidate": true
+      },
+      "core": {
+        "commit": "working-tree",
+        "releaseId": "development",
+        "metadataMatchesCandidate": false,
+        "imageIdMatchesCandidate": true
+      },
+      "repair": {
+        "commit": "working-tree",
+        "releaseId": "development",
+        "metadataMatchesCandidate": false,
+        "imageIdMatchesCandidate": true
+      }
+    }
+  },
+  "method": {
+    "privateSourceFileCount": 52,
+    "liveSessionCounts": {
+      "portable-install": 15,
+      "performance": 21
+    },
+    "liveSessionsReadInReadOnlyTransactions": true,
+    "knownUniqueValuesIncludingTextDecoding": 181,
+    "uniqueEncodingVariants": 727,
+    "privateNeedlesPersisted": false,
+    "encodings": [
+      "raw UTF-8",
+      "Base64 standard and URL-safe, padded and unpadded",
+      "lowercase and uppercase hexadecimal",
+      "URL percent and form encoding",
+      "JSON string escaping",
+      "HTML escaping"
+    ],
+    "matching": "fixed-string byte matching; patterns supplied through anonymous memory pipes",
+    "embeddedArchives": {
+      "archivesScanned": 1,
+      "membersScanned": 2,
+      "uncompressedBytesScanned": 278423,
+      "unreadableArchives": []
+    }
+  },
+  "results": {
+    "knownSecretMatchingPaths": [],
+    "embeddedSecretMatchingPaths": [],
+    "legacyTemporaryNameMatches": [],
+    "temporaryDownloadProxyConfigurationMatches": [],
+    "dependencyIntegrityExceptions": [
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 2105,
+        "reason": "random dependency integrity token"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 3044,
+        "reason": "random dependency integrity token"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 4299,
+        "reason": "random dependency integrity token"
+      }
+    ]
+  },
+  "acceptanceContext": {
+    "browser": {
+      "expected": 6,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "duration": 119255.271
+    },
+    "performancePassed": true,
+    "firstCoreRecoveryPassed": false,
+    "firstCoreRecoveryFailureType": "JSONDecodeError",
+    "secondCoreRecoveryPassed": true,
+    "secondCoreRecoveryOriginalBusinessUnchanged": true,
+    "midnightBrowserEvidence": "Earlier candidate created the reservation; the previous candidate performed the real check-in and maintenance interruption. The final browser archive preserves that provenance."
+  },
+  "limitations": [
+    "Remote GitLab job logs were not collected or scanned.",
+    "Current Docker logs are bounded by the recorded cutoff; later runtime activity and later source edits require a new scan.",
+    "Known-value exact matching cannot prove that unknown secrets are absent.",
+    "Image files were scanned as raw bytes; this audit does not perform OCR. Masked screenshot handling and the real failing-browser-report privacy probe have separate browser evidence.",
+    "The prior failed recovery result and its follow-up observation were retained unchanged.",
+    "Performance core/repair version API metadata still reports development/working-tree, although their immutable running image IDs match R3; portable-install version metadata matches R3 for all three services.",
+    "This audit does not replace the business assertions in browser, performance, recovery or GitLab acceptance."
+  ],
+  "closingSourceRescan": {
+    "startedAt": "2026-10-22T16:56:44.558369+00:00",
+    "completedAt": "2026-10-22T16:56:45.432219+00:00",
+    "sourceHeadCommit": "543a32b56c08d78d57bc52168040d3827382117e",
+    "sourceFileCount": 412,
+    "trackedFileCount": 389,
+    "untrackedSourceAndDocumentationIncluded": [
+      "docs/evidence/final-source-audit.json",
+      "docs/evidence/final-source-audit.md",
+      "docs/evidence/frontend-release.md",
+      "docs/evidence/performance/20261022T162929Z-actual-container-limits.json",
+      "docs/evidence/performance/20261022T162929Z-artifacts.json",
+      "docs/evidence/performance/20261022T162929Z-contention.json",
+      "docs/evidence/performance/20261022T162929Z-data-scale.json",
+      "docs/evidence/performance/20261022T162929Z-database-samples.json",
+      "docs/evidence/performance/20261022T162929Z-environment.json",
+      "docs/evidence/performance/20261022T162929Z-page-query-counts.json",
+      "docs/evidence/performance/20261022T162929Z-queries-summary.txt",
+      "docs/evidence/performance/20261022T162929Z-query-plans.json",
+      "docs/evidence/performance/20261022T162929Z-recovery.json",
+      "docs/evidence/performance/20261022T162929Z-release-binding.json",
+      "docs/evidence/performance/20261022T162929Z-release-manifest.json",
+      "docs/evidence/performance/20261022T162929Z-result.json",
+      "docs/evidence/performance/20261022T162929Z-sql-after.json",
+      "docs/evidence/performance/20261022T162929Z-sql-before.json",
+      "docs/evidence/performance/20261022T162929Z-sql-counts.json",
+      "docs/evidence/release/final-actual-rollback.json",
+      "docs/evidence/release/final-compatibility.json",
+      "docs/evidence/release/final-portable-import.json",
+      "tests/ops/test_performance_identity.py"
+    ],
+    "sourceInventorySha256": "fa9108186d93c1323f36b331302f8f25971f4b9b23d34a7c91765166c9032635",
+    "reason": "Closing CI, acceptance-tool and evidence-document changes after the original runtime audit; all current tracked files and nonignored new source/documentation rescanned.",
+    "sourceChangedDuringRescan": [],
+    "headUnchangedDuringRescan": true,
+    "originalFrozenArtifactFileCount": 116,
+    "originalFrozenArtifactInventoryUnchanged": true,
+    "originalRuntimeCutoffAndReportPreserved": true,
+    "oldSourceAuditPreserved": true,
+    "applicationAndRuntimeProductionFilesMatchCandidate": true,
+    "knownSecretMatchingPaths": [],
+    "legacyTemporaryNameMatches": [],
+    "temporaryDownloadProxyConfigurationMatches": [],
+    "dependencyIntegrityExceptions": [
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 2105,
+        "reason": "random dependency integrity token"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 3044,
+        "reason": "random dependency integrity token"
+      },
+      {
+        "path": "apps/web/pnpm-lock.yaml",
+        "line": 4299,
+        "reason": "random dependency integrity token"
+      }
+    ],
+    "privateSourceFileCount": 53,
+    "liveSessionCounts": {
+      "portable-install": 1,
+      "performance": 21
+    },
+    "knownUniqueValuesIncludingTextDecoding": 174,
+    "uniqueEncodingVariants": 701,
+    "selfReportsCheckedAfterWriting": true
+  }
+}

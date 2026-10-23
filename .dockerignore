@@ -1,0 +1,16 @@
+.git
+.local
+**/node_modules
+**/target
+**/dist
+**/.umi
+**/.umi-production
+output
+test-results
+playwright-report
+*.log
+.env*
+secrets
+
+.playwright-cli
+**/__pycache__

@@ -1,0 +1,16 @@
+{
+  "status": "IN_REPAIR",
+  "secondsFromNetworkRestore": 268.41125025000656,
+  "commands": [
+    {
+      "command_id": "821a509e-8ec5-4790-9a91-d2f4ea5fcd7e",
+      "command_type": "BLOCK",
+      "status": "DONE",
+      "attempts": 8,
+      "last_error_code": null,
+      "request_id": "245b240a-60a7-4b6d-be78-ed5bdfa963cb"
+    }
+  ],
+  "publicAvailableSeatsBefore": 3,
+  "publicAvailableSeatsAfter": 0
+}

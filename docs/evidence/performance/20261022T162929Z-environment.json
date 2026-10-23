@@ -1,0 +1,35 @@
+{
+  "project": "studyroom-performance",
+  "state": "/Users/agiuser/Codes/campus-study-room/.local/performance",
+  "baseUrl": "http://127.0.0.1:19080",
+  "images": {
+    "core": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+    "repair": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+    "web": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d"
+  },
+  "sourceRefs": {
+    "core": "studyroom-core:r-20261022T161900-3c7a93c",
+    "repair": "studyroom-repair:r-20261022T161900-3c7a93c",
+    "web": "studyroom-web:r-20261022T161900-3c7a93c"
+  },
+  "releaseId": "r-20261022T161900-3c7a93c",
+  "releaseCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "cpuSet": "0-3",
+  "memoryLimits": {
+    "postgres": "3g",
+    "core": "2g",
+    "repair": "2g",
+    "mailpit": "512m",
+    "web": "512m",
+    "migrate": "1g"
+  },
+  "docker": {
+    "Architecture": "aarch64",
+    "NCPU": 10,
+    "MemTotal": 8217448448,
+    "OperatingSystem": "Docker Desktop",
+    "KernelVersion": "6.12.54-linuxkit",
+    "ServerVersion": "28.5.2"
+  },
+  "commit": "d5b4f8423f088bae939310b408a721ab48fd7589"
+}

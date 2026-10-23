@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Create isolated runtime configuration without overwriting existing secrets."""
+import argparse
+import base64
+import fcntl
+import json
+import os
+from pathlib import Path
+import secrets
+
+root = Path(__file__).resolve().parent.parent
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("environment", choices=["local", "dev", "test", "prod"], nargs="?", default="local")
+parser.add_argument("--directory", type=Path)
+args = parser.parse_args()
+env = args.environment
+directory = (args.directory or root / ".local" / env).resolve()
+directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+os.chmod(directory, 0o700)
+with open(directory / "initialization.lock", "a") as initialization_lock:
+    fcntl.flock(initialization_lock, fcntl.LOCK_EX)
+    secret_dir = directory / "secrets"
+    secret_dir.mkdir(exist_ok=True, mode=0o700)
+    for name in ["postgres_password", "core_db_password", "repair_db_password", "migration_db_password", "internal_password", "checkin_key", "demo_password"]:
+        path = secret_dir / name
+        if env == "prod" and name == "demo_password":
+            continue
+        if not path.exists():
+            value = base64.b64encode(secrets.token_bytes(32)).decode() if name == "checkin_key" else secrets.token_urlsafe(36)
+            path.write_text(value)
+            os.chmod(path, 0o600)
+    ports = {"local": (18080, 15432, 18025, 11025), "dev": (18081, 15433, 18026, 11026), "test": (18082, 15434, 18027, 11027), "prod": (18443, 15435, 18028, 11028)}[env]
+    config = directory / "compose.env"
+    if not config.exists():
+        config.write_text("\n".join([
+            f"ENV_NAME={env}", f"COMPOSE_PROJECT_NAME=studyroom-{env}", f"STUDYROOM_STATE_DIR={directory}",
+            f"WEB_PORT={ports[0]}", f"DB_PORT={ports[1]}", f"MAIL_UI_PORT={ports[2]}", f"SMTP_PORT_HOST={ports[3]}",
+            "BIND_ADDRESS=127.0.0.1", f"PUBLIC_BASE_URL=http://localhost:{ports[0]}",
+            "RELEASE_ID=development", "RELEASE_COMMIT=working-tree", "COOKIE_SECURE=false", "MAIL_MODE=smtp",
+            "SMTP_HOST=mailpit", "SMTP_PORT=1025", "SMTP_FROM=study@studyroom.test", "JOBS_ENABLED=true", ""
+        ]))
+        os.chmod(config, 0o600)
+    print(f"Environment {env}: {directory}")
+    print("Existing configuration and secrets were preserved.")

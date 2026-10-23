@@ -1,0 +1,81 @@
+{
+  "formatVersion": 1,
+  "runId": "20261022T170955Z",
+  "releaseId": "r-20261022T170200-3012051",
+  "releaseCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+  "recordedAt": "2026-10-22T17:20:22.479254+00:00",
+  "files": {
+    "output/performance/20261022T170955Z/actual-container-limits.json": {
+      "bytes": 987,
+      "sha256": "3124440cf36b16d160531bf65872d220ced03a85262655bc639705143ef58707"
+    },
+    "output/performance/20261022T170955Z/contention.json": {
+      "bytes": 7065,
+      "sha256": "3aff9821023116a6a63df2cc4ed071a61cdae112645ba8b5890cf89679b6ce88"
+    },
+    "output/performance/20261022T170955Z/data-scale.json": {
+      "bytes": 166,
+      "sha256": "264c1333c99dec149fb2f81f5483dd4f3bc0c8457d6a971584a4efda5c130247"
+    },
+    "output/performance/20261022T170955Z/database-samples.json": {
+      "bytes": 32183,
+      "sha256": "4142b4e7fdff04ebeb845e3e4b79b120237d22a350dbda8c1308301dd38b2c89"
+    },
+    "output/performance/20261022T170955Z/environment.json": {
+      "bytes": 1607,
+      "sha256": "74d155ce1dfa0b2d017784a8edc4f6f525a61e71bed968024b33ecf3644b1e4a"
+    },
+    "output/performance/20261022T170955Z/page-query-counts.json": {
+      "bytes": 14254,
+      "sha256": "f8db800e68ffb1665af10d524d0716ec4b278b953b1fab82f0152303cb3356c6"
+    },
+    "output/performance/20261022T170955Z/query-plans.json": {
+      "bytes": 130446,
+      "sha256": "a25ee169d8c8451b4bb2c6ab6560238aa539728222a168c9c3e73f05313b1caf"
+    },
+    "output/performance/20261022T170955Z/recovery.json": {
+      "bytes": 206,
+      "sha256": "1fcd5961fa9d4144f75b7d0fb0f85557d124584f1c83e939441436e70edabf94"
+    },
+    "output/performance/20261022T170955Z/requests.jsonl": {
+      "bytes": 13817839,
+      "sha256": "a4ee3994b0f69716d5846efb05061ff16e972d48c6a77dc2e21ec82aadbc11ea"
+    },
+    "output/performance/20261022T170955Z/result.json": {
+      "bytes": 7719,
+      "sha256": "440009bfe430ccad101d4066d9d8a5274080d7ce4deb38df52632422748d9296"
+    },
+    "output/performance/20261022T170955Z/sql-after.json": {
+      "bytes": 35300,
+      "sha256": "af4b7167df381263b6178ff20b35b04b54c4571bb94ff991f4e7098d6ae73260"
+    },
+    "output/performance/20261022T170955Z/sql-before.json": {
+      "bytes": 14287,
+      "sha256": "410afd61e186c6d4fcf17ec0e57a8a16f88a0203a173912b407b32fa806c2828"
+    },
+    "output/performance/20261022T170955Z/sql-counts.json": {
+      "bytes": 15243,
+      "sha256": "0bf97d88ad13158abc37eac5c659f1fe6deeefb1151745a30ce673e4e7715620"
+    }
+  },
+  "processLogs": {
+    "output/performance-final-v4-run.log": {
+      "bytes": 8706,
+      "sha256": "9ddfda149466793f2ec7b200415207d9fc165a799e37c8b57b7777e45a79bdb9"
+    },
+    "output/performance-final-v4-queries.log": {
+      "bytes": 241,
+      "sha256": "b56358dd8234493d1851608b01a00316c07cfc951d5cc6d03c766f462ad97b73"
+    }
+  },
+  "rawJsonlRetainedOutsideGit": true,
+  "privacy": {
+    "scope": "Raw performance files, core recovery files and three execution logs, before evidence copies; actual repository-local private values and current performance session IDs.",
+    "privateSourceFileCount": 55,
+    "knownUniqueValuesIncludingTextDecoding": 173,
+    "encodingVariants": 697,
+    "livePerformanceSessionCount": 21,
+    "matchingPaths": [],
+    "privateNeedlesPersisted": false
+  }
+}

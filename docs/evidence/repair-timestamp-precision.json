@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-10-22T16:19:39.234427+00:00",
+  "requirements": [
+    "REQ-M3-02",
+    "REQ-M3-04",
+    "REQ-M3-07",
+    "T40-02"
+  ],
+  "sourceBaseCommit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "sourceSha256": {
+    "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairService.java": "3bf6584bee0fd94ce619f24de987bdde5dd648788dd8569728b0e582855b023a",
+    "services/repair-service/src/main/java/com/campus/studyroom/repair/RepairWorker.java": "789bcb9dd336ea45302b7890652875965dc96c331158ef1095812a17255012a9",
+    "services/repair-service/src/test/java/com/campus/studyroom/repair/RepairDeadlineHttpTest.java": "085c8502763ad574013a41feaa400a531642667dba50fb559e0ab096ed366d44"
+  },
+  "trigger": {
+    "gitlabPipeline": 682941,
+    "gitlabJob": 4478341,
+    "test": "RepairAcceptanceTests.test_03_reassignment_keeps_deadline_old_worker_loses_access",
+    "assertion": "first.firstAssignedAt == second.firstAssignedAt",
+    "originalHttpAssertionUnchanged": true
+  },
+  "counterexample": {
+    "tests": 2,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 5.702,
+    "reportSha256": "416834d89f126e903b54195955cdde0888b8393a8c15ea0e7a371fd59d949dbd",
+    "firstResponse": "2026-10-22T16:15:21.123456789Z",
+    "postgresRereadAfterReassign": "2026-10-22T16:15:21.123457Z",
+    "classification": "strict business assertion failure with real PostgreSQL and real core HTTP"
+  },
+  "afterFix": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 7.063,
+    "reportSha256": "8960733eef3bb1fa967571353bf7a158ab0da8ae8dde68b665a294b09ca73937"
+  },
+  "existingPersistenceRegression": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 3.537,
+    "reportSha256": "68e3646922a067bfabae28a20737886ec75975539347175e8fbb5b2cc60514f4"
+  },
+  "recipientAssertions": 27,
+  "nanosecondFractions": [
+    123456789,
+    999999789
+  ],
+  "checks": [
+    "first assignment and reassignment preserve exactly firstAssignedAt and workDueAt",
+    "first response equals fresh PostgreSQL detail",
+    "original create and assignment idempotency replay are exactly preserved",
+    "submitted/assigned/completed/accepted/closed/deadline/audit-history/acceptance/rating timestamps use microsecond precision",
+    "BLOCK occurredAt JSON equals stored order updatedAt",
+    "worker CLOSED event equals normalized test instant",
+    "deadline minus 1ns does not fire; exact deadline fires once",
+    "3 deadline events x 9 recipient scopes unchanged",
+    "existing concurrency/deadline/rollback persistence tests pass"
+  ],
+  "scope": {
+    "precision": "truncate generated persistence event time to microseconds before entity/JSON/deadline construction",
+    "rawClockPreserved": true,
+    "databaseSchemaChanged": false,
+    "historicalIdempotencyRecordsRewritten": false,
+    "liveServiceRestarted": false,
+    "dockerImagesBuilt": false
+  },
+  "localFixtureNote": "An initial narrow attempt found the old isolated deadline DB lacked the already existing assigned_to_name migration. The standard runner applied pending migrations before the recorded business counterexample and positive runs.",
+  "linuxCiAfterFix": "pending root R3 build/push and GitLab execution",
+  "passedLocalRegression": true
+}

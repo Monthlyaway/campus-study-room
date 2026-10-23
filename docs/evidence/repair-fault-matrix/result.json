@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "completedAt": 1792682645.102666,
+  "checks": [
+    "resource BLOCK path unavailable persists pending",
+    "resource RELEASE path unavailable keeps active claim",
+    "automatic network restoration convergence",
+    "same command requestId in both audit APIs",
+    "stable command payload across retries",
+    "late BLOCK replay never resurrects released claim",
+    "permanent processed-command records",
+    "full core outage fails closed503 without transition",
+    "real credentials cookies daily code absent from logs"
+  ]
+}

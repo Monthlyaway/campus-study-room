@@ -1,0 +1,768 @@
+{
+  "formatVersion": 1,
+  "result": "passed",
+  "releaseId": "r-20261023T001633-e95b025",
+  "releaseCandidateCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "sourceHeadCommit": "e95b025de6f03c393d8ad32063ed51b2cbf7babe",
+  "scanStartedAt": "2026-10-23T00:26:34.900175+00:00",
+  "cutoffAt": "2026-10-23T00:26:37.902392+00:00",
+  "sourceScope": {
+    "baselineCommit": "3012051f06c601e6c22a03e50d9d307a3054d1d9",
+    "fileCount": 41,
+    "mode": "Current bytes of tracked files changed since R4 plus nonignored untracked working evidence; not a full repository/history rescan.",
+    "workingDocsIncluded": true,
+    "workingDocsAreNotClaimedToBeInHead": true,
+    "headUnchangedDuringScan": true,
+    "paths": [
+      ".gitlab-ci.yml",
+      "README.md",
+      "docs/evidence/core/restart-recovery-v4.json",
+      "docs/evidence/core/restart-recovery-v4.md",
+      "docs/evidence/frontend-release-final-v5.md",
+      "docs/evidence/frontend-release-v4.md",
+      "docs/evidence/gitlab-config-validation.md",
+      "docs/evidence/gitlab-dind-startup.md",
+      "docs/evidence/gitlab-runner-registration.md",
+      "docs/evidence/performance.md",
+      "docs/evidence/performance/20261022T170955Z-actual-container-limits.json",
+      "docs/evidence/performance/20261022T170955Z-artifacts.json",
+      "docs/evidence/performance/20261022T170955Z-contention.json",
+      "docs/evidence/performance/20261022T170955Z-data-scale.json",
+      "docs/evidence/performance/20261022T170955Z-database-samples.json",
+      "docs/evidence/performance/20261022T170955Z-environment.json",
+      "docs/evidence/performance/20261022T170955Z-page-query-counts.json",
+      "docs/evidence/performance/20261022T170955Z-queries-summary.txt",
+      "docs/evidence/performance/20261022T170955Z-query-plans.json",
+      "docs/evidence/performance/20261022T170955Z-recovery.json",
+      "docs/evidence/performance/20261022T170955Z-release-binding.json",
+      "docs/evidence/performance/20261022T170955Z-release-manifest.json",
+      "docs/evidence/performance/20261022T170955Z-result.json",
+      "docs/evidence/performance/20261022T170955Z-sql-after.json",
+      "docs/evidence/performance/20261022T170955Z-sql-before.json",
+      "docs/evidence/performance/20261022T170955Z-sql-counts.json",
+      "docs/evidence/release/README.md",
+      "docs/evidence/release/final-v5-portable-import.json",
+      "docs/evidence/release/final-v5-production-equivalence.json",
+      "docs/evidence/release/final-v5-r4-rollback.json",
+      "docs/evidence/release/v4-actual-rollback.json",
+      "docs/evidence/release/v4-compatibility.json",
+      "docs/evidence/release/v4-portable-import.json",
+      "docs/evidence/runtime-audit-v4.json",
+      "docs/evidence/runtime-audit-v4.md",
+      "docs/modules/operations.md",
+      "docs/modules/web.md",
+      "docs/progress.md",
+      "docs/requirements-traceability.md",
+      "tests/browser/REVIEW.md",
+      "tests/ops/test_ci_workflow.py"
+    ]
+  },
+  "artifactGroups": [
+    {
+      "name": "finalBrowser",
+      "fileCount": 66,
+      "bytes": 9288478,
+      "paths": [
+        "output/browser-release-final-v5/SHA256SUMS",
+        "output/browser-release-final-v5/command.json",
+        "output/browser-release-final-v5/html/data/10dcfabe15d4ff59420a003a87999c3f3b338635.png",
+        "output/browser-release-final-v5/html/data/30e8e02e3cd68621f2e25fc29faedc0dd17b8d6a.png",
+        "output/browser-release-final-v5/html/data/43794ff1e656155e388147784767e19ae92dc1a7.png",
+        "output/browser-release-final-v5/html/data/5ce174dd16cf22af350c2d6d0b91819fcb67848a.png",
+        "output/browser-release-final-v5/html/data/7526e397ce18fc585ffee97bf017c4b8640b652a.png",
+        "output/browser-release-final-v5/html/data/7b2bf385c8ab9ffe6293f8f233a61d81bf9c56f6.png",
+        "output/browser-release-final-v5/html/data/91ce99a0a7dec9241a7616e3d7cb7c5257547a97.png",
+        "output/browser-release-final-v5/html/data/9c4cdc8ec1fdea74844eb76829c8f562ae32389f.png",
+        "output/browser-release-final-v5/html/data/a494a8fa5c2707e03b6e8522db2442a1170e8332.png",
+        "output/browser-release-final-v5/html/data/abf6bfa60c251fd023ad3536f7f3fdbeebbf3188.png",
+        "output/browser-release-final-v5/html/data/c19295ebc63b81bf5881f1b288e33efe196cbd30.png",
+        "output/browser-release-final-v5/html/data/c9c554caa647f2c0a98144f70f8b35768cc5771f.png",
+        "output/browser-release-final-v5/html/data/cce0b5cdba73bc098ceb8ef93c89144d2ad94351.png",
+        "output/browser-release-final-v5/html/data/e6246354a7cc3a6d47edcf0b9342d46410fc11d1.png",
+        "output/browser-release-final-v5/html/data/e7878121b4a03940bf5ecd25b21dab033846cf05.png",
+        "output/browser-release-final-v5/html/data/e98272e9e038cf91c87af135aa7a020740c3a37c.png",
+        "output/browser-release-final-v5/html/data/ed355a25fb74ca115afc55c90ee5f84f46091e8e.png",
+        "output/browser-release-final-v5/html/data/f98acc7884d829827ad09060e2d6ee05c4f836b3.png",
+        "output/browser-release-final-v5/html/index.html",
+        "output/browser-release-final-v5/junit.xml",
+        "output/browser-release-final-v5/npm-test.log",
+        "output/browser-release-final-v5/preflight-list/html/index.html",
+        "output/browser-release-final-v5/preflight-list/junit.xml",
+        "output/browser-release-final-v5/preflight-list/results.json",
+        "output/browser-release-final-v5/results.json",
+        "output/browser-release-final-v5/results/.last-run.json",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-available-seats-85fd8eb24ffe1d1fb081adb8e2f93677c6e39074.png",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-offline-error-bb6ef79b52c16989856c2a42d48b86b6cb6def95.png",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-real-missing-record-50ac424d57467ea7b7d28922a2478b1a0eb13ede.png",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-available-seats.png",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-offline-error.png",
+        "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-real-missing-record.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/desktop-reservation-created-8b11e7d4d27851b21adf6646e33add6919e3eb8a.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-created-4a09495f53bbecd813afaa550b0f2302f6a2577c.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-selection-1f5d0a9b3ae0ef4d06e501a5a4d35fcb2b2d4cce.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-reservation-history-0e14aaa09f4bb183de77ac3f69c59ed5b89bd2e2.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/real-stale-version-conflict-98c5452da7b80a91dac92a41804f074129d61353.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/desktop-reservation-created.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-created.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-selection.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-reservation-history.png",
+        "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/real-stale-version-conflict.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-application-rejected-d93545ea358539584c91758c5d1f08a8e04eb5c1.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-two-level-approved-d13198eb3e2c61a70c7584b12bbb76e14992ee9a.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-application-cancelled-a215895d89be4232d7be237f05f15fc00a018727.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-rejection-reason-69328adc162c6bb34b90424ed4a0c814e05f4afd.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-application-rejected.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-two-level-approved.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-application-cancelled.png",
+        "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-rejection-reason.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/desktop-repair-awaiting-acceptance-dbe6657706dbcf3579eae76162f63cd0b73c89d7.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-cancelled-04d1165e08957152627a7a1b9bc5ab7fb9d163f1.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-closed-5a910e4c747f01402bd67db138f7231e6f7bf14b.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-created-8ab968093444e8c887854bf8d42c0eda34b39332.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/desktop-repair-awaiting-acceptance.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-cancelled.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-closed.png",
+        "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-created.png",
+        "output/browser-release-final-v5/results/studyroom-administrator-ca-68c98-use-student-booking-actions/administrator-empty-search.png",
+        "output/browser-release-final-v5/results/studyroom-administrator-ca-68c98-use-student-booking-actions/attachments/administrator-empty-search-6582e4e6439f20cc9dfdf0909f0d81ba1b5c6267.png",
+        "output/browser-release-final-v5/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/attachments/student-administration-denied-65f381b4ae9a785d76b55ff8a6592719ca14e332.png",
+        "output/browser-release-final-v5/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/student-administration-denied.png",
+        "output/browser-release-final-v5/run-metadata.json",
+        "output/browser-release-final-v5/verification.json"
+      ]
+    },
+    {
+      "name": "finalBuildExportImport",
+      "fileCount": 5,
+      "bytes": 53560,
+      "paths": [
+        "output/release-final-v5/build.log",
+        "output/release-final-v5/equivalence.json",
+        "output/release-final-v5/export.log",
+        "output/release-final-v5/import.log",
+        "output/release-final-v5/release-id"
+      ]
+    },
+    {
+      "name": "gitlabNewExplicit",
+      "fileCount": 13,
+      "bytes": 958596,
+      "paths": [
+        "output/gitlab/ci-default-branch-simulation.png",
+        "output/gitlab/ci-default-branch-simulation.txt",
+        "output/gitlab/isolated-runner-proposal.png",
+        "output/gitlab/isolated-runner-enabled.png",
+        "output/gitlab/isolated-runner-diagnostic-passed.png",
+        "output/gitlab/isolated-runner-diagnostic.txt",
+        "output/gitlab/protected-runner-branches.png",
+        "output/gitlab/protected-v0.1.0-tag.png",
+        "output/gitlab/mr-final-candidate-description.png",
+        "output/gitlab/mr-latest-protected-pipeline.png",
+        "output/gitlab/final-candidate-linearity.json",
+        "output/gitlab/runner-credential-scan.json",
+        "output/gitlab/r4-container-canceled.png"
+      ]
+    },
+    {
+      "name": "finalCompatibilityOperationLogs",
+      "fileCount": 3,
+      "bytes": 10494,
+      "paths": [
+        ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/deploy-final.log",
+        ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/official-rollback-r4.log",
+        ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/restore-final.log"
+      ]
+    }
+  ],
+  "inventory": {
+    "uniqueFileCount": 128,
+    "totalBytes": 10833372,
+    "sha256": "6213e20e45257f3d5c41013caa5884c477c6c0db0b422a7c388e6bf157b7c529",
+    "files": {
+      ".gitlab-ci.yml": {
+        "bytes": 5746,
+        "sha256": "29082295f44a0b325dc411318154208ffd4750f5554b6e5730d2e88b936c6296"
+      },
+      ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/deploy-final.log": {
+        "bytes": 4073,
+        "sha256": "f6f94aab570292bc914676f7fe18424b8058911817dfa18b676bf6222d48c332"
+      },
+      ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/official-rollback-r4.log": {
+        "bytes": 2348,
+        "sha256": "91a0f32904e48994ba0afd91c5e8db6107ef2c26c9975c032cb38879a387ad63"
+      },
+      ".local/compatibility/final-v5-r4-20261023T002037Z-320c93a0/restore-final.log": {
+        "bytes": 4073,
+        "sha256": "ac431ce277b23857c5e8fd180b8ed57b748c6739dfd2f9012b4392cc22258545"
+      },
+      "README.md": {
+        "bytes": 9557,
+        "sha256": "34d4f6ce2be6016b971f6dadd974df3b92a44d308561dc2bd0afa217fdfdef5d"
+      },
+      "docs/evidence/core/restart-recovery-v4.json": {
+        "bytes": 8911,
+        "sha256": "abe835d81524c75e37d1a6b2be869e94eab92581074260b6ce95c475b25ca31d"
+      },
+      "docs/evidence/core/restart-recovery-v4.md": {
+        "bytes": 3937,
+        "sha256": "923aec773376ee45bb3c5f979b3850770feae7034a033a4579e8b8ee8ae1387e"
+      },
+      "docs/evidence/frontend-release-final-v5.md": {
+        "bytes": 5304,
+        "sha256": "c99541a7681016666207151d3b6fb690d101f09d9265ef7fa382e86bf86f05fe"
+      },
+      "docs/evidence/frontend-release-v4.md": {
+        "bytes": 4124,
+        "sha256": "43c5d5f08600cbdc33971ce862b06ebcea42b8e8043e4bdfe8d574a3a51dc6a8"
+      },
+      "docs/evidence/gitlab-config-validation.md": {
+        "bytes": 3144,
+        "sha256": "7e19b636b12866b40b3d8501ba2bb7982684f1773d92abb06746b6a819a7f33d"
+      },
+      "docs/evidence/gitlab-dind-startup.md": {
+        "bytes": 21636,
+        "sha256": "b22552d542edff1c777cf824f1273a08e2067bdad88fe923e5fb54badbd32205"
+      },
+      "docs/evidence/gitlab-runner-registration.md": {
+        "bytes": 5049,
+        "sha256": "5e35158885a3f2b353d5bd653379d770e89c1e8b3a3d3c91677e39e73d9d1d75"
+      },
+      "docs/evidence/performance.md": {
+        "bytes": 22220,
+        "sha256": "6c5707b13073cfd3257870211c241666143e20b8c776a46f593754fd09059a36"
+      },
+      "docs/evidence/performance/20261022T170955Z-actual-container-limits.json": {
+        "bytes": 987,
+        "sha256": "3124440cf36b16d160531bf65872d220ced03a85262655bc639705143ef58707"
+      },
+      "docs/evidence/performance/20261022T170955Z-artifacts.json": {
+        "bytes": 3292,
+        "sha256": "7a3027ab7f2d2d3e5c2d63717ec2a7d57f05a62e70801196b5e0efecc6c05619"
+      },
+      "docs/evidence/performance/20261022T170955Z-contention.json": {
+        "bytes": 7065,
+        "sha256": "3aff9821023116a6a63df2cc4ed071a61cdae112645ba8b5890cf89679b6ce88"
+      },
+      "docs/evidence/performance/20261022T170955Z-data-scale.json": {
+        "bytes": 166,
+        "sha256": "264c1333c99dec149fb2f81f5483dd4f3bc0c8457d6a971584a4efda5c130247"
+      },
+      "docs/evidence/performance/20261022T170955Z-database-samples.json": {
+        "bytes": 32183,
+        "sha256": "4142b4e7fdff04ebeb845e3e4b79b120237d22a350dbda8c1308301dd38b2c89"
+      },
+      "docs/evidence/performance/20261022T170955Z-environment.json": {
+        "bytes": 1607,
+        "sha256": "74d155ce1dfa0b2d017784a8edc4f6f525a61e71bed968024b33ecf3644b1e4a"
+      },
+      "docs/evidence/performance/20261022T170955Z-page-query-counts.json": {
+        "bytes": 14254,
+        "sha256": "f8db800e68ffb1665af10d524d0716ec4b278b953b1fab82f0152303cb3356c6"
+      },
+      "docs/evidence/performance/20261022T170955Z-queries-summary.txt": {
+        "bytes": 241,
+        "sha256": "b56358dd8234493d1851608b01a00316c07cfc951d5cc6d03c766f462ad97b73"
+      },
+      "docs/evidence/performance/20261022T170955Z-query-plans.json": {
+        "bytes": 130446,
+        "sha256": "a25ee169d8c8451b4bb2c6ab6560238aa539728222a168c9c3e73f05313b1caf"
+      },
+      "docs/evidence/performance/20261022T170955Z-recovery.json": {
+        "bytes": 206,
+        "sha256": "1fcd5961fa9d4144f75b7d0fb0f85557d124584f1c83e939441436e70edabf94"
+      },
+      "docs/evidence/performance/20261022T170955Z-release-binding.json": {
+        "bytes": 2601,
+        "sha256": "d61bdfdb51a26a9a67d87737a73099f685654b57a1254661759f3679103100cf"
+      },
+      "docs/evidence/performance/20261022T170955Z-release-manifest.json": {
+        "bytes": 1934,
+        "sha256": "b24dc2ae24c6dea3ca159290602741fe546793082a896c18a16b1b2ac1f936f6"
+      },
+      "docs/evidence/performance/20261022T170955Z-result.json": {
+        "bytes": 7719,
+        "sha256": "440009bfe430ccad101d4066d9d8a5274080d7ce4deb38df52632422748d9296"
+      },
+      "docs/evidence/performance/20261022T170955Z-sql-after.json": {
+        "bytes": 35300,
+        "sha256": "af4b7167df381263b6178ff20b35b04b54c4571bb94ff991f4e7098d6ae73260"
+      },
+      "docs/evidence/performance/20261022T170955Z-sql-before.json": {
+        "bytes": 14287,
+        "sha256": "410afd61e186c6d4fcf17ec0e57a8a16f88a0203a173912b407b32fa806c2828"
+      },
+      "docs/evidence/performance/20261022T170955Z-sql-counts.json": {
+        "bytes": 15243,
+        "sha256": "0bf97d88ad13158abc37eac5c659f1fe6deeefb1151745a30ce673e4e7715620"
+      },
+      "docs/evidence/release/README.md": {
+        "bytes": 9877,
+        "sha256": "7a2eda5c2034e5f9f80132493b43a893621d560bcb12b4c7131942743c075226"
+      },
+      "docs/evidence/release/final-v5-portable-import.json": {
+        "bytes": 6839,
+        "sha256": "6df83e75d6436bde7342d3605e5f5e30ddaa044236dca001f0b6f8dd07425a9c"
+      },
+      "docs/evidence/release/final-v5-production-equivalence.json": {
+        "bytes": 1320,
+        "sha256": "04c1725898169014af9ba51800e0565b6b538be308b87b32f599788cbc38af59"
+      },
+      "docs/evidence/release/final-v5-r4-rollback.json": {
+        "bytes": 12774,
+        "sha256": "74654fe060341ce5d24d267e3f2ac42dd00da4405e96b2a434fd9a8df9003a65"
+      },
+      "docs/evidence/release/v4-actual-rollback.json": {
+        "bytes": 5173,
+        "sha256": "8c27b62d1a8a19d5ab67a77f81f4b530e14758aba15ecf89c44d5317b4a5c207"
+      },
+      "docs/evidence/release/v4-compatibility.json": {
+        "bytes": 3478,
+        "sha256": "e5ce46faa778341c7ba902a9448b5e4d050b6d29603f15c9d680eb1dabbdb047"
+      },
+      "docs/evidence/release/v4-portable-import.json": {
+        "bytes": 5636,
+        "sha256": "4bdcba48b3d81caae428e8d5dad596b81e253b01ad64996c5aa506e2d8fafd99"
+      },
+      "docs/evidence/runtime-audit-v4.json": {
+        "bytes": 16080,
+        "sha256": "c8aeb9a982d72a221c9f957729ecff2a246b2339624637802b3ea966dee9f177"
+      },
+      "docs/evidence/runtime-audit-v4.md": {
+        "bytes": 3485,
+        "sha256": "18a3126f3bae38f65c66af95a447651428be0fd9296fb6eab04d90f03a180702"
+      },
+      "docs/modules/operations.md": {
+        "bytes": 15380,
+        "sha256": "8ecb9bfaf7b5ee2ac38baa6fcfa6688ea99cc8e9194b0689eed5dbd9ac6ba612"
+      },
+      "docs/modules/web.md": {
+        "bytes": 14475,
+        "sha256": "ba87c98e79d5faba0ce4542ddc7886beb9b0dc120a97379a03a855e048f418e6"
+      },
+      "docs/progress.md": {
+        "bytes": 11336,
+        "sha256": "8bd74c0fc3b4961625f9de6cbf10d0a3c51bd2d3789472c004b776c7485a954c"
+      },
+      "docs/requirements-traceability.md": {
+        "bytes": 35272,
+        "sha256": "78ac3858c42a7095ef170c1467941aaff0741a26ea887389852dfbdb003d7717"
+      },
+      "output/browser-release-final-v5/SHA256SUMS": {
+        "bytes": 10054,
+        "sha256": "7e5035f4ff949524f4796670774310dab868436afce9ce15bddbc3e0d0b82d94"
+      },
+      "output/browser-release-final-v5/command.json": {
+        "bytes": 498,
+        "sha256": "6b1098c0d4d935ffabe0483ff7d1a6365d8c9a119ab7b7ed5227e8d5babab558"
+      },
+      "output/browser-release-final-v5/html/data/10dcfabe15d4ff59420a003a87999c3f3b338635.png": {
+        "bytes": 118826,
+        "sha256": "ec1770a299e6510d45759547565c2a7691ad45dd041f34218b5c9b440e570ffc"
+      },
+      "output/browser-release-final-v5/html/data/30e8e02e3cd68621f2e25fc29faedc0dd17b8d6a.png": {
+        "bytes": 42986,
+        "sha256": "d1b69d999009ff9a415d2d11609dc2f891eb5199672b3c831c96c3f8d27253fc"
+      },
+      "output/browser-release-final-v5/html/data/43794ff1e656155e388147784767e19ae92dc1a7.png": {
+        "bytes": 337918,
+        "sha256": "80a5705e487fb94e28c99311099185c0f031c35fb2c05b5677a846fc301ba621"
+      },
+      "output/browser-release-final-v5/html/data/5ce174dd16cf22af350c2d6d0b91819fcb67848a.png": {
+        "bytes": 84663,
+        "sha256": "ab6419fdff0f9f7fc54be1cf73a7f75065b62098c132d8a495c99da4349f394c"
+      },
+      "output/browser-release-final-v5/html/data/7526e397ce18fc585ffee97bf017c4b8640b652a.png": {
+        "bytes": 173898,
+        "sha256": "d43c394b93e2f9c6d172efd49e55b14075a23c8c630b3a3acf86e44fe4e30856"
+      },
+      "output/browser-release-final-v5/html/data/7b2bf385c8ab9ffe6293f8f233a61d81bf9c56f6.png": {
+        "bytes": 190122,
+        "sha256": "b2afe2fd0157278bc45806e33e66bba42bdeabec731d525c3d3127c25add84be"
+      },
+      "output/browser-release-final-v5/html/data/91ce99a0a7dec9241a7616e3d7cb7c5257547a97.png": {
+        "bytes": 147066,
+        "sha256": "f187268a0e5dd1df928b7fbea6288eeb0e180883b0f94784c201e92883c05d57"
+      },
+      "output/browser-release-final-v5/html/data/9c4cdc8ec1fdea74844eb76829c8f562ae32389f.png": {
+        "bytes": 76147,
+        "sha256": "b903317019bc4b54e38f8333d921b83fb87490023b51b9cff7101f566e29ce3e"
+      },
+      "output/browser-release-final-v5/html/data/a494a8fa5c2707e03b6e8522db2442a1170e8332.png": {
+        "bytes": 20690,
+        "sha256": "72316782ed9f6d8a055fa87ec4e911f79414ee9f566115361fe073be2db619c3"
+      },
+      "output/browser-release-final-v5/html/data/abf6bfa60c251fd023ad3536f7f3fdbeebbf3188.png": {
+        "bytes": 194998,
+        "sha256": "6ef5d1250af423c2d4101b01d2ea96908b5ece428a24e7caa98607982a989702"
+      },
+      "output/browser-release-final-v5/html/data/c19295ebc63b81bf5881f1b288e33efe196cbd30.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v5/html/data/c9c554caa647f2c0a98144f70f8b35768cc5771f.png": {
+        "bytes": 111392,
+        "sha256": "cde0f61bd1e9e8cdf0e2952157ae819f8bbd6d6a926c440eeef230c182fc8b94"
+      },
+      "output/browser-release-final-v5/html/data/cce0b5cdba73bc098ceb8ef93c89144d2ad94351.png": {
+        "bytes": 74525,
+        "sha256": "b99d26c0ea6af764b70778a78a2bf4cd25fd5b03c5edc77d886c6c9724246a7f"
+      },
+      "output/browser-release-final-v5/html/data/e6246354a7cc3a6d47edcf0b9342d46410fc11d1.png": {
+        "bytes": 192901,
+        "sha256": "8956342930d3c242399bd266c2bf7bcd30024482416bf0c9b23f88737c988965"
+      },
+      "output/browser-release-final-v5/html/data/e7878121b4a03940bf5ecd25b21dab033846cf05.png": {
+        "bytes": 162310,
+        "sha256": "6a6ecbce40bc951a74b1d9b8a4cb97fdd3e58071691a235433303a16fff27657"
+      },
+      "output/browser-release-final-v5/html/data/e98272e9e038cf91c87af135aa7a020740c3a37c.png": {
+        "bytes": 222990,
+        "sha256": "a2aca93afd405a763434e7aba3692878dd4d3f76492afa88a65523f21c5a3a12"
+      },
+      "output/browser-release-final-v5/html/data/ed355a25fb74ca115afc55c90ee5f84f46091e8e.png": {
+        "bytes": 305025,
+        "sha256": "ad65ef16c0216fa5b19b7231913aad1452f0bdf2de25fdb0fcc2f42c3d76e0b6"
+      },
+      "output/browser-release-final-v5/html/data/f98acc7884d829827ad09060e2d6ee05c4f836b3.png": {
+        "bytes": 173887,
+        "sha256": "7882cf985cf20be61370b822dfcdaced09f7f2461cdb5306b636475b624e1eea"
+      },
+      "output/browser-release-final-v5/html/index.html": {
+        "bytes": 551912,
+        "sha256": "43c82eff5a6405f40149b3a07353e485610f7f616f20f46fe66de6515fa86f30"
+      },
+      "output/browser-release-final-v5/junit.xml": {
+        "bytes": 4538,
+        "sha256": "e7788abe0420845c40e7f5c2b3b0d7a91e0c98448dc517aea320a51eb51cc5ce"
+      },
+      "output/browser-release-final-v5/npm-test.log": {
+        "bytes": 1314,
+        "sha256": "d1456c13c49c8ef70690f54e337f00a96155ad184a3785f94861af79717111f9"
+      },
+      "output/browser-release-final-v5/preflight-list/html/index.html": {
+        "bytes": 518948,
+        "sha256": "2ec0d697cdfbbae8d00831b712e020b40d66c50c3d11632e2218cf56a21ce0ba"
+      },
+      "output/browser-release-final-v5/preflight-list/junit.xml": {
+        "bytes": 1297,
+        "sha256": "0daa03c3695fc0da89a88c18519201b4144946810798786ebeb8b0cb044b04c3"
+      },
+      "output/browser-release-final-v5/preflight-list/results.json": {
+        "bytes": 7098,
+        "sha256": "70a346e30bfdd9cae62fc849d7a5199918260e19599fde8ad45814d759ad8f78"
+      },
+      "output/browser-release-final-v5/results.json": {
+        "bytes": 17148,
+        "sha256": "605267b5f38cfb3115b0618d0791d7e9a285b78c053d2f8e75628dd2744b0297"
+      },
+      "output/browser-release-final-v5/results/.last-run.json": {
+        "bytes": 45,
+        "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-available-seats-85fd8eb24ffe1d1fb081adb8e2f93677c6e39074.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-offline-error-bb6ef79b52c16989856c2a42d48b86b6cb6def95.png": {
+        "bytes": 42986,
+        "sha256": "d1b69d999009ff9a415d2d11609dc2f891eb5199672b3c831c96c3f8d27253fc"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/attachments/mobile-real-missing-record-50ac424d57467ea7b7d28922a2478b1a0eb13ede.png": {
+        "bytes": 20690,
+        "sha256": "72316782ed9f6d8a055fa87ec4e911f79414ee9f566115361fe073be2db619c3"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-available-seats.png": {
+        "bytes": 93630,
+        "sha256": "0902fdbe0c6e64589956fc4d337df1067f9d435367d6ee11da38815f91b6850f"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-offline-error.png": {
+        "bytes": 42986,
+        "sha256": "d1b69d999009ff9a415d2d11609dc2f891eb5199672b3c831c96c3f8d27253fc"
+      },
+      "output/browser-release-final-v5/results/studyroom-375px-navigation-3e508-d-offline-retry-stay-usable/mobile-real-missing-record.png": {
+        "bytes": 20690,
+        "sha256": "72316782ed9f6d8a055fa87ec4e911f79414ee9f566115361fe073be2db619c3"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/desktop-reservation-created-8b11e7d4d27851b21adf6646e33add6919e3eb8a.png": {
+        "bytes": 305025,
+        "sha256": "ad65ef16c0216fa5b19b7231913aad1452f0bdf2de25fdb0fcc2f42c3d76e0b6"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-created-4a09495f53bbecd813afaa550b0f2302f6a2577c.png": {
+        "bytes": 222990,
+        "sha256": "a2aca93afd405a763434e7aba3692878dd4d3f76492afa88a65523f21c5a3a12"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-repeat-reservation-selection-1f5d0a9b3ae0ef4d06e501a5a4d35fcb2b2d4cce.png": {
+        "bytes": 84663,
+        "sha256": "ab6419fdff0f9f7fc54be1cf73a7f75065b62098c132d8a495c99da4349f394c"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/mobile-reservation-history-0e14aaa09f4bb183de77ac3f69c59ed5b89bd2e2.png": {
+        "bytes": 190122,
+        "sha256": "b2afe2fd0157278bc45806e33e66bba42bdeabec731d525c3d3127c25add84be"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/attachments/real-stale-version-conflict-98c5452da7b80a91dac92a41804f074129d61353.png": {
+        "bytes": 337918,
+        "sha256": "80a5705e487fb94e28c99311099185c0f031c35fb2c05b5677a846fc301ba621"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/desktop-reservation-created.png": {
+        "bytes": 305025,
+        "sha256": "ad65ef16c0216fa5b19b7231913aad1452f0bdf2de25fdb0fcc2f42c3d76e0b6"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-created.png": {
+        "bytes": 222990,
+        "sha256": "a2aca93afd405a763434e7aba3692878dd4d3f76492afa88a65523f21c5a3a12"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-repeat-reservation-selection.png": {
+        "bytes": 84663,
+        "sha256": "ab6419fdff0f9f7fc54be1cf73a7f75065b62098c132d8a495c99da4349f394c"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/mobile-reservation-history.png": {
+        "bytes": 190122,
+        "sha256": "b2afe2fd0157278bc45806e33e66bba42bdeabec731d525c3d3127c25add84be"
+      },
+      "output/browser-release-final-v5/results/studyroom-M1-availability--d8c41-se-create-a-new-reservation/real-stale-version-conflict.png": {
+        "bytes": 337918,
+        "sha256": "80a5705e487fb94e28c99311099185c0f031c35fb2c05b5677a846fc301ba621"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-application-rejected-d93545ea358539584c91758c5d1f08a8e04eb5c1.png": {
+        "bytes": 111392,
+        "sha256": "cde0f61bd1e9e8cdf0e2952157ae819f8bbd6d6a926c440eeef230c182fc8b94"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/desktop-two-level-approved-d13198eb3e2c61a70c7584b12bbb76e14992ee9a.png": {
+        "bytes": 118826,
+        "sha256": "ec1770a299e6510d45759547565c2a7691ad45dd041f34218b5c9b440e570ffc"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-application-cancelled-a215895d89be4232d7be237f05f15fc00a018727.png": {
+        "bytes": 194998,
+        "sha256": "6ef5d1250af423c2d4101b01d2ea96908b5ece428a24e7caa98607982a989702"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/attachments/mobile-rejection-reason-69328adc162c6bb34b90424ed4a0c814e05f4afd.png": {
+        "bytes": 192901,
+        "sha256": "8956342930d3c242399bd266c2bf7bcd30024482416bf0c9b23f88737c988965"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-application-rejected.png": {
+        "bytes": 111392,
+        "sha256": "cde0f61bd1e9e8cdf0e2952157ae819f8bbd6d6a926c440eeef230c182fc8b94"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/desktop-two-level-approved.png": {
+        "bytes": 118826,
+        "sha256": "ec1770a299e6510d45759547565c2a7691ad45dd041f34218b5c9b440e570ffc"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-application-cancelled.png": {
+        "bytes": 194998,
+        "sha256": "6ef5d1250af423c2d4101b01d2ea96908b5ece428a24e7caa98607982a989702"
+      },
+      "output/browser-release-final-v5/results/studyroom-M2-independent-a-9a2a7--a-mandatory-visible-reason/mobile-rejection-reason.png": {
+        "bytes": 192901,
+        "sha256": "8956342930d3c242399bd266c2bf7bcd30024482416bf0c9b23f88737c988965"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/desktop-repair-awaiting-acceptance-dbe6657706dbcf3579eae76162f63cd0b73c89d7.png": {
+        "bytes": 147066,
+        "sha256": "f187268a0e5dd1df928b7fbea6288eeb0e180883b0f94784c201e92883c05d57"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-cancelled-04d1165e08957152627a7a1b9bc5ab7fb9d163f1.png": {
+        "bytes": 173898,
+        "sha256": "d43c394b93e2f9c6d172efd49e55b14075a23c8c630b3a3acf86e44fe4e30856"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-closed-5a910e4c747f01402bd67db138f7231e6f7bf14b.png": {
+        "bytes": 173887,
+        "sha256": "7882cf985cf20be61370b822dfcdaced09f7f2461cdb5306b636475b624e1eea"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/attachments/mobile-repair-created-8ab968093444e8c887854bf8d42c0eda34b39332.png": {
+        "bytes": 162310,
+        "sha256": "6a6ecbce40bc951a74b1d9b8a4cb97fdd3e58071691a235433303a16fff27657"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/desktop-repair-awaiting-acceptance.png": {
+        "bytes": 147066,
+        "sha256": "f187268a0e5dd1df928b7fbea6288eeb0e180883b0f94784c201e92883c05d57"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-cancelled.png": {
+        "bytes": 173898,
+        "sha256": "d43c394b93e2f9c6d172efd49e55b14075a23c8c630b3a3acf86e44fe4e30856"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-closed.png": {
+        "bytes": 173887,
+        "sha256": "7882cf985cf20be61370b822dfcdaced09f7f2461cdb5306b636475b624e1eea"
+      },
+      "output/browser-release-final-v5/results/studyroom-M3-mobile-report-81b90-chronization-and-acceptance/mobile-repair-created.png": {
+        "bytes": 162310,
+        "sha256": "6a6ecbce40bc951a74b1d9b8a4cb97fdd3e58071691a235433303a16fff27657"
+      },
+      "output/browser-release-final-v5/results/studyroom-administrator-ca-68c98-use-student-booking-actions/administrator-empty-search.png": {
+        "bytes": 76147,
+        "sha256": "b903317019bc4b54e38f8333d921b83fb87490023b51b9cff7101f566e29ce3e"
+      },
+      "output/browser-release-final-v5/results/studyroom-administrator-ca-68c98-use-student-booking-actions/attachments/administrator-empty-search-6582e4e6439f20cc9dfdf0909f0d81ba1b5c6267.png": {
+        "bytes": 76147,
+        "sha256": "b903317019bc4b54e38f8333d921b83fb87490023b51b9cff7101f566e29ce3e"
+      },
+      "output/browser-release-final-v5/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/attachments/student-administration-denied-65f381b4ae9a785d76b55ff8a6592719ca14e332.png": {
+        "bytes": 74525,
+        "sha256": "b99d26c0ea6af764b70778a78a2bf4cd25fd5b03c5edc77d886c6c9724246a7f"
+      },
+      "output/browser-release-final-v5/results/studyroom-login-rejects-a--933d9-n-and-guards-administration/student-administration-denied.png": {
+        "bytes": 74525,
+        "sha256": "b99d26c0ea6af764b70778a78a2bf4cd25fd5b03c5edc77d886c6c9724246a7f"
+      },
+      "output/browser-release-final-v5/run-metadata.json": {
+        "bytes": 759,
+        "sha256": "7a952b5f7183da69949b1a14c1b8fb67d003359ff37623e796f8a6a423b32544"
+      },
+      "output/browser-release-final-v5/verification.json": {
+        "bytes": 2945,
+        "sha256": "085996a8001734d29a1060b47f6e52ad99d385cc441821049e283ae8d57b4f38"
+      },
+      "output/gitlab/ci-default-branch-simulation.png": {
+        "bytes": 159050,
+        "sha256": "def6d7d999986fbdff6eefab9e7933d1559709eed90502d9113c8af6b378563a"
+      },
+      "output/gitlab/ci-default-branch-simulation.txt": {
+        "bytes": 1675,
+        "sha256": "59b16a418cf00311035fac225b01eca1e91a9521dd7f6f6c8783dc46bc6f5fc3"
+      },
+      "output/gitlab/final-candidate-linearity.json": {
+        "bytes": 334,
+        "sha256": "dc4bab3f5abf03b2da4aa948a650e2144ace657e5424b393f69352598e6584cb"
+      },
+      "output/gitlab/isolated-runner-diagnostic-passed.png": {
+        "bytes": 118339,
+        "sha256": "e8414ea1ebd9b60ac0ad8996782e556d1adabc89b374becfc7416caa3e992acd"
+      },
+      "output/gitlab/isolated-runner-diagnostic.txt": {
+        "bytes": 20409,
+        "sha256": "c38323877bd2f9dbaeee142ae7866cfe1d2899ca802105d7999638eaa4803776"
+      },
+      "output/gitlab/isolated-runner-enabled.png": {
+        "bytes": 61514,
+        "sha256": "272a6dae81a9deb42fb9628d919990ddb4e821983faf5abba8ad17f425a41b6f"
+      },
+      "output/gitlab/isolated-runner-proposal.png": {
+        "bytes": 86828,
+        "sha256": "983a6bab8a68ef10c34004c20d1618acbb5f9d6235f22274e54554c563b0d86c"
+      },
+      "output/gitlab/mr-final-candidate-description.png": {
+        "bytes": 133498,
+        "sha256": "2586601f4a3b7ac2fd82f8b31d0e6e3edfeb86dbd4e93e603782eb50badcb2fc"
+      },
+      "output/gitlab/mr-latest-protected-pipeline.png": {
+        "bytes": 121416,
+        "sha256": "1a1d0927b63fe74f19e2b816d9b615180d7f49fc0b72467c9802ca59af3e1a72"
+      },
+      "output/gitlab/protected-runner-branches.png": {
+        "bytes": 70703,
+        "sha256": "91d73878894a48f003ec726f8031e114ce2f558b1edd256f7e528b76c4ad1c05"
+      },
+      "output/gitlab/protected-v0.1.0-tag.png": {
+        "bytes": 66830,
+        "sha256": "8174bc339b084820507fc10b4a3cf03d49af57fbf90c3560f509730cb0a1a487"
+      },
+      "output/gitlab/r4-container-canceled.png": {
+        "bytes": 115759,
+        "sha256": "30fb3d4b3973a54b07645fcbff3f8819d38afae1f8cf85c127ec3ab2fab593dd"
+      },
+      "output/gitlab/runner-credential-scan.json": {
+        "bytes": 2241,
+        "sha256": "04a109fa2acad8218ef2605f8505f5872c373a47d7b55f1dc4da1f6592f67dcf"
+      },
+      "output/release-final-v5/build.log": {
+        "bytes": 7624,
+        "sha256": "4645963d243400f8f542b6dd7cb19e560f173f67f6afe18c6f9fb8f25bbd6137"
+      },
+      "output/release-final-v5/equivalence.json": {
+        "bytes": 41370,
+        "sha256": "0bacaa87d96114a1e32b1c4153ee6e0b6a25d75d281c7a6f9882bbcfeef13b4e"
+      },
+      "output/release-final-v5/export.log": {
+        "bytes": 90,
+        "sha256": "866741673d133e5594e98e7e90df2f804ba3a3cbf1a8f9f22acbd631c3e7add9"
+      },
+      "output/release-final-v5/import.log": {
+        "bytes": 4450,
+        "sha256": "237c8c6e0fa36daea2e857d4514d24085db995cedb28d9b7b5fbc9902cce6ceb"
+      },
+      "output/release-final-v5/release-id": {
+        "bytes": 26,
+        "sha256": "0e40869f518545f612684cdc94afe3c1ed87795097dcde49db0bab02367b62a9"
+      },
+      "tests/browser/REVIEW.md": {
+        "bytes": 12404,
+        "sha256": "7c2d9f03e2b7c400ec4e45aa37bd43afd05ed9200642b5c104a1d3b28026ff67"
+      },
+      "tests/ops/test_ci_workflow.py": {
+        "bytes": 11556,
+        "sha256": "644a1f8aefacfc3619ce20e589d161a0ee274210702866000d4c0134b7ff8982"
+      }
+    },
+    "filesChangedDuringScan": []
+  },
+  "knownValueScan": {
+    "privateSourceCount": 44,
+    "sourceKinds": {
+      "local-secret-file": 35,
+      "private-fixture-cookie": 8,
+      "private-previous-fault-known-values": 1
+    },
+    "knownValueCount": 129,
+    "encodingVariantCount": 513,
+    "matchingPaths": [],
+    "secretValuesOrTheirHashesEmitted": false,
+    "credentialValuesReadOnlyInProcessMemory": true,
+    "forms": [
+      "raw UTF-8",
+      "standard and URL-safe Base64 with/without padding",
+      "lower/upper hexadecimal",
+      "URL and form encoding",
+      "JSON escape",
+      "HTML escape",
+      "printable decoded cookie/session values"
+    ]
+  },
+  "archiveScan": {
+    "archiveCount": 2,
+    "memberCount": 4,
+    "archives": [
+      {
+        "source": "output/browser-release-final-v5/html/index.html#embedded-zip-1",
+        "memberCount": 2
+      },
+      {
+        "source": "output/browser-release-final-v5/preflight-list/html/index.html#embedded-zip-1",
+        "memberCount": 2
+      }
+    ],
+    "unreadableArchives": [],
+    "allDecodedMembersMatchedAgainstKnownValues": true
+  },
+  "runnerTokenBoundary": {
+    "tokenReadByThisAuditor": false,
+    "vmAccessByThisAuditor": false,
+    "referencedReport": "output/gitlab/runner-credential-scan.json",
+    "reportedAt": "2026-10-23T00:13:41.443756+00:00",
+    "reportedFileCount": 38,
+    "reportedVariants": 3,
+    "reportedMatchingPaths": [],
+    "secretReportedToRemainInGuest": true,
+    "limitation": "Independent root-agent guest scan covers only its listed 38 inputs at its own cutoff; this audit does not extend token coverage to newer files."
+  },
+  "freezeCoordination": {
+    "frontendFilesFrozen": true,
+    "coreCompatibilityEvidenceFrozen": true,
+    "rootGitlabInputListFrozen": true
+  },
+  "selfReportCheck": {
+    "paths": [
+      "docs/evidence/runtime-audit-final-v5.json",
+      "docs/evidence/runtime-audit-final-v5.md"
+    ],
+    "knownSecretMatches": 0
+  },
+  "limitations": [
+    "Known-value exact matching cannot prove absence of unknown secrets.",
+    "PNG screenshots receive raw-byte matching, not OCR; visual screenshot feedback is separately recorded by the frontend agent.",
+    "No current application/VM/container logs were newly collected; only the explicitly listed retained process logs were scanned.",
+    "No Runner token was read or copied from the VM. The referenced 38-file guest scan is not presented as coverage of all current artifacts.",
+    "No new browser, performance, CI, deployment or rollback run was performed for this audit.",
+    "GitLab final-job logs/screenshots collected after this cutoff require a separate closing supplement and are not covered by this zero-hit result.",
+    "R4 and earlier audits and failed-run evidence remain unchanged.",
+    "SHA256 entries bind public/operational artifact bytes, never secret values or private credential fixtures."
+  ]
+}

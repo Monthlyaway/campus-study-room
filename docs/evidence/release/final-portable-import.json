@@ -1,0 +1,128 @@
+{
+  "formatVersion": 1,
+  "recordedAt": "2026-10-22T16:31:09.661756+00:00",
+  "result": "passed",
+  "releaseId": "r-20261022T161900-3c7a93c",
+  "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "platform": {
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  "verificationMode": "Independent read-only verification after the completed offline import; no deploy/load/build/service mutation performed by this audit",
+  "bundle": {
+    "directory": ".local/releases/r-20261022T161900-3c7a93c/portable",
+    "allFivePayloadChecksumsValid": true,
+    "sourceCommitMatches": true,
+    "sourceManifestAndMigrationInventoryMatch": true,
+    "artifactSha256": {
+      "manifest.json": "2d334c604de51bc3a65c4d4d4715966420c0adf87c77d63a023b8f31fefcc03f",
+      "source.tar.gz": "8dd66c8b6eaf30d0acc1fbc3fc91cd138cae54a8352cdd4723518ac8786bbfc1",
+      "images.tar": "cabeb7328c3ad3fe150b48ab77834d60f124600da1579ebba762d6b4c6767c84"
+    },
+    "imageArchiveBytes": 417843200
+  },
+  "extractedSource": {
+    "directory": ".local/portable-source-final",
+    "containsGitDirectory": false,
+    "verifiedFileCount": 385,
+    "fileContentAndExecutableBitsMatch": true,
+    "mismatchPaths": [],
+    "unexpectedPaths": []
+  },
+  "runningImages": {
+    "core": {
+      "expectedId": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+      "runningId": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807",
+      "matches": true,
+      "running": true
+    },
+    "mailpit": {
+      "expectedId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "runningId": "sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387",
+      "matches": true,
+      "running": true
+    },
+    "postgres": {
+      "expectedId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "runningId": "sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc",
+      "matches": true,
+      "running": true
+    },
+    "repair": {
+      "expectedId": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+      "runningId": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89",
+      "matches": true,
+      "running": true
+    },
+    "web": {
+      "expectedId": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+      "runningId": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d",
+      "matches": true,
+      "running": true
+    }
+  },
+  "serviceVersions": {
+    "web": {
+      "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+      "releaseId": "r-20261022T161900-3c7a93c",
+      "matches": true
+    },
+    "core": {
+      "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+      "releaseId": "r-20261022T161900-3c7a93c",
+      "matches": true
+    },
+    "repair": {
+      "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+      "releaseId": "r-20261022T161900-3c7a93c",
+      "matches": true
+    }
+  },
+  "currentReleaseManifestMatches": true,
+  "secrets": {
+    "beforeFileCount": 7,
+    "afterFileCount": 7,
+    "fileNamesUnchanged": true,
+    "allFileHashesUnchanged": true,
+    "valuesOrHashesReported": false
+  },
+  "businessTables": {
+    "core.reservation": {
+      "beforeCount": 17,
+      "afterCount": 17,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    },
+    "core.room_application": {
+      "beforeCount": 14,
+      "afterCount": 14,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    },
+    "repair.repair_order": {
+      "beforeCount": 9,
+      "afterCount": 9,
+      "countUnchanged": true,
+      "rowDigestMd5Unchanged": true
+    }
+  },
+  "readOnlyQuery": {
+    "transactionReadOnly": true,
+    "rowDigestMethod": "md5(coalesce(string_agg(md5(row_to_json(r)::text), '' ORDER BY id), ''))",
+    "rawRowsReported": false
+  },
+  "importLog": {
+    "path": "output/release-final-v3-import.log",
+    "sha256": "878e31a55799f480e2368e9129b41f0050c4ad6e60605c59da5b04993e7f1bb5",
+    "lineCount": 57,
+    "deploymentSuccessMarker": true,
+    "offlineImportSuccessMarker": true,
+    "pullOrBuildIndicators": 0
+  },
+  "limitations": [
+    "This import reused the existing isolated portable-install state; it proves preservation across import, not creation of another fresh environment.",
+    "The verified package is linux/arm64 on the local Docker daemon; no remote amd64 host was tested.",
+    "No network-disconnection experiment was performed; absence of pull/build is verified from the import log and the reviewed importer path.",
+    "Browser and performance/recovery results remain separate evidence; growing runtime artifacts are not covered by this source/import audit."
+  ]
+}

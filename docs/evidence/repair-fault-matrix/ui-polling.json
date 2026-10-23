@@ -1,0 +1,46 @@
+{
+  "orderId": "d0a806ed-469a-4283-9bd7-cf3536561c04",
+  "url": "http://127.0.0.1:18183",
+  "fault": "real resource-command TCP disconnect before upstream; authorization/read requests continue",
+  "beforeFix": [
+    {
+      "at": "2026-10-22T15:11:32.580Z",
+      "detailGets": 30,
+      "manualRefreshMessage": true
+    },
+    {
+      "at": "2026-10-22T15:11:51.851Z",
+      "detailGets": 31,
+      "automaticRefreshMessage": true
+    },
+    {
+      "at": "2026-10-22T15:12:15.732Z",
+      "detailGets": 31,
+      "automaticRefreshMessage": true
+    }
+  ],
+  "afterFix": [
+    {
+      "at": "2026-10-22T15:15:14.262Z",
+      "detailGets": 30,
+      "manualRefreshMessage": true
+    },
+    {
+      "at": "2026-10-22T15:15:19.274Z",
+      "detailGets": 32,
+      "automaticRefreshMessage": true
+    },
+    {
+      "at": "2026-10-22T15:15:38.522Z",
+      "detailGets": 42,
+      "automaticRefreshMessage": true
+    }
+  ],
+  "measurement": "Read-only browser PerformanceResourceTiming entries for exact real repair detail URL; no mocked API, fake clock, test-only endpoint, DB status rewrite or retry backoff change",
+  "viewport": {
+    "width": 375,
+    "documentWidth": 375,
+    "drawerWidth": 375
+  },
+  "result": "polling restart regression verified"
+}

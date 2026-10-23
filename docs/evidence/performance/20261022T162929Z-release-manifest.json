@@ -1,0 +1,33 @@
+{
+  "releaseId": "r-20261022T161900-3c7a93c",
+  "commit": "3c7a93cae56e68d2a96adb1e022f4fffc8112c5e",
+  "createdAt": "2026-10-22T16:20:07.439013+00:00",
+  "images": {
+    "core": {
+      "ref": "studyroom-core:r-20261022T161900-3c7a93c",
+      "id": "sha256:78dd0fff8c833b2bb2b154f9689314f715e8409e7c551eb14a5e949e65ec5807"
+    },
+    "repair": {
+      "ref": "studyroom-repair:r-20261022T161900-3c7a93c",
+      "id": "sha256:7f7288f21aad76937c1733698a8a1a1a15a06e1ea9786e9b45de01029a3a3f89"
+    },
+    "web": {
+      "ref": "studyroom-web:r-20261022T161900-3c7a93c",
+      "id": "sha256:a5249225237e455adb9295cbca268dd95ea027a83f0cf7c8f746ffaaf5393e3d"
+    }
+  },
+  "composeSha256": "2312d20cefccf4c3fa452af86b45e1bf9759d705a0fe4f7049972109ed0b0fe3",
+  "dependencyBaselineSha256": "3365ed6f61da8e2e107c6176c7c031a3b0fecda4961804386962164ad220ea56",
+  "migrations": {
+    "db/migration/core/V20261022000100__core_schema.sql": "7dce95580f862204b51146df5ade6535180926792fd8c68386533eeda4848c29",
+    "db/migration/core/V20261022130000__self_role_scope.sql": "ea2d286f3d2a63e6ad506cddd205b5db008f450366eaebd17a24b13dc4370bbf",
+    "db/migration/core/V20261022143000__reservation_history_index.sql": "d685c7baaa00d467fe53b9c340948434ecb1fcd62f368432fd0c6200f3f7b2f8",
+    "db/migration/core/V20261022150000__reservation_operator_note.sql": "2d51694965275c4ee6c38f320a6c03e5526c1fd0f5bca631e6cf4aeaa84d89b3",
+    "db/migration/repair/V20261022120000__repair_domain.sql": "7dda9fca5a299572c7fe647942eaf1c5d4c83cb40fa917c7f9852e642d7fd134",
+    "db/migration/repair/V20261022160000__assigned_worker_name_snapshot.sql": "3f44c3e18fed67307c52bcbe4bfa86411d82835659de07730b2c939ce7f0cf23",
+    "db/migration/session/V20261022000000__spring_session.sql": "6e72898cd1af72893b3ff13deacf100b114ee528ca0f9c8e348c235c0d63c4e9"
+  },
+  "referenceSeed": "1",
+  "rollbackCompatibility": "expand-only-v1",
+  "transport": "docker-save-content-addressed"
+}

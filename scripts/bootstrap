@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""Provision the pinned Ubuntu runtime through Ansible; local/dev/test only."""
+import argparse
+import base64
+import hashlib
+import ipaddress
+import json
+import os
+from pathlib import Path, PurePosixPath
+import re
+import shlex
+import subprocess
+import sys
+import tempfile
+
+ROOT = Path(__file__).resolve().parent.parent
+ANSIBLE = ROOT / "infra/ansible"
+LOCK = json.loads((ANSIBLE / "runtime-lock.json").read_text())
+
+
+def safe_path(value, name):
+    if not isinstance(value, str) or not re.fullmatch(r"/[A-Za-z0-9_./-]+", value):
+        raise ValueError(f"{name} must be an absolute path without shell metacharacters")
+    path = PurePosixPath(value)
+    if ".." in path.parts or len(path.parts) < 4 or path.parts[1] not in {"srv", "opt", "var"}:
+        raise ValueError(f"{name} must be a dedicated directory under /srv, /opt or /var")
+    return str(path)
+
+
+def validate_inventory(environment, source):
+    if environment not in {"local", "dev", "test"}:
+        raise ValueError("prod bootstrap is unavailable until TLS/SMTP and production deployment gates are configured")
+    allowed = {"environment", "connection", "host", "ssh_port", "ssh_user", "ssh_private_key_file", "ssh_host_key", "sudo",
+               "deployment_user", "state_directory", "release_directory", "backup_directory", "project_name",
+               "bind_address", "web_port", "mail_ui_port", "public_base_url"}
+    if not isinstance(source, dict) or set(source) - allowed:
+        raise ValueError("Inventory contains unsupported keys; use the restricted JSON example")
+    data = dict(source)
+    if data.get("environment") != environment or data.get("sudo") is not True:
+        raise ValueError("Inventory environment must match and authorized sudo must be explicitly true")
+    for name in ("state_directory", "release_directory", "backup_directory"):
+        data[name] = safe_path(data.get(name), name)
+    state, release = PurePosixPath(data["state_directory"]), PurePosixPath(data["release_directory"])
+    if state == release or state in release.parents or release in state.parents:
+        raise ValueError("State and release directories must be separate")
+    if data["backup_directory"] != str(state / "backups"):
+        raise ValueError("backup_directory must be state_directory/backups, the deployment backup location")
+    if not isinstance(data.get("deployment_user"), str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,30}", data.get("deployment_user", "")) or data["deployment_user"] in {"root", "ubuntu", "nobody"}:
+        raise ValueError("Use a dedicated unprivileged deployment account")
+    if not isinstance(data.get("project_name"), str) or not re.fullmatch(r"studyroom-" + environment + r"(?:-[a-z0-9][a-z0-9_-]{0,40})?", data.get("project_name", "")):
+        raise ValueError("project_name must be studyroom-<environment> with an optional unique suffix")
+    if data.get("bind_address") != "127.0.0.1":
+        raise ValueError("This local-delivery bootstrap exposes only loopback; use SSH forwarding")
+    for key in ("web_port", "mail_ui_port"):
+        if type(data.get(key)) is not int or not 1024 <= data[key] <= 65535:
+            raise ValueError(f"{key} must be an unprivileged TCP port")
+    if data["web_port"] == data["mail_ui_port"]:
+        raise ValueError("Web and Mailpit ports must differ")
+    expected = {f"http://localhost:{data['web_port']}", f"http://127.0.0.1:{data['web_port']}"}
+    if not isinstance(data.get("public_base_url"), str) or data.get("public_base_url") not in expected:
+        raise ValueError("public_base_url must match the loopback web port")
+    connection = data.get("connection", "ssh")
+    if connection == "local":
+        if not isinstance(data.get("host"), str) or data.get("host") not in {"localhost", "127.0.0.1"}:
+            raise ValueError("Local connection requires localhost")
+    elif connection == "ssh":
+        host = data.get("host", "")
+        if not isinstance(host, str):
+            raise ValueError("Invalid SSH host")
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            if not isinstance(host, str) or len(host) > 253 or not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?", host):
+                raise ValueError("Invalid SSH host") from None
+        if type(data.get("ssh_port")) is not int or not 1 <= data["ssh_port"] <= 65535:
+            raise ValueError("Invalid SSH port")
+        if not isinstance(data.get("ssh_user"), str) or not re.fullmatch(r"[a-z_][a-z0-9_-]{0,31}", data.get("ssh_user", "")):
+            raise ValueError("Invalid SSH user")
+        if not isinstance(data.get("ssh_private_key_file"), str) or not isinstance(data.get("ssh_host_key"), str):
+            raise ValueError("Provide a private key path and verified SSH public host key")
+        identity = Path(data["ssh_private_key_file"])
+        if not identity.is_absolute() or not identity.is_file() or (identity.stat().st_mode & 0o777) not in {0o400, 0o600}:
+            raise ValueError("SSH private key must be an existing absolute file with 0600/0400 permissions")
+        key = data.get("ssh_host_key", "").split()
+        try:
+            raw = base64.b64decode(key[1], validate=True)
+            length = int.from_bytes(raw[:4], "big")
+            valid = len(key) == 2 and key[0] in {"ssh-ed25519", "ssh-rsa", "ecdsa-sha2-nistp256"} and raw[4:4 + length].decode() == key[0] and len(raw) > length + 8
+        except (IndexError, ValueError, UnicodeError):
+            valid = False
+        if not valid:
+            raise ValueError("Provide the exact SSH public host key obtained through a trusted channel")
+    else:
+        raise ValueError("connection must be ssh or local")
+    data["connection"] = connection
+    return data
+
+
+def controller():
+    explicit = os.environ.get("STUDYROOM_ANSIBLE_PLAYBOOK")
+    if explicit:
+        executable = Path(explicit).resolve()
+    else:
+        if sys.version_info < (3, 12):
+            raise RuntimeError("The bootstrap controller requires Python 3.12+ for pinned Ansible")
+        cache = Path(os.environ.get("STUDYROOM_BOOTSTRAP_CACHE", Path.home() / ".cache/campus-study-room")) / ("ansible-" + LOCK["ansibleCore"])
+        executable = cache / "bin/ansible-playbook"
+        signature = hashlib.sha256((ANSIBLE / "requirements.txt").read_bytes()).hexdigest()
+        marker = cache / "requirements.sha256"
+        if not executable.exists() or not marker.exists() or marker.read_text().strip() != signature:
+            subprocess.run([sys.executable, "-m", "venv", str(cache)], check=True)
+            subprocess.run([cache / "bin/python", "-m", "pip", "install", "--only-binary=:all:", "-r", ANSIBLE / "requirements.txt"], check=True)
+            marker.write_text(signature + "\n")
+    version = subprocess.run([executable, "--version"], check=True, text=True, capture_output=True).stdout
+    if not version.startswith("ansible-playbook [core " + LOCK["ansibleCore"] + "]"):
+        raise RuntimeError("Ansible does not match infra/ansible/runtime-lock.json")
+    return executable
+
+
+def invocation(environment, data, directory, container_validation=False):
+    folder = Path(directory)
+    known_hosts = folder / "known_hosts"
+    known_hosts.write_text("studyroom-bootstrap-target " + data.get("ssh_host_key", "") + "\n")
+    known_hosts.chmod(0o600)
+    ssh_options = ["-o", "StrictHostKeyChecking=yes", "-o", "UserKnownHostsFile=" + str(known_hosts), "-o", "GlobalKnownHostsFile=/dev/null",
+                   "-o", "HostKeyAlias=studyroom-bootstrap-target", "-o", "CheckHostIP=no", "-o", "UpdateHostKeys=no", "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes"]
+    variables = {"ansible_connection": data["connection"], "ansible_host": data["host"], "ansible_become": True,
+                 "ansible_python_interpreter": "/usr/bin/python3"}
+    if data["connection"] == "ssh":
+        variables.update(ansible_user=data["ssh_user"], ansible_port=data["ssh_port"], ansible_ssh_private_key_file=data["ssh_private_key_file"],
+                         ansible_ssh_common_args=shlex.join(ssh_options))
+    inventory = folder / "inventory.json"
+    inventory.write_text(json.dumps({"all": {"children": {"studyroom": {"hosts": {"runtime": variables}}}}}))
+    settings = {key: data[key] for key in ("environment", "deployment_user", "state_directory", "release_directory", "backup_directory", "project_name", "bind_address", "web_port", "mail_ui_port", "public_base_url")}
+    extra = folder / "variables.json"
+    extra.write_text(json.dumps({"bootstrap_settings": settings, "bootstrap_repository_root": str(ROOT), "bootstrap_lock": LOCK,
+                                "bootstrap_container_validation": container_validation}))
+    env = {**os.environ, "ANSIBLE_HOST_KEY_CHECKING": "True", "ANSIBLE_SSH_ARGS": shlex.join(ssh_options), "ANSIBLE_RETRY_FILES_ENABLED": "False"}
+    return ["-i", str(inventory), str(ANSIBLE / "bootstrap.yml"), "--extra-vars", "@" + str(extra)], env
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("environment", choices=["local", "dev", "test", "prod"])
+    parser.add_argument("inventory", type=Path)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--validate", action="store_true", help="Validate inputs without installing Ansible or connecting")
+    mode.add_argument("--syntax-check", action="store_true")
+    mode.add_argument("--check", action="store_true", help="Ansible check mode; not a server acceptance test")
+    parser.add_argument("--container-validation", action="store_true", help="Local Ubuntu-container package/path check; explicitly skips daemon/network acceptance")
+    args = parser.parse_args(argv)
+    try:
+        data = validate_inventory(args.environment, json.loads(args.inventory.read_text()))
+        if args.container_validation and data["connection"] != "local":
+            raise ValueError("Container validation requires an explicit local connection")
+        if args.validate:
+            print("Inventory validated; no host was contacted or changed.")
+            return
+        executable = controller()
+        with tempfile.TemporaryDirectory(prefix="studyroom-bootstrap-") as directory:
+            command, env = invocation(args.environment, data, directory, args.container_validation)
+            if args.syntax_check:
+                command += ["--syntax-check"]
+            if args.check:
+                command += ["--check"]
+            subprocess.run([executable, *command], env=env, check=True)
+    except (ValueError, RuntimeError, OSError, subprocess.CalledProcessError) as error:
+        parser.exit(1, f"Bootstrap failed: {error}\n")
+
+
+if __name__ == "__main__":
+    main()

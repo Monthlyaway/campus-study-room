@@ -1,0 +1,32 @@
+{
+  "name": "@campus-study-room/web",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "umi dev --port 8000",
+    "build": "umi build",
+    "postinstall": "umi setup",
+    "typecheck": "umi setup && tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "generate": "node scripts/generate.mjs"
+  },
+  "dependencies": {
+    "@ant-design/icons": "6.3.4",
+    "antd": "6.6.7",
+    "dayjs": "1.11.23",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "umi": "4.7.26"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/node": "24.10.0",
+    "@umijs/openapi": "1.14.1",
+    "typescript": "5.9.3"
+  }
+}

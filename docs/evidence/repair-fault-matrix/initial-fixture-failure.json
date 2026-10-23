@@ -1,0 +1,13 @@
+{
+  "time": 1792681699.421061,
+  "orderId": "76528a74-6eed-4396-aaa0-8dd1a233e9f5",
+  "status": "IN_REPAIR",
+  "outbox": [
+    {
+      "command_type": "BLOCK",
+      "status": "DONE",
+      "attempts": 0
+    }
+  ],
+  "cause": "HTTP suite STUDYROOM_CORE_URL inherited by Java overrode Spring studyroom.core-url and bypassed proxy; isolated core18181 only. Fixed runner removes test URL environment variables. Not a production business change."
+}
