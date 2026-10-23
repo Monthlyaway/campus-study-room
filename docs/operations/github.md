@@ -21,12 +21,12 @@ git fetch origin
 
 ## 检查和合入
 
-工作流按 `verify → publish → deploy` 顺序执行：verify 负责验证；publish 和 deploy 只在版本 tag 发布路径执行。deploy 单独绑定 `production` environment，使用只读 contents/packages 与 deployments 写权限，可在部署失败后独立重跑。main 的 push、目标为 main 的 PR、版本 tag push 和手动 `workflow_dispatch` 会触发工作流；工作分支通过 PR 验证，不再同时对 feature push 重复运行，以免占满 2 GiB 服务器。需要独立调试时可在可信 `ycy/` 分支手动 dispatch。实际执行还要求 owner actor/triggering actor、同仓库可信引用，准确条件以[工作流源码](../../.github/workflows/ci.yml)为准。每次改动必须实际运行完整 `./scripts/check`，包括编译、生成客户端差异、类型/单元检查和真实 PostgreSQL/HTTP/SMTP 测试；镜像发布还要完成隔离 test 部署、三应用版本核对和真实浏览器 E2E。失败、缺失、零用例、必需套件跳过或旧 SHA 的绿色结果均不能当作当前候选通过。
+工作流按 `verify → publish → deploy` 顺序执行：verify 负责验证；publish 和 deploy 只在版本 tag 发布路径执行。deploy 单独绑定 `production` environment，使用只读 contents/packages 与 deployments 写权限，可在部署失败后独立重跑。main 的 push、目标为 main 的 PR、版本 tag push 和手动 `workflow_dispatch` 会触发工作流；工作分支通过 PR 验证，不再同时对 feature push 重复运行，以免占满 2 GiB 服务器。需要独立调试时可在可信 `ycy/` 分支手动 dispatch。实际执行还要求 owner actor/triggering actor、同仓库可信引用，准确条件以[工作流源码](../../.github/workflows/ci.yml)为准。每个 PR 的最新提交由 Actions 实际运行完整 `./scripts/check`，包括编译、生成客户端差异、类型/单元检查和真实 PostgreSQL/HTTP/SMTP 测试，并完成隔离 test 部署、三应用版本核对和真实浏览器 E2E。开发目录仅按改动运行针对性验证，不在 Mac 或 codex-lb 提 PR 前重复整套门禁；CI 失败后可针对性复现，用户明确要求时可例外运行。版本 tag 按正式工作流重新验证候选。失败、缺失、零用例、必需套件跳过或旧 SHA 的绿色结果均不能当作当前候选通过。
 
 合入顺序：
 
-1. 在工作分支完成修改，运行针对性测试和完整门禁，检查 diff、生成物、秘密与文档链接，保留逻辑 commit。
-2. 推送工作分支并创建 PR。比较最新 main，必要时 rebase 并重新执行新 SHA 的验证。
+1. 在工作分支完成修改和针对性验证，检查 diff、生成物、秘密与文档链接，保留逻辑 commit；不预先重复完整集成/E2E。
+2. 推送工作分支并创建 PR，由 PR Actions 承担完整检查、真实集成与 E2E。比较最新 main，必要时 rebase，再由 Actions 验证新的 head SHA。
 3. 复核 PR 的最新 head SHA、全部必要 Actions 结果及其真实报告。失败的候选继续修复，不能删检查、降低断言或手写成功结果。
 4. 使用 GitHub rebase merge，不 squash，不产生 merge commit。核对 PR 已合并、main 历史线性、每个逻辑提交仍存在。
 5. 核对 main 对应工作流，再将通过 test 的不可变镜像组合晋级发布和生产。

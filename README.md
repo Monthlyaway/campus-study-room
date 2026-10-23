@@ -18,7 +18,7 @@
 
 ## 当前访问与开发入口
 
-服务部署到 codex-lb，公网目标为 `https://49.51.193.169`。实际运行版本、HTTPS 状态、维护入口及已验证范围统一记录在[当前实例接手卡](docs/operations/current-instance.md)。生产使用独立管理员和正式账号，不能套用测试环境的 `student` / `admin` 演示凭据。使用已安装系统的用户无需安装开发工具。
+v0.2.2 已部署到 codex-lb，公网入口为 [https://49.51.193.169](https://49.51.193.169)。实际运行版本、HTTPS 状态、维护入口及已验证范围统一记录在[当前实例接手卡](docs/operations/current-instance.md)。生产使用独立管理员和正式账号，不能套用测试环境的 `student` / `admin` 演示凭据。使用已安装系统的用户无需安装开发工具。
 
 代码、CI 和发布全部在 codex-lb；控制电脑通过 SSH 连接。开发 checkout 为 `/home/ubuntu/Codes/campus-study-room`，从[远程开发指南](docs/development/local-setup.md)开始。GitHub 私有仓库为 [Monthlyaway/campus-study-room](https://github.com/Monthlyaway/campus-study-room)，PR、Actions 与 Packages/Release 操作见[GitHub 手册](docs/operations/github.md)。
 
@@ -38,7 +38,7 @@ cd campus-study-room
 
 ## 当前交付
 
-P0 覆盖账号与权限、预约、教室审批、维修闭环，以及安装、不可变发布、备份和回退。当前 GitHub Actions 使用 codex-lb 的专用 runner，三应用通过 GHCR Packages 保存，发行信息见 [GitHub Releases](https://github.com/Monthlyaway/campus-study-room/releases)。工作分支通过完整验证后提交 PR，使用 rebase merge，默认不 squash，保留每个逻辑提交。
+P0 覆盖账号与权限、预约、教室审批、维修闭环，以及安装、不可变发布、备份和回退。当前 GitHub Actions 使用 codex-lb 的专用 runner，三应用通过 GHCR Packages 保存，发行信息见 [GitHub Releases](https://github.com/Monthlyaway/campus-study-room/releases)。工作分支完成针对性验证后提交 PR，由 PR Actions 执行完整检查、集成和 E2E；最新提交全部通过后使用 rebase merge，默认不 squash，保留每个逻辑提交。Mac 或 codex-lb 开发目录不在提 PR 前重复运行完整门禁；CI 失败时按失败点复现，用户明确要求时可另行执行。
 
 原 GitLab v0.1.0 / Linux ARM64 交付按[历史发布记录](docs/evidence/gitlab-release-v0.1.0.md)保留。新服务器、Linux AMD64、HTTPS 与生产运行以本次[进度](docs/progress.md)和[证据索引](docs/evidence/README.md)为准；不能用旧通过结果代替。邮件仍使用 Mailpit，外部 SMTP 实际收信未提供验收条件；P1 自然语言业务 Agent 未启动。用户调整的开发、资源与交付边界见 [ADR 0004](docs/adr/0004-github-codex-lb-production.md)。
 

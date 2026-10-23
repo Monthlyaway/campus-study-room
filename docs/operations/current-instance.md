@@ -2,16 +2,18 @@
 
 [运维导航](README.md) · [巡检与排障](runbook.md) · [演示账号](../development/demo-accounts.md)
 
-## codex-lb 部署准备快照
+<a id="codex-lb-部署准备快照"></a>
 
-以下为 **2026-10-23 v0.2.1 浏览器验证失败后**的已核对状态，不是自动刷新的健康页面。PR #2 完整 CI 通过后已 rebase merge；正式 v0.2.1 的全仓检查通过，但浏览器 6 项中 1 项失败，verify 未通过，publish 与 deploy 均跳过，没有该版本的新 Release 或 package。生产应用尚未启动。HTTPS 入口已配置，最近一次外部 HTTPS 检查通过证书校验、应用响应为 **502**。运行身份与失败位置见 [v0.2.1 记录](../evidence/github-production-v0.2.1.md)，v0.2.0 的独立结果保留在[原发布中断记录](../evidence/github-production-v0.2.0.md)，后续状态以[进度](../progress.md)为准。
+## codex-lb 生产快照
+
+以下为 **2026-10-23 v0.2.2 已部署后的核对快照**，不是自动刷新的健康页面。正式 Actions 的 verify/publish/deploy 均成功，公网 HTTPS 首页与三应用版本接口均为 200，11 个课程账号已实际验证登录。备份调度首次安装的 systemd unit 错误已在宿主修正，实际备份、隔离恢复与 42 表内容核对通过；独立桌面/375px 只读 UI 也已通过；资源观测只覆盖文档列明的 12 次样本，生成器修复已通过针对性验证，完整结论以对应 PR Checks 为准。完整运行身份、资产校验及实际边界见 [v0.2.2 发布记录](../evidence/github-production-v0.2.2.md)；旧 [v0.2.1](../evidence/github-production-v0.2.1.md) / [v0.2.0](../evidence/github-production-v0.2.0.md) 失败不改写为成功。
 
 | 项目 | 已核对事实 / 配置位置 |
 | --- | --- |
 | 主机与公网入口 | codex-lb；`https://49.51.193.169` |
-| 发布候选 | `v0.2.1` → `655cc322b96118827efa9c5572aeab323a055f60`；全仓检查通过，浏览器 1/6 失败，verify 失败，publish/deploy 跳过 |
-| 发布中断边界 | v0.2.1 没有发布；v0.2.0 仅 core 的既有部分上传保持原记录，不作为生产版本 |
-| HTTP / HTTPS | TCP 80/443 可达；HTTP 308 到 HTTPS；不使用 `-k` 的 TLS 校验成功，应用响应当前为 502 |
+| 正式运行版本 | `v0.2.2` → `524134c7ad9b730538f535aa2245c7f8f8d611c0`；Actions 39955632806 / attempt 1 三 job 全部 success |
+| 发布与运行绑定 | 稳定 Release 已发布；6 个资产 digest、3 个已测试 image ID 与发布组合核对一致，完整摘要见发布记录 |
+| HTTP / HTTPS | TCP 80/443 可达；HTTP 308 到 HTTPS；证书验证通过，HTTPS 首页及 web/core/repair 版本接口均为 200 |
 | HTTPS 服务 | 宿主 nginx 系统服务 active；回环 upstream `127.0.0.1:18443` |
 | 证书 | Let’s Encrypt YE2；SAN 为 IP `49.51.193.169` |
 | 首次证书有效期 | `2026-10-23T08:15:52Z` 至 `2026-10-30T00:15:51Z`；真实续期后需重新查询 |
@@ -24,9 +26,15 @@
 | 运行工具 | Docker 29.1.3、Compose 2.40.3、GitHub CLI 2.103.0；Node 24.22.1、Java 21.0.12.1 |
 | 开发 checkout | `/home/ubuntu/Codes/campus-study-room`；代码编辑、commit 与 push 均在该服务器 |
 | 生产持久状态 | `/home/ubuntu/.local/state/campus-study-room/prod`；与 CI/浏览器测试状态隔离 |
-| 不可变发布源码 | `/home/ubuntu/Deployments/campus-study-room/releases/<releaseId>/source`；每版单独保留 |
+| 不可变发布源码 | `/home/ubuntu/Deployments/campus-study-room/releases/v0.2.2/source`；后续文档 HEAD 不改变此运行版 |
+| 课程资源 | 11 个账号已验证 HTTPS 登录，3 房间 / 30 座位；无预造预约、审批或工单，账号入口见[演示账号](../development/demo-accounts.md) |
+| 独立生产 UI | 学生/管理员 × 1440px/375px 四上下文通过只读试用及会话/路由权限；手机管理表格右侧列可达，无业务写入 |
+| 已完成资源观测 | 13:14:20.899763Z–13:19:50.924237Z，12次采样：四入口200/TLS0、版本一致、5容器healthy且重启/OOM为0；该窗口无PR CI负载 |
+| 备份调度 | `com.campus-study-room.backup.8e4b5303d478.timer` enabled / active waiting，`Linger=yes`；首次 unit 配置错误已修正，生成器修复待 PR 验证 |
+| 最近备份与恢复 | `backups/20261023T131356842634Z.dump`；隔离库 `studyroom_restore_20261023131409` 的 42 表内容一致，在线库未改，详细摘要见发布记录 |
+| 备份日志 | `journalctl --user -u com.campus-study-room.backup.8e4b5303d478.service`；不以 Linux 的空 backup-scheduler.log 判断任务状态 |
 
-该服务器约 2 核/2 GiB RAM、4 GiB swap；已通过的串行 CI 不代表原 4 核/8 GiB 性能验收或 CI 与生产共同运行容量已验。当前生产镜像运行、课程账号创建与实际登录、HTTPS 业务流程、定时备份及隔离恢复均待执行。先完成本次弹窗动画/布局采样修复及新版本验证，再由正式 deploy 推广已测试镜像；届时补齐三应用 digest、运行版本、备份/恢复与资源观测。账号凭据只在[演示账号](../development/demo-accounts.md)维护，本页不复制密码。
+该服务器约 2 核/2 GiB RAM、4 GiB swap；已通过的串行 CI 和成功部署不代表原 4 核/8 GiB 性能或 CI 与生产共同运行容量已验。已通过的备份/恢复只覆盖本次恢复点，独立 UI 只执行只读操作；资源样本没有覆盖后续 PR CI 负载。本次生成器修复和交付文档按[贡献指南](../contributing.md)的 PR 流程验证，完整结论以对应 PR 的 Checks 为准，不由当前生产状态推断新提交通过。生产状态不可作为普通测试默认目标；账号凭据只在[演示账号](../development/demo-accounts.md)维护，本页不复制密码。
 
 日常证书查询与排障见[GitHub 运维手册](github.md#ip-https-与续期)。公网仅开放应用 HTTP/HTTPS 入口；数据库、内部 API、Mailpit 保持私网/回环，SSH 保持既有规则。
 

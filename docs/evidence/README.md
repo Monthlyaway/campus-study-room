@@ -8,9 +8,10 @@
 
 | 要核对什么 | 证据与边界 |
 | --- | --- |
-| 最新 v0.2.1 验证为何停止 | [v0.2.1 失败记录](github-production-v0.2.1.md)：PR #2 完整 CI 通过并 rebase merge；tag 全仓检查通过，浏览器 1/6 失败，publish/deploy 跳过，无本版本的新 Release/package，生产仍待部署 |
-| GitHub / codex-lb 的 v0.2.0 验证与发布中断 | [v0.2.0 记录](github-production-v0.2.0.md)：PR rebase merge、Linux AMD64 全仓检查、三镜像隔离部署与浏览器 6 项通过；tag verify 成功，publish 失败、deploy 跳过，生产/课程账号/备份恢复待执行 |
-| 公网 IP HTTPS 与续期准备 | [当前接手卡](../operations/current-instance.md#codex-lb-部署准备快照)：有效 IP 证书、外部 TLS 校验及续期 dry-run 通过；应用最近响应为 502，不等同生产上线 |
+| v0.2.2 正式发布与生产上线 | [v0.2.2 记录](github-production-v0.2.2.md)：verify/publish/deploy 全成功，资产/镜像及 HTTPS 版本绑定通过，11 个课程账号已验证登录；真实备份/隔离恢复42表一致、独立UI通过；12次资源采样不含PR CI负载，生成器修复结果看本次PR，首次安装失败保留 |
+| v0.2.1 验证为何停止 | [v0.2.1 失败记录](github-production-v0.2.1.md)：PR #2 完整 CI 通过并 rebase merge；tag 全仓检查通过，浏览器 1/6 失败，publish/deploy 跳过，无本版本的新 Release/package，该版本未部署 |
+| GitHub / codex-lb 的 v0.2.0 验证与发布中断 | [v0.2.0 记录](github-production-v0.2.0.md)：PR rebase merge、Linux AMD64 全仓检查、三镜像隔离部署与浏览器 6 项通过；tag verify 成功，publish 失败、deploy 跳过，该版本未完成生产交付 |
+| 运行入口、IP HTTPS 与续期 | [当前接手卡](../operations/current-instance.md#codex-lb-生产快照)：有效 IP 证书、外部 TLS 校验及续期 dry-run 通过；正式 HTTPS 首页与三版本接口均 200 |
 | v0.1.0发布、线性合并、完整五门禁 | [GitLab发布记录](gitlab-release-v0.1.0.md)，运行源码为10799003；纯文档基线d397d05与运行版本分开 |
 | V6桌面与手机六流程 | [浏览器最终报告](frontend-release-final-v6.md)，6/6、113.061秒；独立报告隐私探针1/1 |
 | V6离线导入与运输包内容 | [导入记录](release/final-v6-portable-import.json)、[归档校验](release/final-v6-archive-verification.json)，450源码文件、五镜像，linux/arm64 |
@@ -24,14 +25,15 @@
 
 - S、R4、V5、V6等是报告中的运行身份简称，必须结合完整commit、releaseId、镜像ID和时间。README或文档HEAD变化不会改变已运行的镜像。
 - 通过只覆盖报告中的断言与条件；取消、失败、跳过和未执行不能改成通过。旧失败的后续修复另有运行记录。
-- 本机交付、CI 隔离部署、宿主 HTTPS 与生产业务上线是不同验证对象。旧 GitLab / ARM64 报告保留原范围；新增 codex-lb 记录已覆盖 Linux AMD64 CI、Ubuntu SSH/systemd 配置及公网 IP TLS，但生产业务仍待部署。不声称隔绝外网、外部 SMTP 实际收信、线上数据库切换或同机 CI/生产容量已验收。
+- 本机交付、CI 隔离部署、宿主 HTTPS 与生产业务上线是不同验证对象。旧 GitLab / ARM64 报告保留原范围；新增 codex-lb 记录已覆盖 Linux AMD64 CI、Ubuntu SSH/systemd 配置及公网 IP TLS，生产版本与课程登录已验证，本次备份/隔离恢复已有 42 表内容核对，独立生产 UI 只读试用已完成，资源观察仅覆盖列明窗口。不声称隔绝外网、外部 SMTP 实际收信、线上数据库切换或同机 CI/生产容量已验收。
 - `output/`、`.local/`是忽略的本机原始产物/状态，普通clone不带它们。报告中的这些路径说明原保存位置，不是用户手册必须下载的附件；CI制品按对应job权限与保留策略访问。需要重现时走[测试指南](../development/testing.md)。
 - 不公开密码、Cookie、CSRF、Runner令牌或未审核日志。一次限定扫描不能保证后续全部文件；证据有自己的截止时间。
 - 本轮保留已有34份历史Markdown原字节，另建此索引和新报告；历史JSON、日志和截图也不因文档整理而改写结果。
 
 ## GitHub 与 codex-lb
 
-- [v0.2.1 浏览器验证失败记录](github-production-v0.2.1.md)：桌面真实 409 弹窗关闭后缩至 375px 的动画越界与检查读取竞争；修复验证尚未完成。
+- [v0.2.2 发布与生产交付记录](github-production-v0.2.2.md)：正式 Actions、发行资产、镜像与公网版本已核对；备份安装失败、后续修复及剩余验收分开记录。
+- [v0.2.1 浏览器验证失败记录](github-production-v0.2.1.md)：冻结当时的动画越界与检查读取竞争失败；后续修复验证见 v0.2.2 记录。
 - [v0.2.0 发布验证与中断记录](github-production-v0.2.0.md)：按实际 PR、tag、run/attempt 和镜像身份核对；修复后的新版本另立记录，失败版本不回填为上线成功。
 
 ## 全部历史文字报告
