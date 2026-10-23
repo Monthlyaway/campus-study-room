@@ -2,6 +2,8 @@
 
 [文档首页](README.md) · [39项P0追踪](requirements-traceability.md) · [验收证据](evidence/README.md)
 
+当前最新状态：v0.2.1 全仓检查通过、浏览器 1/6 失败，publish/deploy 跳过；生产仍未部署。失败位置和修复验证边界见[本轮记录](evidence/github-production-v0.2.1.md)。
+
 更新时间：2026-10-23。下方 v0.1.0 与 MS0～MS6 表格记录原本机 / ARM64 可迁移交付：P0 的39项需求已验证，v0.1.0已发布，边界见[ADR 0002](adr/0002-delivery-and-gitlab.md)。后续 GitHub / codex-lb / Linux AMD64 的实际进度见本页末尾；不能把历史结果当作新生产环境验收。P1尚未启动。
 
 ## 当前交付
@@ -56,3 +58,17 @@
 [PR #1](https://github.com/Monthlyaway/campus-study-room/pull/1) 已在完整验证通过后 rebase merge 到 main，保留 9 个逻辑提交、作者信息和源码树。PR verify 和正式 v0.2.0 verify 均通过，包括 158 项运维单测、真实 PostgreSQL/HTTP、三镜像隔离部署和 6 项浏览器测试。
 
 v0.2.0 的 publish 在 core 私有镜像上传后失败：GHCR REST 元数据未返回脚本要求的 repository 字段。只读 Actions 查询与 GitHub 页面已定位该误判，deploy 因上游失败没有执行。现有部分版本保留，修复后重新经 PR 验证并发布新版本。生产应用、实际课程账号、生产备份恢复与公网 UI 验收仍待完成；HTTPS 已可用不等于应用已上线。详见[本次验证与中断记录](evidence/github-production-v0.2.0.md)。
+
+
+## 2026-10-23 — v0.2.1 浏览器验证失败（REQ-ENG-05/07/08）
+
+GHCR 元数据兼容性修复在 [PR #2](https://github.com/Monthlyaway/campus-study-room/pull/2) 完整 CI 通过后 rebase merge 到 `655cc322b96118827efa9c5572aeab323a055f60`，保留 2 个逻辑提交、作者/日期及源码树。正式 [Actions 39946065589](https://github.com/Monthlyaway/campus-study-room/actions/runs/39946065589) 的全仓检查通过：164 项 ops、7 套 HTTP / 18 项、9 套 PostgreSQL / 66 项、27 项期限收件人断言与响应丢失重放。
+
+正式浏览器验证 6 项中 1 项失败，总耗时 125.841992 秒。失败发生在关闭桌面真实 409 弹窗后缩至 375px，尚未打开历史再约弹窗；现有证据同时显示退出动画沿旧桌面 origin 造成真实越界，以及 helper 枚举可见元素与读取尺寸之间的竞争。修复正在进行，后续验证尚未完成。verify 未通过，publish/deploy 跳过，本版本无新 Release/package；生产部署、课程账号、备份恢复和同机运行观测继续待执行。详见 [v0.2.1 失败记录](evidence/github-production-v0.2.1.md)，旧版本报告保留原结果。
+
+
+## 2026-10-23 — 手机弹窗退出动画与布局采样修复（REQ-ENG-02/05）
+
+v0.2.1 浏览器失败已在独立测试环境复现：桌面点击位置在缩至 375px 后成为屏幕外的退出动画原点，旧布局 helper 又可能在弹窗消失后等待动态定位器。修复将手机弹窗动画原点固定在中心，并在一次页面快照中读取布局；原选择器、1px 容差和 5 秒上限保留。
+
+新增逐帧回归在旧 CSS 上失败、修复候选上通过。基于未提交工作树构建的独立诊断镜像完成真实浏览器 6/6（124.465 秒）和隐私探针 1/1；另一名 agent 实际检查桌面与 375px，完全展开后关闭分别采样 18/20 帧，均无越界、无 JavaScript 错误。诊断镜像未覆盖原 v0.2.1，不作为正式 CI 或发布证明；开发目录的完整检查已按用户新指示中止，不计为完整通过；后续完整集成验收交由 PR/版本 Actions 执行。该避免重复检查的规则已写入 AGENTS.md 和贡献指南。生产仍未部署。

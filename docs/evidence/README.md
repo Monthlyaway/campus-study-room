@@ -8,6 +8,7 @@
 
 | 要核对什么 | 证据与边界 |
 | --- | --- |
+| 最新 v0.2.1 验证为何停止 | [v0.2.1 失败记录](github-production-v0.2.1.md)：PR #2 完整 CI 通过并 rebase merge；tag 全仓检查通过，浏览器 1/6 失败，publish/deploy 跳过，无本版本的新 Release/package，生产仍待部署 |
 | GitHub / codex-lb 的 v0.2.0 验证与发布中断 | [v0.2.0 记录](github-production-v0.2.0.md)：PR rebase merge、Linux AMD64 全仓检查、三镜像隔离部署与浏览器 6 项通过；tag verify 成功，publish 失败、deploy 跳过，生产/课程账号/备份恢复待执行 |
 | 公网 IP HTTPS 与续期准备 | [当前接手卡](../operations/current-instance.md#codex-lb-部署准备快照)：有效 IP 证书、外部 TLS 校验及续期 dry-run 通过；应用最近响应为 502，不等同生产上线 |
 | v0.1.0发布、线性合并、完整五门禁 | [GitLab发布记录](gitlab-release-v0.1.0.md)，运行源码为10799003；纯文档基线d397d05与运行版本分开 |
@@ -30,6 +31,7 @@
 
 ## GitHub 与 codex-lb
 
+- [v0.2.1 浏览器验证失败记录](github-production-v0.2.1.md)：桌面真实 409 弹窗关闭后缩至 375px 的动画越界与检查读取竞争；修复验证尚未完成。
 - [v0.2.0 发布验证与中断记录](github-production-v0.2.0.md)：按实际 PR、tag、run/attempt 和镜像身份核对；修复后的新版本另立记录，失败版本不回填为上线成功。
 
 ## 全部历史文字报告
