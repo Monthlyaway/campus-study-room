@@ -1,0 +1,39 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "8285c5926fe83bc11a3d4172a11beb784af50002",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/user-guide/README.md",
+      "additions": {
+        "human": 52
+      }
+    },
+    {
+      "new_path": "docs/user-guide/administration.md",
+      "additions": {
+        "human": 127
+      }
+    },
+    {
+      "new_path": "docs/user-guide/faq.md",
+      "additions": {
+        "human": 85
+      }
+    },
+    {
+      "new_path": "docs/user-guide/pages.md",
+      "additions": {
+        "human": 122
+      }
+    },
+    {
+      "new_path": "docs/user-guide/workflows.md",
+      "additions": {
+        "human": 92
+      }
+    }
+  ]
+}
