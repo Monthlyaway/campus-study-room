@@ -1,0 +1,156 @@
+---
+{
+  "schema_version": "authorship/3.1.0",
+  "tlab_version": "0.13.1",
+  "base_commit_sha": "f0a7efdae2572f70f0a393cb20f0cf8c3ed281c8",
+  "prompts": {},
+  "changes": [
+    {
+      "new_path": "docs/architecture/README.md",
+      "additions": {
+        "human": 88
+      }
+    },
+    {
+      "new_path": "docs/architecture/data-consistency.md",
+      "additions": {
+        "human": 210
+      }
+    },
+    {
+      "new_path": "docs/architecture/security.md",
+      "additions": {
+        "human": 126
+      }
+    },
+    {
+      "new_path": "docs/development/README.md",
+      "additions": {
+        "human": 28
+      }
+    },
+    {
+      "new_path": "docs/development/api.md",
+      "additions": {
+        "human": 144
+      }
+    },
+    {
+      "new_path": "docs/development/backend.md",
+      "additions": {
+        "human": 83
+      }
+    },
+    {
+      "new_path": "docs/development/demo-accounts.md",
+      "additions": {
+        "human": 58
+      }
+    },
+    {
+      "new_path": "docs/development/frontend.md",
+      "additions": {
+        "human": 140
+      }
+    },
+    {
+      "new_path": "docs/development/local-setup.md",
+      "additions": {
+        "human": 106
+      }
+    },
+    {
+      "new_path": "docs/development/testing.md",
+      "additions": {
+        "human": 115
+      }
+    },
+    {
+      "old_path": "contracts/openapi/README.md",
+      "new_path": "contracts/openapi/README.md",
+      "additions": {
+        "human": 28
+      },
+      "deletions": {
+        "human": 11
+      }
+    },
+    {
+      "old_path": "docs/modules/administration.md",
+      "new_path": "docs/modules/administration.md",
+      "additions": {
+        "human": 25
+      },
+      "deletions": {
+        "human": 25
+      }
+    },
+    {
+      "old_path": "docs/modules/core.md",
+      "new_path": "docs/modules/core.md",
+      "additions": {
+        "human": 37
+      },
+      "deletions": {
+        "human": 59
+      }
+    },
+    {
+      "old_path": "docs/modules/observability.md",
+      "new_path": "docs/modules/observability.md",
+      "additions": {
+        "human": 55
+      },
+      "deletions": {
+        "human": 12
+      }
+    },
+    {
+      "old_path": "docs/modules/repair.md",
+      "new_path": "docs/modules/repair.md",
+      "additions": {
+        "human": 44
+      },
+      "deletions": {
+        "human": 56
+      }
+    },
+    {
+      "old_path": "docs/modules/shared-services.md",
+      "new_path": "docs/modules/shared-services.md",
+      "additions": {
+        "human": 25
+      },
+      "deletions": {
+        "human": 21
+      }
+    },
+    {
+      "old_path": "docs/modules/web.md",
+      "new_path": "docs/modules/web.md",
+      "additions": {
+        "human": 23
+      },
+      "deletions": {
+        "human": 102
+      }
+    },
+    {
+      "old_path": "tests/browser/README.md",
+      "new_path": "tests/browser/README.md",
+      "additions": {
+        "human": 9
+      },
+      "deletions": {
+        "human": 3
+      }
+    },
+    {
+      "old_path": "tests/performance/README.md",
+      "new_path": "tests/performance/README.md",
+      "additions": {
+        "human": 2
+      }
+    }
+  ]
+}
