@@ -302,6 +302,35 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
 test('administrator can search an empty result but cannot use student booking actions', async ({ page }, info) => {
   await login(page, 'admin');
   await page.goto('/admin/users');
+  // A dialog opened from a desktop click must not leave toward that stale screen
+  // position after a resize. Observe every closing frame, not only its final state.
+  await page.getByRole('button', { name: /创建账号/ }).click();
+  await expect(modal(page)).toBeVisible();
+  await expect.poll(() => modal(page).evaluate((element) =>
+    element.getAnimations().filter((animation) => animation.playState === 'running').length)).toBe(0);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await noHorizontalOverflow(page);
+  const closing = modal(page).evaluate((element) => new Promise((resolve) => {
+    const started = performance.now();
+    const overflow = [];
+    let frames = 0;
+    function observe() {
+      const box = element.getBoundingClientRect();
+      if (!box?.width || !box.height) return resolve({ closed: true, frames, overflow });
+      frames++;
+      if (box.x < -1 || box.right > innerWidth + 1)
+        overflow.push({ x: box.x, width: box.width, viewport: innerWidth });
+      if (performance.now() - started > 2_000) return resolve({ closed: false, frames, overflow });
+      requestAnimationFrame(observe);
+    }
+    observe();
+  }));
+  await modal(page).getByRole('button', { name: /^返\s*回$/ }).click();
+  const motion = await closing;
+  expect(motion.closed, 'Dismissed dialog must finish closing').toBe(true);
+  expect(motion.frames, 'Observe the real dialog before it closes').toBeGreaterThan(0);
+  expect(motion.overflow, 'Every mobile closing frame must stay inside the viewport').toEqual([]);
+  await noHorizontalOverflow(page);
   const search = page.getByPlaceholder('搜索账号或姓名');
   await search.fill(unique('missing-user'));
   await search.press('Enter');

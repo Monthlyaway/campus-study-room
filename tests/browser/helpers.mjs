@@ -98,23 +98,25 @@ export async function selectFirst(page, label) {
 }
 
 export async function noHorizontalOverflow(page) {
-  // Observe the settled layout, including Ant Design opening/closing transitions.
-  await expect.poll(async () => {
-    const dimensions = await page.evaluate(() => ({
-      viewport: window.innerWidth,
-      document: document.documentElement.scrollWidth,
-      body: document.body.scrollWidth,
-    }));
-    const overflow = [];
-    if (dimensions.document > dimensions.viewport + 1 || dimensions.body > dimensions.viewport + 1)
-      overflow.push(dimensions);
-    for (const element of await page.locator('.ant-modal:visible, .ant-drawer-open .ant-drawer-content-wrapper').all()) {
-      const box = await element.boundingBox();
-      if (box && (box.x < -1 || box.x + box.width > dimensions.viewport + 1))
-        overflow.push({ ...box, viewport: dimensions.viewport });
-    }
-    return overflow;
-  }, { timeout: 5_000, message: 'Page and visible dialogs must fit the viewport after transitions' }).toEqual([]);
+  // Read one animation frame atomically: a :visible locator can disappear between
+  // all() and boundingBox(), leaving the poll waiting on an already closed dialog.
+  await expect.poll(() => page.locator('.ant-modal:visible, .ant-drawer-open .ant-drawer-content-wrapper')
+    .evaluateAll((elements) => {
+      const dimensions = {
+        viewport: window.innerWidth,
+        document: document.documentElement.scrollWidth,
+        body: document.body.scrollWidth,
+      };
+      const overflow = [];
+      if (dimensions.document > dimensions.viewport + 1 || dimensions.body > dimensions.viewport + 1)
+        overflow.push(dimensions);
+      for (const element of elements) {
+        const { x, y, width, height } = element.getBoundingClientRect();
+        if (width && height && (x < -1 || x + width > dimensions.viewport + 1))
+          overflow.push({ x, y, width, height, viewport: dimensions.viewport });
+      }
+      return overflow;
+    }), { timeout: 5_000, message: 'Page and visible dialogs must fit the viewport after transitions' }).toEqual([]);
 }
 
 export async function screenshot(page, info, label) {

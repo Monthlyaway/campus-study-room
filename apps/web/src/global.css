@@ -1403,6 +1403,10 @@ a:focus-visible {
   }
 }
 @media (max-width: 800px) {
+  .ant-modal {
+    /* A desktop click origin can sit outside the viewport after a resize. */
+    transform-origin: center !important;
+  }
   .desktop-sidebar {
     display: none;
   }
