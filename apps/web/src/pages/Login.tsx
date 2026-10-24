@@ -77,15 +77,16 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       </section>
       <section className="login-form-area">
         <div className="login-form">
-          <div className="eyebrow">WELCOME BACK</div>
+          <div className="eyebrow">校园自习室资源系统</div>
           <h2>欢迎回到栖学</h2>
-          <p className="muted">登录校园账号，开启今天的专注时光。</p>
+          <p className="muted">预约自习座位、申请教室，或处理审批与维修。</p>
           <Failure error={error} />
           <Form
             layout="vertical"
             onFinish={login}
             disabled={busy}
             requiredMark={false}
+            scrollToFirstError={{ focus: true }}
           >
             <Form.Item
               name="username"
@@ -95,7 +96,9 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
               <Input
                 prefix={<UserOutlined />}
                 size="large"
-                placeholder="请输入校园账号"
+                placeholder="输入管理员为你开通的账号…"
+                spellCheck={false}
+                autoCapitalize="none"
                 autoComplete="username"
                 maxLength={64}
               />

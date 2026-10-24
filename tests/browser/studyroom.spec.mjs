@@ -18,7 +18,7 @@ test('login rejects a wrong password, preserves a real session and guards admini
   await expect(page.locator('.error-box')).toBeVisible();
   await login(page, 'student');
   await page.reload();
-  await expect(page.getByRole('heading', { name: '找一个好位置' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '查找座位' })).toBeVisible();
   await page.goto('/admin/users');
   await expect(page.getByText('暂无页面访问权限', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '新建账号' })).toHaveCount(0);
@@ -30,15 +30,18 @@ test('M1 availability, real stale 409 and mobile history reuse create a new rese
   try {
     await login(page, 'student');
     await page.goto('/seats');
-    await page.getByRole('button', { name: '查找空间' }).click();
+    await page.getByRole('button', { name: '查询可预约座位' }).click();
     const seat = page.getByRole('button', { name: /^预约 .*号座位/ }).first();
     await expect(seat).toBeVisible();
+    const repeatedSearch = page.waitForResponse(response => new URL(response.url()).pathname === '/api/v1/availability/seats');
+    await page.getByRole('button', { name: '查询可预约座位' }).click();
+    expect((await repeatedSearch).status(), 'The same search must fetch current availability again').toBe(200);
     await seat.click();
     const record = await confirm(page, '/reservations', [201]);
     id = record.id;
     expect(id).toBeTruthy();
     await expect(page).toHaveURL(/\/reservations/);
-    const card = page.locator('.reservation-card').filter({ hasText: id.slice(0, 8).toUpperCase() });
+    const card = page.locator(`[data-reservation-id="${id}"]`);
     await expect(card.getByText('待签到', { exact: true })).toBeVisible();
     await screenshot(page, info, 'desktop-reservation-created');
 
@@ -50,10 +53,17 @@ test('M1 availability, real stale 409 and mobile history reuse create a new rese
     await second.close();
     await card.getByRole('button', { name: '取消预约', exact: true }).click();
     await confirm(page, `/reservations/${id}/cancel`, [409]);
-    const staleConfirm = modal(page).getByRole('button', { name: '确认', exact: true });
-    await expect(staleConfirm).toHaveText(/^确\s*认$/);
+    const staleConfirm = modal(page).getByRole('button', { name: '确认取消预约', exact: true });
+    await expect(staleConfirm).toHaveText('确认取消预约');
     await expect(staleConfirm).toBeDisabled();
     await expect(staleConfirm).toHaveAttribute('aria-busy', 'false');
+    // Native form submission is the same path as Enter in a field; a disabled
+    // button alone must not allow the already-conflicted command to be sent again.
+    const unexpectedRetry = page.waitForRequest(request => request.method() === 'POST' &&
+      new URL(request.url()).pathname === `/api/v1/reservations/${id}/cancel`, { timeout: 500 })
+      .then(() => true, () => false);
+    await modal(page).locator('form').evaluate(form => form.requestSubmit());
+    expect(await unexpectedRetry, 'Conflict must block native form submission too').toBe(false);
     await expect(modal(page).getByText('已刷新服务器数据，请返回后重新选择操作。')).toBeVisible();
     await screenshot(page, info, 'real-stale-version-conflict');
     await modal(page).getByRole('button', { name: '返回并重新选择' }).click();
@@ -83,7 +93,7 @@ test('M1 availability, real stale 409 and mobile history reuse create a new rese
     await expect(startTime.getByTitle('13:00', { exact: true })).toHaveText('13:00');
     await timeInput.press('Escape');
     const availability = page.waitForResponse((response) => new URL(response.url()).pathname === '/api/v1/availability/seats');
-    await page.getByRole('button', { name: '查找空间' }).click();
+    await page.getByRole('button', { name: '查询可预约座位' }).click();
     const availableResponse = await availability;
     expect(availableResponse.status()).toBe(200);
     const searched = new URL(availableResponse.url()).searchParams;
@@ -105,7 +115,7 @@ test('M1 availability, real stale 409 and mobile history reuse create a new rese
     const original = await realApi(context, 'GET', `/reservations/${id}`);
     for (const key of ['id', 'version', 'status', 'startAt', 'endAt', 'seatId', 'cancelReason'])
       expect(original[key], `History reuse must preserve original ${key}`).toEqual(cancelled[key]);
-    const newCard = page.locator('.reservation-card').filter({ hasText: repeatedId.slice(0, 8).toUpperCase() });
+    const newCard = page.locator(`[data-reservation-id="${repeatedId}"]`);
     await expect(newCard.getByText('待签到', { exact: true })).toBeVisible();
     await screenshot(page, info, 'mobile-repeat-reservation-created');
   } finally {
@@ -121,7 +131,11 @@ test('M2 independent approvals, mobile cancellation and rejection with a mandato
   try {
     await applicant.page.goto('/applications');
     await applicant.page.getByRole('button', { name: '申请教室' }).click();
-    await drawer(applicant.page).getByRole('button', { name: '查找空间' }).click();
+    await drawer(applicant.page).getByRole('button', { name: '查询可申请教室' }).click();
+    await expect(drawer(applicant.page).getByRole('button', { name: '选择教室' }).first()).toBeVisible();
+    const repeatedRoomSearch = applicant.page.waitForResponse(response => new URL(response.url()).pathname === '/api/v1/availability/rooms');
+    await drawer(applicant.page).getByRole('button', { name: '查询可申请教室' }).click();
+    expect((await repeatedRoomSearch).status(), 'The same room search must fetch current availability again').toBe(200);
     await drawer(applicant.page).getByRole('button', { name: '选择教室' }).first().click();
     await modal(applicant.page).getByLabel('用途标题', { exact: true }).fill(title);
     await modal(applicant.page).getByLabel('用途说明', { exact: true }).fill('真实浏览器验收：小组自习讨论，结束后撤销并释放资源。');
@@ -131,18 +145,29 @@ test('M2 independent approvals, mobile cancellation and rejection with a mandato
     department = await actor(browser, 'dept-approver');
     await department.page.goto(`/applications?id=${id}`);
     await expect(drawer(department.page).getByRole('heading', { name: title })).toBeVisible();
-    await drawer(department.page).getByRole('button', { name: '通过审批' }).click();
+    await drawer(department.page).getByRole('button', { name: '通过院系审批' }).click();
     await modal(department.page).getByLabel('审批意见（选填）').fill('院系同意；真实浏览器验收');
     await confirm(department.page, `/room-applications/${id}/decisions`);
-    await expect(drawer(department.page).getByRole('button', { name: '通过审批' })).toHaveCount(0);
+    await expect(drawer(department.page).getByRole('button', { name: '通过院系审批' })).toHaveCount(0);
 
     space = await actor(browser, 'space-approver');
     await space.page.goto(`/applications?id=${id}`);
-    await drawer(space.page).getByRole('button', { name: '通过审批' }).click();
+    await drawer(space.page).getByRole('button', { name: '通过教室审批' }).click();
     await modal(space.page).getByLabel('审批意见（选填）').fill('空间同意；真实浏览器验收');
     await confirm(space.page, `/room-applications/${id}/decisions`);
     await expect(drawer(space.page).getByText('已批准', { exact: true }).first()).toBeVisible();
     await screenshot(space.page, info, 'desktop-two-level-approved');
+
+    // Reviewers need readable detail drawers on phones as well as the applicant.
+    for (const [session, label] of [[department, 'department'], [space, 'classroom']]) {
+      await session.page.setViewportSize({ width: 375, height: 812 });
+      await session.page.goto(`/applications?id=${id}`);
+      await expect(drawer(session.page).getByRole('heading', { name: title })).toBeVisible();
+      await expect(drawer(session.page).getByText('已批准', { exact: true }).first()).toBeVisible();
+      await noHorizontalOverflow(session.page);
+      await screenshot(session.page, info, `mobile-${label}-approval-detail`);
+    }
+    await department.page.setViewportSize({ width: 1440, height: 1000 });
 
     await applicant.page.setViewportSize({ width: 375, height: 812 });
     await applicant.page.goto(`/applications?id=${id}`);
@@ -158,7 +183,7 @@ test('M2 independent approvals, mobile cancellation and rejection with a mandato
 
     await applicant.page.goto('/applications');
     await applicant.page.getByRole('button', { name: '申请教室' }).click();
-    await drawer(applicant.page).getByRole('button', { name: '查找空间' }).click();
+    await drawer(applicant.page).getByRole('button', { name: '查询可申请教室' }).click();
     await drawer(applicant.page).getByRole('button', { name: '选择教室' }).first().click();
     const rejectedTitle = unique('rejection history');
     await modal(applicant.page).getByLabel('用途标题', { exact: true }).fill(rejectedTitle);
@@ -173,7 +198,7 @@ test('M2 independent approvals, mobile cancellation and rejection with a mandato
         decisions.push(request);
     };
     department.page.on('request', decisionListener);
-    await modal(department.page).getByRole('button', { name: /^确\s*认$/ }).click();
+    await modal(department.page).getByRole('button', { name: '确认驳回申请' }).click();
     await expect(modal(department.page).getByText('请填写此项', { exact: true })).toBeVisible();
     expect(decisions, 'An empty rejection reason must not submit a decision').toHaveLength(0);
     const reason = '活动用途尚不明确，请补充后重新提交；真实浏览器拒绝验收。';
@@ -187,7 +212,7 @@ test('M2 independent approvals, mobile cancellation and rejection with a mandato
     expect(rejected.actions).toEqual(expect.arrayContaining([expect.objectContaining({ decision: 'REJECT', comment: reason })]));
     await department.page.reload();
     await expect(drawer(department.page).getByText('未通过', { exact: true }).first()).toBeVisible();
-    await expect(drawer(department.page).getByRole('button', { name: '通过审批', exact: true })).toHaveCount(0);
+    await expect(drawer(department.page).getByRole('button', { name: '通过院系审批', exact: true })).toHaveCount(0);
     await expect(drawer(department.page).getByRole('button', { name: /^驳\s*回$/ })).toHaveCount(0);
     await screenshot(department.page, info, 'desktop-application-rejected');
     await applicant.page.goto(`/applications?id=${rejectedId}`);
@@ -214,7 +239,7 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await reporter.page.goto('/repairs');
     await reporter.page.getByRole('button', { name: '上报故障' }).click();
     await selectFirst(reporter.page, '故障教室');
-    await modal(reporter.page).getByLabel('故障标题').fill(title);
+    await modal(reporter.page).getByLabel('哪里出了问题').fill(title);
     await modal(reporter.page).getByLabel('问题描述').fill('隔离测试环境内的模拟报修；验证派单、维修、验收与资源恢复。');
     await noHorizontalOverflow(reporter.page);
     id = (await confirm(reporter.page, '/repairs', [201])).id;
@@ -225,7 +250,7 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
 
     dispatcher = await actor(browser, 'dispatcher');
     await dispatcher.page.goto(`/repairs?id=${id}`);
-    await drawer(dispatcher.page).getByRole('button', { name: '派单 / 重新派单' }).click();
+    await drawer(dispatcher.page).getByRole('button', { name: '分配维修人员' }).click();
     const workerName = await selectFirst(dispatcher.page, '维修人员');
     const assigned = await confirm(dispatcher.page, `/repairs/${id}/assign`);
     expect(assigned.assignedToName).toBe(workerName);
@@ -240,13 +265,13 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await drawer(worker.page).getByRole('button', { name: '开始维修', exact: true }).click();
     await confirm(worker.page, `/repairs/${id}/start`);
     await expect(drawer(worker.page).getByRole('button', { name: '提交完工', exact: true })).toBeVisible({ timeout: 45_000 });
-    await expect(drawer(worker.page).getByText('处理截止', { exact: true })).toBeVisible();
+    await expect(drawer(worker.page).getByText('完工截止', { exact: true })).toBeVisible();
     await expect(drawer(worker.page).getByRole('button', { name: '验收通过', exact: true })).toHaveCount(0);
     await drawer(worker.page).getByRole('button', { name: '提交完工', exact: true }).click();
     await modal(worker.page).getByLabel('维修处理情况').fill('已检查模拟问题，测试完成后恢复教室资源。');
-    await expect(modal(worker.page).getByRole('button', { name: '确认', exact: true })).toHaveAttribute('aria-busy', 'false');
+    await expect(modal(worker.page).getByRole('button', { name: '提交完工说明', exact: true })).toHaveAttribute('aria-busy', 'false');
     await confirm(worker.page, `/repairs/${id}/complete`);
-    await expect(drawer(worker.page).getByText('等待验收，座位仍保持下架')).toBeVisible();
+    await expect(drawer(worker.page).getByText('已提交完工，等待现场验收')).toBeVisible();
     await screenshot(worker.page, info, 'desktop-repair-awaiting-acceptance');
 
     await reporter.page.reload();
@@ -257,7 +282,7 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await confirm(reporter.page, `/repairs/${id}/acceptance`);
     await expect(drawer(reporter.page).getByRole('button', { name: '评价维修' })).toBeVisible({ timeout: 45_000 });
     await expect(workerDescription(reporter.page)).toHaveText(workerName);
-    await expect(drawer(reporter.page).getByText('处理截止', { exact: true })).toHaveCount(0);
+    await expect(drawer(reporter.page).getByText('完工截止', { exact: true })).toHaveCount(0);
     await noHorizontalOverflow(reporter.page);
     await screenshot(reporter.page, info, 'mobile-repair-closed');
 
@@ -280,14 +305,14 @@ test('M3 mobile reporter, dispatcher and repairer finish real assignment, resour
     await delayedRooms.detach();
     await reportButton.click();
     await selectFirst(reporter.page, '故障教室');
-    await modal(reporter.page).getByLabel('故障标题').fill(unique('cancelled repair'));
+    await modal(reporter.page).getByLabel('哪里出了问题').fill(unique('cancelled repair'));
     await modal(reporter.page).getByLabel('问题描述').fill('独立测试取消终态的截止字段；提交后由本人撤销。');
     cancelledId = (await confirm(reporter.page, '/repairs', [201])).id;
     await drawer(reporter.page).getByRole('button', { name: '取消工单', exact: true }).click();
     await modal(reporter.page).getByLabel('取消原因').fill('检查后确认无需维修，撤销模拟工单');
     await confirm(reporter.page, `/repairs/${cancelledId}/cancel`);
     await expect(drawer(reporter.page).getByText('已取消', { exact: true }).first()).toBeVisible();
-    await expect(drawer(reporter.page).getByText('处理截止', { exact: true })).toHaveCount(0);
+    await expect(drawer(reporter.page).getByText('完工截止', { exact: true })).toHaveCount(0);
     await noHorizontalOverflow(reporter.page);
     await screenshot(reporter.page, info, 'mobile-repair-cancelled');
   } finally {
@@ -339,23 +364,23 @@ test('administrator can search an empty result but cannot use student booking ac
   await screenshot(page, info, 'administrator-empty-search');
   await page.goto('/seats');
   await expect(page.getByText('暂无页面访问权限', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '查找空间' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '查询可预约座位' })).toHaveCount(0);
 });
 
 test('375px navigation, real delayed loading, missing-record error and offline retry stay usable', async ({ page, context }, info) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await login(page, 'student2');
   await page.getByRole('button', { name: '打开导航' }).click();
-  await page.locator('.mobile-menu').getByRole('link', { name: '我的预约' }).click();
-  await expect(page.getByRole('heading', { name: '我的预约', exact: true })).toBeVisible();
+  await page.locator('.mobile-menu').getByRole('link', { name: '我的座位预约' }).click();
+  await expect(page.getByRole('heading', { name: '我的座位预约', exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
 
   await page.goto('/seats');
   const cdp = await context.newCDPSession(page);
   await cdp.send('Network.enable');
   await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 1000, downloadThroughput: 1_000_000, uploadThroughput: 1_000_000 });
-  await page.getByRole('button', { name: '查找空间' }).click();
-  await expect(page.getByRole('button', { name: '查找空间' })).toHaveClass(/ant-btn-loading/);
+  await page.getByRole('button', { name: '查询可预约座位' }).click();
+  await expect(page.getByRole('button', { name: '查询可预约座位' })).toHaveClass(/ant-btn-loading/);
   await expect(page.locator('.ant-btn-loading-icon').first()).toBeVisible();
   await expect(page.getByRole('button', { name: /^预约 .*号座位/ }).first()).toBeVisible();
   await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });

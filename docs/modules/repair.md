@@ -28,7 +28,7 @@ repair 是独立 Spring Boot 进程，使用 `repair` 保存业务、`session` �
 
 账号启用后，本人历史、取消、验收、评价保留相应收尾例外；撤销创建角色不应隐藏已承诺业务。`allowedActions` 帮助 UI 展示，服务端仍校验身份、范围、状态、版本、归属和职责分离。
 
-派单把候选查询授权结果中的姓名保存为 `assignedToName` 快照，列表/详情不再逐个查询用户。之后改名不改变历史，重新派单更新快照。[扩展迁移](../../db/migration/repair/V20261022160000__assigned_worker_name_snapshot.sql)使用可空列，旧工单由界面回退显示编号，保持旧版兼容。
+派单把候选查询授权结果中的姓名保存为 `assignedToName` 快照，列表/详情不再逐个查询用户。之后改名不改变历史，重新派单更新快照。[扩展迁移](../../db/migration/repair/V20261022160000__assigned_worker_name_snapshot.sql)使用可空列，旧工单未保存姓名时显示“已安排（历史记录未保存姓名）”，避免把人员 UUID 当作姓名，保持旧版兼容。
 
 ## 异步资源同步
 
@@ -64,3 +64,8 @@ BLOCK/RELEASE 固定 `sourceVersion=1/2`，与工单 JPA 版本不同。outbox �
 同步长时间不结束，先取详情的 `sync`、响应 requestId 和运行版本，按[日志排障](observability.md)检查 core 可达性与相关 commandId。不得用“重新建一张工单”掩盖原命令状态。独立故障测试和会重启本机 repair 的脚本有不同副作用，执行前必须看测试矩阵。
 
 历史覆盖见[维修验收](../evidence/repair-validation-2026-10-22.md)、[期限与 SMTP](../evidence/repair-acceptance.md)、[姓名升级](../evidence/repair-assignment-name.md)、[网络故障](../evidence/repair-fault-matrix.md)。当前交付身份统一看[交付台账](../evidence/delivery-ledger-2026-10-23.md)，本页不把旧测试数当作当前执行结果。
+
+
+## 工单教室名称
+
+工单列表与详情在既有对象授权完成后，通过 core 的内部 HTTP 教室引用接口补充 `roomName`。同一列表页的相同教室只查询一次；只读名称查询不在工单写事务内，不访问 core 业务表。名称暂不可用时返回空字符串，前端明确提示“教室名称暂不可用”，不将 UUID 当作名称。新建响应复用创建校验取得的教室名称，操作响应在授权后、锁事务前读取名称，并在保存幂等响应前加入结果；重放精确保留原响应（包括当时名称），历史响应不追补字段。页面成功后读取最新详情。契约见 `repairs.yaml`，真实 HTTP 断言见 `tests/integration/repair_http.py`。

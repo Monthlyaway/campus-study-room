@@ -74,6 +74,22 @@ public class CoreController {
     return ok(Map.of("releaseId", release, "commit", commit, "service", "core-service"));
   }
 
+  @GetMapping("/notification-scope-rooms")
+  Object notificationScopeRooms(Authentication a,
+      @RequestParam(defaultValue = "") String q,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size) {
+    return ok(admin.notificationScopeRooms(user(a), q, page, size));
+  }
+
+  @GetMapping("/role-scope-rooms")
+  Object roleScopeRooms(Authentication a,
+      @RequestParam(defaultValue = "") String q,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size) {
+    return ok(admin.roleScopeRooms(user(a), q, page, size));
+  }
+
   @GetMapping("/availability/{kind:seats|rooms}")
   Object search(
       Authentication a,

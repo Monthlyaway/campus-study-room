@@ -26,6 +26,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { api, items, query } from "../services/api";
+import { AccessEditor, responsibility } from "./AdminAccess";
 import { can, roleLabel, permissionLabel } from "../access";
 import { useSession } from "../services/session";
 import {
@@ -46,17 +47,12 @@ export function Users() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [binding, setBinding] = useState<RecordData>();
-  const [bindingForm] = Form.useForm();
-  const [bindingBusy, setBindingBusy] = useState(false);
-  const [bindingError, setBindingError] = useState<Error>();
-  const [bindingKey, setBindingKey] = useState(crypto.randomUUID());
-  const { message } = App.useApp();
+  const { user } = useSession();
   const users = useData<Page<RecordData>>(
     `/users?${query({ q: search, page, size: 20 })}`
   );
-  const roles = useData<any>("/roles?size=100");
+  const roles = useData<any>(can(user, "role:manage") ? "/roles?size=100" : null);
   const departments = useData<any>("/departments?size=100");
-  const rooms = useData<any>("/rooms?size=100");
   const action = useAction(() => users.reload());
   const fields = (edit = false) => [
     ...(!edit
@@ -95,60 +91,17 @@ export function Users() {
       body: { expectedVersion: r.version },
       fields: fields(true).map((f) => ({ ...f, initial: r[f.name] })),
     });
-  const bind = (r: RecordData) => {
-    setBinding(r);
-    setBindingError(undefined);
-    setBindingKey(crypto.randomUUID());
-    bindingForm.setFieldsValue({
-      bindings: (r.roleBindings || r.bindings || []).map((b: any) => ({
-        roleId: b.roleId,
-        scopes: b.scopes?.length ? b.scopes : [{ scopeType: "SELF" }],
-      })),
-    });
-  };
-  const saveBindings = async () => {
-    if (!binding) return;
-    try {
-      const v = await bindingForm.validateFields();
-      setBindingBusy(true);
-      setBindingError(undefined);
-      await api(`/users/${binding.id}/role-bindings`, {
-        method: "PUT",
-        body: {
-          bindings: (v.bindings || []).map((b: any) => ({
-            roleId: b.roleId,
-            scopes: (b.scopes || []).map((s: any) => ({
-              scopeType: s.scopeType,
-              ...(s.scopeType === "DEPARTMENT"
-                ? { departmentId: s.departmentId }
-                : s.scopeType === "ROOM"
-                ? { roomId: s.roomId }
-                : {}),
-            })),
-          })),
-          expectedVersion: binding.version,
-        },
-        key: bindingKey,
-      });
-      message.success("权限已更新，用户需重新登录");
-      setBinding(undefined);
-      users.reload();
-    } catch (e) {
-      if (e instanceof Error) setBindingError(e);
-    } finally {
-      setBindingBusy(false);
-    }
-  };
   return (
     <>
       <PageHeading
         eyebrow="ACCESS MANAGEMENT"
-        title="用户管理"
-        description="管理校园账号，为每个人分配恰当的角色与范围。"
+        title="账号与授权"
+        description="先创建账号，再设置这个人能做什么、负责哪些教室或院系。"
         action={
           <Button
             type="primary"
             icon={<PlusOutlined />}
+            disabled={departments.loading || !!departments.error}
             onClick={() =>
               action.open({
                 title: "创建账号",
@@ -163,7 +116,8 @@ export function Users() {
       />
       <div className="list-toolbar">
         <Input.Search
-          placeholder="搜索账号或姓名"
+          aria-label="搜索账号或姓名"
+          placeholder="搜索账号或姓名…"
           allowClear
           onSearch={(v) => {
             setSearch(v);
@@ -176,6 +130,8 @@ export function Users() {
         </Button>
       </div>
       <Failure error={users.error} onRetry={users.reload} />
+      <Failure error={departments.error} onRetry={departments.reload} />
+      <Failure error={roles.error} onRetry={roles.reload} />
       <div className="panel table-panel">
         <Table
           rowKey="id"
@@ -217,9 +173,11 @@ export function Users() {
                   <Button size="small" onClick={() => edit(r)}>
                     编辑
                   </Button>
-                  <Button size="small" onClick={() => bind(r)}>
-                    角色与范围
-                  </Button>
+                  {can(user, "role:manage") && <Button size="small"
+                    disabled={roles.loading || !!roles.error || departments.loading || !!departments.error}
+                    onClick={() => setBinding(r)}>
+                    设置职责
+                  </Button>}
                   <Button
                     size="small"
                     onClick={() =>
@@ -281,148 +239,9 @@ export function Users() {
         hideOnSinglePage
         showSizeChanger={false}
       />
-      <Modal
-        zIndex={1200}
-        forceRender
-        title={`角色与数据范围 · ${binding?.displayName || ""}`}
-        width={720}
-        open={!!binding}
-        onCancel={() => setBinding(undefined)}
-        onOk={saveBindings}
-        confirmLoading={bindingBusy}
-        okText="保存授权"
-        cancelText="取消"
-      >
-        <Alert
-          className="mb-20"
-          type="info"
-          title="权限与范围按同一角色绑定生效"
-          description="修改会使该用户原会话失效。管理角色没有范围时，不能访问全校数据。"
-        />
-        <Failure error={bindingError} />
-        <Form
-          form={bindingForm}
-          layout="vertical"
-          onValuesChange={() => setBindingKey(crypto.randomUUID())}
-        >
-          <Form.List name="bindings">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name }) => (
-                  <section className="binding-card" key={key}>
-                    <div className="binding-title">
-                      <Form.Item
-                        name={[name, "roleId"]}
-                        label="角色"
-                        rules={[{ required: true, message: "请选择角色" }]}
-                      >
-                        <Select
-                          options={items(roles.data).map((r) => ({
-                            value: r.id,
-                            label: `${roleLabel(r)} (${r.code})`,
-                          }))}
-                        />
-                      </Form.Item>
-                      <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        aria-label="移除角色"
-                        onClick={() => remove(name)}
-                      />
-                    </div>
-                    <Form.List name={[name, "scopes"]}>
-                      {(scopes, { add: addScope, remove: removeScope }) => (
-                        <>
-                          {scopes.map(({ key: sk, name: sn }) => (
-                            <div className="scope-row" key={sk}>
-                              <Form.Item
-                                name={[sn, "scopeType"]}
-                                label="范围"
-                                rules={[{ required: true }]}
-                              >
-                                <Select
-                                  options={[
-                                    { value: "SELF", label: "本人" },
-                                    { value: "DEPARTMENT", label: "指定院系" },
-                                    { value: "ROOM", label: "指定教室" },
-                                    { value: "ALL", label: "全校" },
-                                  ]}
-                                />
-                              </Form.Item>
-                              <Form.Item noStyle shouldUpdate>
-                                {() => {
-                                  const type = bindingForm.getFieldValue([
-                                    "bindings",
-                                    name,
-                                    "scopes",
-                                    sn,
-                                    "scopeType",
-                                  ]);
-                                  return type === "DEPARTMENT" ? (
-                                    <Form.Item
-                                      name={[sn, "departmentId"]}
-                                      label="院系"
-                                      rules={[{ required: true }]}
-                                    >
-                                      <Select
-                                        options={items(departments.data).map(
-                                          (d) => ({
-                                            value: d.id,
-                                            label: d.name,
-                                          })
-                                        )}
-                                      />
-                                    </Form.Item>
-                                  ) : type === "ROOM" ? (
-                                    <Form.Item
-                                      name={[sn, "roomId"]}
-                                      label="教室"
-                                      rules={[{ required: true }]}
-                                    >
-                                      <Select
-                                        options={items(rooms.data).map((d) => ({
-                                          value: d.id,
-                                          label: d.name,
-                                        }))}
-                                      />
-                                    </Form.Item>
-                                  ) : null;
-                                }}
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                danger
-                                aria-label="移除范围"
-                                icon={<DeleteOutlined />}
-                                onClick={() => removeScope(sn)}
-                              />
-                            </div>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => addScope({ scopeType: "SELF" })}
-                          >
-                            添加范围
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </section>
-                ))}
-                <Button
-                  type="dashed"
-                  block
-                  icon={<PlusOutlined />}
-                  onClick={() => add({ scopes: [{ scopeType: "SELF" }] })}
-                >
-                  添加角色绑定
-                </Button>
-              </>
-            )}
-          </Form.List>
-        </Form>
-      </Modal>
+      {binding && <AccessEditor target={binding} roles={items(roles.data)}
+        departments={items(departments.data)} onClose={() => setBinding(undefined)}
+        onSaved={() => { setBinding(undefined); users.reload(); }} />}
       {action.dialog}
     </>
   );
@@ -461,8 +280,8 @@ export function Roles() {
     <>
       <PageHeading
         eyebrow="ROLES & PERMISSIONS"
-        title="角色权限"
-        description="组合系统已有权限，形成职责清晰的角色。"
+        title="角色与职责"
+        description="角色是一组工作权限。配置后，到“账号与授权”把职责分配给具体人员，并选择负责对象。"
         action={
           <Button
             type="primary"
@@ -472,7 +291,7 @@ export function Roles() {
                 title: "新建角色",
                 path: "/roles",
                 fields: [
-                  { name: "code", label: "角色编码", required: true, max: 64 },
+                  { name: "code", label: "角色编码", required: true, max: 64, help: "用于区分角色的固定代号，例如 LIBRARY_OPERATOR；日常操作显示下面的中文名称。" },
                   { name: "name", label: "角色名称", required: true, max: 100 },
                 ],
               })
@@ -491,7 +310,7 @@ export function Roles() {
           pagination={false}
           scroll={{ x: 600 }}
           columns={[
-            { title: "角色", render: (_, r) => roleLabel(r) },
+            { title: "角色", render: (_, r) => <><strong>{roleLabel(r)}</strong><p className="muted">{responsibility(r)}</p></> },
             { title: "编码", dataIndex: "code" },
             {
               title: "权限数量",
@@ -547,13 +366,14 @@ export function Roles() {
         onCancel={() => setRole(undefined)}
         onOk={save}
         confirmLoading={busy}
-        okText="保存"
+        okText="保存角色权限"
         cancelText="取消"
+        okButtonProps={{ disabled: permissions.loading || !!permissions.error }}
         width={720}
       >
         <Failure error={error || permissions.error} />
         <p className="muted">
-          只有代码注册的权限可被授予。修改后关联用户需重新登录。
+          勾选这个角色需要完成的工作。修改会影响所有使用该角色的人员，他们需要重新登录。负责哪些教室或院系，在用户的“设置职责”中单独指定。
         </p>
         <Checkbox.Group
           className="permission-grid"
@@ -567,7 +387,7 @@ export function Roles() {
             label: (
               <span>
                 <strong>{permissionLabel(p)}</strong>
-                <small>{p.code || ""}</small>
+
               </span>
             ),
           }))}
@@ -694,14 +514,16 @@ function ReferenceTable({
 
 export function Spaces() {
   const { user } = useSession();
-  const [tab, setTab] = useState("rooms");
+  const canManageRooms = can(user, "room:manage");
+  const [tab, setTab] = useState(canManageRooms ? "rooms" : "departments");
   const [room, setRoom] = useState<RecordData>();
   const [rulesOpen, setRulesOpen] = useState(false);
   const [rulesForm] = Form.useForm();
   const [rulesBusy, setRulesBusy] = useState(false);
   const [rulesError, setRulesError] = useState<Error>();
   const [rulesKey, setRulesKey] = useState(crypto.randomUUID());
-  const rooms = useData<Page<Room>>("/rooms?size=100");
+  const [roomPage, setRoomPage] = useState(1);
+  const rooms = useData<Page<Room>>(canManageRooms ? "/rooms?page=" + roomPage + "&size=20" : null);
   const buildings = useData<any>("/buildings?size=100");
   const departments = useData<any>("/departments?size=100");
   const seats = useData<any>(room ? `/rooms/${room.id}/seats?size=100` : null);
@@ -745,18 +567,16 @@ export function Spaces() {
     <>
       <PageHeading
         eyebrow="SPACE MANAGEMENT"
-        title="空间管理"
-        description="维护教室、座位与开放时段，保留所有历史使用记录。"
+        title="教室与座位"
+        description={canManageRooms ? "选择教室后管理座位与开放时间。新教室需添加座位并设置开放时间，才能供师生预约。" : "维护院系、校区和楼宇。教室与座位由获授权的教室管理员维护。"}
       />
       <Tabs
         activeKey={tab}
         onChange={setTab}
         items={[
-          { key: "rooms", label: "教室与座位" },
-          { key: "campuses", label: "校区" },
-          { key: "buildings", label: "楼宇" },
+          ...(canManageRooms ? [{ key: "rooms", label: "教室与座位" }] : []),
           ...(can(user, "user:manage")
-            ? [{ key: "departments", label: "院系" }]
+            ? [{ key: "departments", label: "院系" }, { key: "campuses", label: "校区" }, { key: "buildings", label: "楼宇" }]
             : []),
         ]}
       />
@@ -770,6 +590,7 @@ export function Spaces() {
             <Button
               type="primary"
               icon={<PlusOutlined />}
+              disabled={buildings.loading || departments.loading || !!buildings.error || !!departments.error}
               onClick={() =>
                 action.open({
                   title: "添加教室",
@@ -816,7 +637,9 @@ export function Spaces() {
               刷新
             </Button>
           </div>
-          <Failure error={rooms.error} />
+          <Failure error={rooms.error} onRetry={rooms.reload} />
+          <Failure error={buildings.error} onRetry={buildings.reload} />
+          <Failure error={departments.error} onRetry={departments.reload} />
           <div className="panel table-panel">
             <Table
               rowKey="id"
@@ -840,7 +663,7 @@ export function Spaces() {
                     `${r.campusName || ""} · ${r.buildingName || ""}`,
                 },
                 {
-                  title: "共享范围",
+                  title: "谁可以预约",
                   render: (_, r) =>
                     r.departmentId
                       ? items(departments.data).find(
@@ -867,6 +690,9 @@ export function Spaces() {
               ]}
             />
           </div>
+          <Pagination className="pagination" current={roomPage} pageSize={20}
+            total={rooms.data?.total || 0} onChange={setRoomPage}
+            hideOnSinglePage showSizeChanger={false} />
         </>
       )}
       <Drawer
@@ -875,7 +701,8 @@ export function Spaces() {
         onClose={() => setRoom(undefined)}
         size={700}
       >
-        <Failure error={detail.error} />
+        <Failure error={detail.error} onRetry={detail.reload} />
+        <p className="muted">教室启用、至少一个座位启用且设置开放时间后，符合院系要求的师生才可以预约。</p>
         <Space wrap className="mb-20">
           <Button
             onClick={() =>
@@ -900,7 +727,7 @@ export function Spaces() {
           >
             编辑名称
           </Button>
-          <Button
+          <Button disabled={detail.loading || !!detail.error}
             onClick={() => {
               setRulesOpen(true);
               setRulesError(undefined);
@@ -977,6 +804,7 @@ export function Spaces() {
           dataSource={items(seats.data)}
           loading={seats.loading}
           pagination={false}
+          scroll={{ x: 450 }}
           columns={[
             { title: "编号", dataIndex: "code" },
             {
@@ -992,7 +820,7 @@ export function Spaces() {
             {
               title: "操作",
               render: (_, s) => (
-                <Space>
+                <Space wrap>
                   <Button
                     size="small"
                     onClick={() =>
@@ -1013,7 +841,7 @@ export function Spaces() {
                       })
                     }
                   >
-                    插座
+                    {s.hasPower ? "改为无插座" : "改为有插座"}
                   </Button>
                   <Button
                     size="small"
@@ -1116,6 +944,7 @@ export function Spaces() {
         />
         <Failure error={rulesError} />
         <Form
+          layout="vertical"
           form={rulesForm}
           onValuesChange={() => setRulesKey(crypto.randomUUID())}
         >
@@ -1126,6 +955,7 @@ export function Spaces() {
                   <div className="rule-row" key={key}>
                     <Form.Item
                       name={[name, "weekday"]}
+                      label="星期"
                       rules={[{ required: true }]}
                     >
                       <Select
@@ -1137,6 +967,7 @@ export function Spaces() {
                     </Form.Item>
                     <Form.Item
                       name={[name, "startMinute"]}
+                      label="开放开始"
                       rules={[{ required: true }]}
                     >
                       <Select
@@ -1150,6 +981,7 @@ export function Spaces() {
                     <span>至</span>
                     <Form.Item
                       name={[name, "endMinute"]}
+                      label="开放结束"
                       rules={[{ required: true }]}
                     >
                       <Select
@@ -1266,29 +1098,34 @@ export function Statistics() {
   ]);
   const [roomId, setRoomId] = useState<string>();
   const rooms = useData<any>("/rooms?size=100");
+  const dateCount = dates[1].startOf("day").diff(dates[0].startOf("day"), "day") + 1;
+  const validDates = dateCount > 0 && dateCount <= 31;
   const data = useData<any>(
-    `/statistics/usage?${query({
+    validDates ? `/statistics/usage?${query({
       fromDate: dates[0].format("YYYY-MM-DD"),
       toDate: dates[1].format("YYYY-MM-DD"),
       roomId,
-    })}`
+    })}` : null
   );
-  const d = data.data;
+  const d = validDates ? data.data : undefined;
   return (
     <>
       <PageHeading
         eyebrow="SPACE INSIGHTS"
         title="使用统计"
-        description="了解授权空间的预约与签到情况，帮助校园资源合理分配。"
+        description="选择日期和教室，查看预约量、签到情况与座位使用时长。仅统计你负责的教室。"
       />
       <div className="list-toolbar">
         <DatePicker.RangePicker
+          aria-label="统计起止日期"
           value={dates}
           allowClear={false}
           onChange={(v) => v && setDates(v)}
         />
         <Select
-          placeholder="全部授权教室"
+          aria-label="统计教室"
+          showSearch={{ optionFilterProp: "label" }}
+          placeholder="全部负责教室"
           allowClear
           value={roomId}
           onChange={setRoomId}
@@ -1308,7 +1145,8 @@ export function Statistics() {
         title="预约 / 签到记录指标"
         description="统计按中国标准时间的自然日计算，单次查询最多 31 天。此数据不代表实际人员在场率。"
       />
-      <Failure error={data.error} onRetry={data.reload} />
+      {!validDates && <Alert className="mb-20" type="warning" showIcon title="请选择最多 31 天的日期范围" description="缩短结束日期后会自动重新查询。" />}
+      <Failure error={data.error || rooms.error} onRetry={() => { data.reload(); rooms.reload(); }} />
       <LoadingBlock loading={data.loading}>
         <div className="metric-grid">
           {[
@@ -1351,6 +1189,29 @@ export function Statistics() {
   );
 }
 
+const auditActions: Record<string, string> = {
+  USER_CREATED: "创建账号", USER_UPDATED: "修改账号资料", PASSWORD_RESET: "重置密码",
+  USER_ROLE_BINDINGS_CHANGED: "调整人员职责与负责对象",
+  ROLE_CREATED: "创建角色", ROLE_DISABLED: "停用角色", ROLE_PERMISSIONS_CHANGED: "调整角色权限",
+  MASTER_CREATED: "添加基础资料", MASTER_UPDATED: "修改基础资料", OPENING_RULES_UPDATED: "调整开放时间",
+  CONFIG_UPDATED: "调整系统参数", RESOURCE_DISABLED: "停用资源",
+  RESERVATION_CREATED: "创建座位预约", RESERVATION_CANCELLED: "取消座位预约",
+  RESERVATION_CHECKED_IN: "完成签到", RESERVATION_COMPLETED: "预约结束", RESERVATION_NO_SHOW: "记录未按时签到",
+  APPLICATION_CREATED: "提交教室申请", APPLICATION_APPROVE: "通过教室审批",
+  APPLICATION_REJECT: "驳回教室申请", APPLICATION_CANCELLED: "取消教室申请",
+  APPLICATION_EXPIRED: "教室申请过期", RESOURCE_CLAIMED: "占用教室或座位", RESOURCE_RELEASED: "释放资源占用",
+  REPAIR_SUBMITTED: "提交报修", REPAIR_ASSIGN: "派发维修任务", REPAIR_START: "开始维修",
+  REPAIR_COMPLETE: "提交维修完工", REPAIR_ACCEPT: "提交验收结果", REPAIR_CANCEL: "取消报修",
+  REPAIR_RATE: "评价维修", REPAIR_RETRY_SYNC: "重试教室状态更新",
+  RESOURCE_BLOCK_CONFIRMED: "确认暂停教室使用", RESOURCE_RELEASE_CONFIRMED: "确认恢复教室使用",
+  LOGIN_SUCCESS: "登录成功", LOGIN_FAILURE: "登录失败", LOGOUT: "退出登录",
+};
+const auditSources: Record<string, string> = {
+  M1: "座位预约", M2: "教室申请", M3: "报修维修", user: "账号", role: "角色",
+  room: "教室", seat: "座位", campus: "校区", building: "楼宇", department: "院系",
+  config: "系统参数",
+};
+
 export function Audit() {
   const [source, setSource] = useState("core");
   const [objectId, setObjectId] = useState("");
@@ -1367,7 +1228,7 @@ export function Audit() {
       <PageHeading
         eyebrow="TRACEABLE OPERATIONS"
         title="操作审计"
-        description="按业务编号追踪状态变更与资源占用，所有记录只读。"
+        description="查看谁在何时做了什么。可从预约、申请或报修详情复制编号，追踪该业务的全部操作。"
       />
       <Tabs
         activeKey={source}
@@ -1376,13 +1237,14 @@ export function Audit() {
           setPage(1);
         }}
         items={[
-          { key: "core", label: "预约 / 审批 / 公共层" },
-          { key: "repair", label: "报修服务" },
+          { key: "core", label: "预约、审批与系统管理" },
+          { key: "repair", label: "报修与维修" },
         ]}
       />
       <div className="list-toolbar">
         <Input.Search
-          placeholder="按完整业务编号查询"
+          aria-label="按完整业务编号查询"
+          placeholder="粘贴从业务详情复制的完整编号…"
           onSearch={(v) => {
             setObjectId(v);
             setPage(1);
@@ -1404,15 +1266,15 @@ export function Audit() {
           scroll={{ x: 1000 }}
           columns={[
             { title: "时间", dataIndex: "createdAt", render: dateTime },
-            { title: "动作", dataIndex: "action" },
-            { title: "来源", dataIndex: "sourceType" },
+            { title: "做了什么", dataIndex: "action", render: (v) => <details><summary>{auditActions[v] || "其他系统操作"}</summary><small>{v}</small></details> },
+            { title: "业务", render: (_, r) => auditSources[r.sourceType || r.objectType] || "系统管理" },
             {
-              title: "对象",
+              title: "业务编号",
               dataIndex: "objectId",
               render: (v) => <Identifier value={v} />,
             },
             {
-              title: "操作者",
+              title: "操作人员编号",
               dataIndex: "actorId",
               render: (v) => <Identifier value={v} />,
             },

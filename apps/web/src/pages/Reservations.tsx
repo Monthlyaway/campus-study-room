@@ -32,8 +32,26 @@ import {
   slotLabel,
   Identifier,
   statusLabels,
+  shanghai,
 } from "../components/business/common";
 import type { Page, RecordData } from "../services/types";
+function reservationNextStep(record: RecordData) {
+  if (record.status === "RESERVED")
+    return `签到时间：${dateTime(record.startAt)} 至 ${dateTime(
+      shanghai(record.startAt).add(15, "minute").format()
+    )} 前。到教室查看当日签到码。`;
+  if (record.status === "CHECKED_IN")
+    return "已签到，可按预约时段使用座位；结束后自动完成。";
+  if (record.cancelReason === "MAINTENANCE" || record.status === "INTERRUPTED")
+    return "教室维修影响了本次预约，不计未签到。如需继续自习，请重新选座。";
+  if (record.status === "NO_SHOW")
+    return "超过签到时间，座位已释放；你仍可重新预约。";
+  if (record.status === "CANCELLED")
+    return "预约已取消，座位已释放。需要使用时可再次预约。";
+  if (record.status === "COMPLETED")
+    return "本次使用已结束。再次预约会创建一条新的记录。";
+  return "";
+}
 export default function Reservations() {
   const { user } = useSession();
   const maySearch = can(user, "seat:search");
@@ -48,13 +66,15 @@ export default function Reservations() {
     `${tab === "violations" ? "/violations" : "/reservations"}?${query({
       page,
       size: 12,
-      status,
-      startFrom: range?.[0]
-        ? range[0].format("YYYY-MM-DD") + "T00:00:00+08:00"
-        : undefined,
-      startTo: range?.[1]
-        ? range[1].add(1, "day").format("YYYY-MM-DD") + "T00:00:00+08:00"
-        : undefined,
+      status: tab === "bookings" ? status : undefined,
+      startFrom:
+        tab === "bookings" && range?.[0]
+          ? range[0].format("YYYY-MM-DD") + "T00:00:00+08:00"
+          : undefined,
+      startTo:
+        tab === "bookings" && range?.[1]
+          ? range[1].add(1, "day").format("YYYY-MM-DD") + "T00:00:00+08:00"
+          : undefined,
     })}`
   );
   const detail = useData<RecordData>(id ? `/reservations/${id}` : null);
@@ -70,6 +90,7 @@ export default function Reservations() {
           onClick={() =>
             action.open({
               title: "输入教室签到码",
+              confirmText: "确认签到",
               path: `/reservations/${r.id}/check-in`,
               body: { expectedVersion: r.version },
               fields: [
@@ -78,9 +99,17 @@ export default function Reservations() {
                   label: "教室当日签到码",
                   required: true,
                   max: 32,
-                  help: "请查看教室屏幕。签到窗口为开始后 15 分钟内。",
+                  placeholder: "输入教室屏幕上的 8 位编码…",
+                  help: "请查看当前教室的签到屏幕；无需填写教室编号或座位号。",
                 },
               ],
+              description: (
+                <p>
+                  {r.roomName} · {r.seatCode} 号座位
+                  <br />
+                  {slotLabel(r.startAt, r.endAt)}
+                </p>
+              ),
               success: "签到成功，祝你学习顺利",
             })
           }
@@ -94,17 +123,27 @@ export default function Reservations() {
           onClick={() =>
             action.open({
               title: "取消这次预约？",
+              confirmText: "确认取消预约",
+              success: "预约已取消，座位已释放",
               path: `/reservations/${r.id}/cancel`,
               body: { expectedVersion: r.version },
               danger: true,
-              description: <p>取消后会释放这个座位，其他同学可以预约。</p>,
+              description: (
+                <p>
+                  {r.roomName} · {r.seatCode} 号座位
+                  <br />
+                  {slotLabel(r.startAt, r.endAt)}
+                  <br />
+                  取消后会释放这个座位，其他同学可以预约。
+                </p>
+              ),
             })
           }
         >
           取消预约
         </Button>
       )}
-      {maySearch && (
+      {maySearch && can(user, "reservation:create") && (
         <Button
           onClick={() => {
             history.push(`/seats?roomId=${r.roomId}&seatId=${r.seatId}`);
@@ -119,8 +158,8 @@ export default function Reservations() {
     <>
       <PageHeading
         eyebrow="MY STUDY PLAN"
-        title="我的预约"
-        description="每一段专注都有安排，每一次使用都有记录。"
+        title="我的座位预约"
+        description="查看使用时间、到场签到或取消预约。取消须在开始前完成，签到须在开始后的 15 分钟内完成。"
         action={
           maySearch ? (
             <Button type="primary" onClick={() => history.push("/seats")}>
@@ -143,6 +182,7 @@ export default function Reservations() {
       {tab === "bookings" && (
         <div className="list-toolbar">
           <Select
+            aria-label="预约状态"
             placeholder="全部状态"
             allowClear
             value={status}
@@ -160,11 +200,25 @@ export default function Reservations() {
             ].map((v) => ({ value: v, label: statusLabels[v] }))}
           />
           <DatePicker.RangePicker
+            value={range}
+            aria-label="预约开始日期范围"
+            placeholder={["开始日期", "结束日期"]}
             onChange={(v) => {
               setRange(v);
               setPage(1);
             }}
           />
+          {(status || range) && (
+            <Button
+              onClick={() => {
+                setStatus(undefined);
+                setRange(undefined);
+                setPage(1);
+              }}
+            >
+              清除筛选
+            </Button>
+          )}
           <Button icon={<ReloadOutlined />} onClick={data.reload}>
             刷新
           </Button>
@@ -183,7 +237,11 @@ export default function Reservations() {
       <LoadingBlock loading={data.loading}>
         <div className="record-list">
           {items<RecordData>(data.data).map((r) => (
-            <article className="panel reservation-card" key={r.id}>
+            <article
+              className="panel reservation-card"
+              data-reservation-id={r.id}
+              key={r.id}
+            >
               <div className="record-date">
                 <CalendarOutlined />
                 <strong>
@@ -200,13 +258,10 @@ export default function Reservations() {
                 </div>
                 <p>{slotLabel(r.startAt, r.endAt)}</p>
                 <span className="muted">
-                  <EnvironmentOutlined /> {r.buildingName || "校园自习空间"} ·{" "}
-                  <Identifier value={r.id} />
+                  <EnvironmentOutlined /> {r.buildingName || "校园自习空间"}
                 </span>
-                {r.cancelReason === "MAINTENANCE" && (
-                  <p className="maintenance-note">
-                    因教室维修取消，本次不计未签到。
-                  </p>
+                {tab === "bookings" && (
+                  <p className="booking-next-step">{reservationNextStep(r)}</p>
                 )}
               </div>
               <div className="record-actions">
@@ -221,14 +276,32 @@ export default function Reservations() {
         {!data.loading && !data.error && items(data.data).length === 0 && (
           <div className="panel">
             <EmptyState
-              title={tab === "violations" ? "没有未签到记录" : "还没有预约记录"}
+              title={
+                tab === "violations"
+                  ? "没有未签到记录"
+                  : status || range
+                  ? "没有符合筛选条件的预约"
+                  : "还没有预约记录"
+              }
               description={
                 tab === "violations"
                   ? "按时签到，一起让空间更好用。"
-                  : "挑一个喜欢的位置，开始下一段专注时光。"
+                  : status || range
+                  ? "试试其他状态或日期，也可以清除筛选查看全部记录。"
+                  : "点击“查找座位”，选择时间和座位后即可预约。"
               }
               action={
-                tab === "bookings" && maySearch ? (
+                tab === "bookings" && (status || range) ? (
+                  <Button
+                    onClick={() => {
+                      setStatus(undefined);
+                      setRange(undefined);
+                      setPage(1);
+                    }}
+                  >
+                    清除筛选
+                  </Button>
+                ) : tab === "bookings" && maySearch ? (
                   <Button type="primary" onClick={() => history.push("/seats")}>
                     查找座位
                   </Button>
@@ -277,7 +350,9 @@ export default function Reservations() {
                   {
                     key: "in",
                     label: "签到时间",
-                    children: dateTime(detail.data.checkedInAt),
+                    children: detail.data.checkedInAt
+                      ? dateTime(detail.data.checkedInAt)
+                      : "尚未签到",
                   },
                   {
                     key: "reason",
@@ -293,14 +368,17 @@ export default function Reservations() {
                   },
                 ]}
               />
-              {detail.data.status === "RESERVED" && (
-                <Alert
-                  className="mb-20"
-                  type="info"
-                  title="签到窗口：预约开始后 15 分钟内"
-                  description="在教室查看当日编码，输入后完成签到。"
-                />
-              )}
+              <Alert
+                className="mb-20"
+                type={detail.data.status === "NO_SHOW" ? "warning" : "info"}
+                showIcon
+                title={
+                  detail.data.status === "RESERVED"
+                    ? "下一步：到教室后签到"
+                    : "本次预约说明"
+                }
+                description={reservationNextStep(detail.data)}
+              />
               {controls(detail.data)}
             </>
           )}

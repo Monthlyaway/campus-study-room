@@ -61,6 +61,28 @@ export async function postApiV1NotificationDeliveriesIdRetry(
   });
 }
 
+/** Search room names for notification delivery management Requires notification:manage. Returns only room naming metadata matched by this permission and scope in the same enabled role binding (ALL, ROOM, DEPARTMENT or SHARED). SELF and other roles do not grant room access. Includes disabled rooms for historical notification filtering. Does not widen room business access. GET /api/v1/notification-scope-rooms */
+export async function getApiV1NotificationScopeRooms(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: CoreAPI.getApiV1NotificationScopeRoomsParams,
+  options?: { [key: string]: any }
+) {
+  return request<CoreAPI.RoleScopeRoomPage>(
+    "/api/v1/notification-scope-rooms",
+    {
+      method: "GET",
+      params: {
+        // page has a default value: 1
+        page: "1",
+        // size has a default value: 100
+        size: "100",
+        ...params,
+      },
+      ...(options || {}),
+    }
+  );
+}
+
 /** Administration GET /api/v1/notifications GET /api/v1/notifications */
 export async function getApiV1Notifications(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -104,6 +126,25 @@ export async function postApiV1NotificationsIdRead(
 export async function getApiV1Permissions(options?: { [key: string]: any }) {
   return request<CoreAPI.PermissionPage>("/api/v1/permissions", {
     method: "GET",
+    ...(options || {}),
+  });
+}
+
+/** Search room names for role assignment Requires role:manage. Includes enabled and disabled rooms across departments solely as authorization choices. Does not grant access to room details, bookings, availability, or other business data. GET /api/v1/role-scope-rooms */
+export async function getApiV1RoleScopeRooms(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: CoreAPI.getApiV1RoleScopeRoomsParams,
+  options?: { [key: string]: any }
+) {
+  return request<CoreAPI.RoleScopeRoomPage>("/api/v1/role-scope-rooms", {
+    method: "GET",
+    params: {
+      // page has a default value: 1
+      page: "1",
+      // size has a default value: 100
+      size: "100",
+      ...params,
+    },
     ...(options || {}),
   });
 }

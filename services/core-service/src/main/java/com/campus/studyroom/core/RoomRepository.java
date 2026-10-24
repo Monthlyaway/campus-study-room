@@ -17,6 +17,20 @@ public interface RoomRepository extends JpaRepository<Room, UUID>, JpaSpecificat
   boolean existsByBuildingIdAndEnabledTrue(UUID buildingId);
 
   @Query(
+      "select room from Room room where (:search='' or locate(:search,lower(room.name))>0 or locate(:search,lower(room.code))>0)"
+          + " and exists (select s.id from UserRoleEntity ur join RoleEntity role on role.id=ur.roleId"
+          + " join RolePermissionEntity rp on rp.roleId=role.id join PermissionEntity p on p.id=rp.permissionId"
+          + " join RoleScopeEntity s on s.userRoleId=ur.id where ur.userId=:user and role.enabled=true"
+          + " and p.code=:permission and (s.scopeType='ALL' or (s.scopeType='ROOM' and s.roomId=room.id)"
+          + " or (s.scopeType='DEPARTMENT' and s.departmentId=room.departmentId)"
+          + " or (s.scopeType='SHARED' and room.departmentId is null)))")
+  Page<Room> managed(
+      @Param("user") UUID user,
+      @Param("permission") String permission,
+      @Param("search") String search,
+      Pageable pageable);
+
+  @Query(
       "select room from Room room where (:building is null or room.buildingId=:building) and"
           + " (:filterDepartment is null or room.departmentId=:filterDepartment) and"
           + " (room.departmentId is null or room.departmentId=:department or exists (select s.id"

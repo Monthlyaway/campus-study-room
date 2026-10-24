@@ -100,12 +100,18 @@ class RepairHttpTests(unittest.TestCase):
         status, body = self.student.call("POST", "/api/v1/repairs", payload, key)
         self.assertEqual(201, status, body)
         self.assertEqual("SUBMITTED", body["data"]["status"])
+        self.assertEqual(self.room["name"], body["data"]["roomName"])
+        detail = self.student.get("/api/v1/repairs/" + body["data"]["id"])
+        self.assertEqual(self.room["name"], detail["roomName"])
+        listed = self.student.get("/api/v1/repairs?view=mine&roomId=" + self.room_id)["items"]
+        self.assertEqual(self.room["name"], next(row for row in listed if row["id"] == body["data"]["id"])["roomName"])
         return body["data"], payload
 
     def action(self, client, order, name, expected=200, **extra):
         current = client.get("/api/v1/repairs/" + order["id"])
         status, body = client.call("POST", "/api/v1/repairs/" + order["id"] + "/" + name, {"expectedVersion": current["version"], **extra})
         self.assertEqual(expected, status, body)
+        self.assertEqual(self.room["name"], body["data"]["roomName"])
         return body["data"]
 
     def until(self, order, status):
@@ -124,7 +130,7 @@ class RepairHttpTests(unittest.TestCase):
         order, payload = self.create(key=key)
         status, replay = self.student.call("POST", "/api/v1/repairs", payload, key)
         self.assertEqual(201, status)
-        self.assertEqual(order["id"], replay["data"]["id"])
+        self.assertEqual(order, replay["data"], "Creation replay must retain the complete original response, including the room name")
         status, mismatch = self.student.call("POST", "/api/v1/repairs", {**payload, "title": "另一个内容"}, key)
         self.assertEqual(409, status, mismatch)
         status, hidden = self.other.call("GET", "/api/v1/repairs/" + order["id"])
@@ -137,6 +143,7 @@ class RepairHttpTests(unittest.TestCase):
         # A completed request replays its original result even if the object later changed state.
         status, replay = self.student.call("POST", "/api/v1/repairs", payload, key)
         self.assertEqual("SUBMITTED", replay["data"]["status"])
+        self.assertEqual(order, replay["data"], "Later state changes must not decorate or replace the original idempotent response")
 
     def test_02_real_resource_lifecycle_and_multiple_sources(self):
         future = (datetime.now(timezone(timedelta(hours=8))) + timedelta(days=1)).replace(hour=10, minute=0, second=0, microsecond=0)
