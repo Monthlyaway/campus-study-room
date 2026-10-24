@@ -222,6 +222,71 @@ class AdminPersistenceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
+  void authorizationDirectoryNamesAllDepartmentsWithoutOpeningBusinessAccess() {
+    String prefix = "AUTH" + UUID.randomUUID().toString().substring(0, 8);
+    var created = new ArrayList<Room>();
+    for (int n = 0; n < 101; n++) {
+      Room r = new Room();
+      r.id = UUID.randomUUID();
+      r.buildingId = seeded("building:LIBRARY");
+      r.departmentId = seeded("department:ART");
+      r.code = prefix + String.format("%03d", n);
+      r.name = "授权目录测试教室 " + n;
+      r.enabled = n != 100;
+      created.add(r);
+    }
+    rooms.saveAllAndFlush(created);
+    var first = (PageData<Map<String, Object>>) admin.roleScopeRooms(actor(), prefix, 1, 100);
+    var second = (PageData<Map<String, Object>>) admin.roleScopeRooms(actor(), prefix, 2, 100);
+    assertEquals(101, first.total());
+    assertEquals(100, first.items().size());
+    assertEquals(1, second.items().size());
+    assertEquals("授权目录测试教室 100", second.items().getFirst().get("name"));
+    assertEquals(false, second.items().getFirst().get("enabled"));
+    assertEquals(Set.of("id", "name", "code", "enabled", "buildingName", "departmentName"),
+        second.items().getFirst().keySet());
+    assertFalse(admin.visibleRoom(actor(), created.getFirst().id));
+    assertThrows(ApiException.class, () -> admin.room(actor(), created.getFirst().id));
+    assertEquals(403, assertThrows(ApiException.class,
+        () -> admin.roleScopeRooms(seeded("user:student"), "", 1, 20)).status);
+    assertEquals(400, assertThrows(ApiException.class,
+        () -> admin.roleScopeRooms(actor(), "", 0, 20)).status);
+    UUID target = user();
+    var scoped = role("room:manage");
+    var result = map(admin.roleBindings(actor(), target, Map.of("expectedVersion", userVersion(target),
+        "bindings", List.of(binding(Store.id(scoped.get("id")), Map.of("scopeType", "ROOM", "roomId", created.getLast().id))))));
+    var bindings = (List<Map<String, Object>>) result.get("roleBindings");
+    var projectedScopes = (List<Map<String, Object>>) bindings.getFirst().get("scopes");
+    assertEquals(created.getLast().name, projectedScopes.getFirst().get("roomName"));
+    assertEquals(created.getLast().id.toString(), projectedScopes.getFirst().get("roomId"));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void notificationRoomDirectoryUsesOnlySameBindingManagementScope() {
+    UUID target = user();
+    var ownRole = role("notification:manage");
+    var otherRole = role("audit:read");
+    UUID roomId = Store.id(room(roomAdmin(), seeded("department:ART")).get("id"));
+    admin.roleBindings(actor(), target, Map.of("expectedVersion", userVersion(target),
+        "bindings", List.of(binding(Store.id(ownRole.get("id")), Map.of("scopeType", "SELF")),
+            binding(Store.id(otherRole.get("id")), Map.of("scopeType", "ALL")))));
+    assertEquals(0, ((PageData<?>) admin.notificationScopeRooms(target, "", 1, 100)).total());
+    admin.roleBindings(actor(), target, Map.of("expectedVersion", userVersion(target),
+        "bindings", List.of(binding(Store.id(ownRole.get("id")), Map.of("scopeType", "ROOM", "roomId", roomId)),
+            binding(Store.id(otherRole.get("id")), Map.of("scopeType", "ALL")))));
+    var result = (PageData<Map<String, Object>>) admin.notificationScopeRooms(target, "", 1, 100);
+    assertEquals(1, result.total());
+    assertEquals(roomId.toString(), result.items().getFirst().get("id"));
+    assertFalse(admin.visibleRoom(target, roomId));
+    assertThrows(ApiException.class, () -> admin.room(target, roomId));
+    assertEquals(0, ((PageData<?>) admin.notificationScopeRooms(target, "no-match-" + UUID.randomUUID(), 1, 100)).total());
+    assertEquals(403, assertThrows(ApiException.class,
+        () -> admin.notificationScopeRooms(seeded("user:student"), "", 1, 100)).status);
+  }
+
+  @Test
   void selfScopePersistsWithoutGrantingRoomManagementAndInvalidatesSession() {
     UUID id = user();
     var before = accounts.findById(id).orElseThrow();

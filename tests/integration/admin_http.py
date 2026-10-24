@@ -42,6 +42,22 @@ class AdministrationHttpTests(unittest.TestCase):
         self.assertEqual(401,current.call('GET','/api/v1/repairs')[0])
         self.assertEqual(401,current.call('GET','/api/v1/auth/me')[0])
 
+    def test_authorization_room_directory_requires_role_management(self):
+        directory=self.admin.get('/api/v1/role-scope-rooms?page=1&size=100')
+        self.assertGreater(len(directory['items']),0)
+        self.assertEqual({'id','name','code','enabled','buildingName','departmentName'},set(directory['items'][0]))
+        selected=directory['items'][0]
+        search=self.admin.get('/api/v1/role-scope-rooms?q='+urllib.parse.quote(selected['code']))
+        self.assertIn(selected['id'],[r['id'] for r in search['items']])
+        self.assertEqual(400,self.admin.call('GET','/api/v1/role-scope-rooms?page=0')[0])
+        student=Client('student',self.password)
+        self.assertEqual(403,student.call('GET','/api/v1/role-scope-rooms')[0])
+        self.assertEqual(403,student.call('GET','/api/v1/notification-scope-rooms')[0])
+        managed=self.admin.get('/api/v1/notification-scope-rooms?page=1&size=100')
+        self.assertEqual({'id','name','code','enabled','buildingName','departmentName'},set(managed['items'][0]))
+        room_admin=Client('room-admin',self.password)
+        self.assertEqual(403,room_admin.call('GET','/api/v1/role-scope-rooms')[0])
+
     def test_invalid_scope_rolls_back_and_stale_version_conflicts(self):
         name,user=self.user()
         status,body=self.admin.call('PUT','/api/v1/users/'+user['id']+'/role-bindings',{'expectedVersion':user['version'],'bindings':[{'roleId':self.student_role,'scopes':[{'scopeType':'SELF','departmentId':self.admin.me['departmentId']}]}]})

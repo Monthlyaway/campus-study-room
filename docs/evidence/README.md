@@ -36,6 +36,14 @@
 - [v0.2.1 浏览器验证失败记录](github-production-v0.2.1.md)：冻结当时的动画越界与检查读取竞争失败；后续修复验证见 v0.2.2 记录。
 - [v0.2.0 发布验证与中断记录](github-production-v0.2.0.md)：按实际 PR、tag、run/attempt 和镜像身份核对；修复后的新版本另立记录，失败版本不回填为上线成功。
 
+## 本轮全角色交互检查
+
+- [账号授权与管理工作台](ux-admin-2026-10-24.md)：20 个桌面/手机场景与手机跨院系授权保存，独立 agent 实际试用。
+- [座位与两级审批](ux-booking-2026-10-24.md)：真实预约/取消与两级审批/撤销，手机抽屉问题及修复后验证边界。
+- [维修、通知与签到屏](ux-repair-2026-10-24.md)：真实角色工作流和性能、响应式问题的修复记录。
+
+这些记录使用 codex-lb 隔离开发环境；正式不可变镜像结果以[本次 PR 的 Checks](https://github.com/Monthlyaway/campus-study-room/pulls?q=is%3Apr+head%3Aycy%2Fclear-role-workflows)为准，不将 agent 试用写成人工签字或生产验收。
+
 ## 全部历史文字报告
 
 ### 核心业务与接口

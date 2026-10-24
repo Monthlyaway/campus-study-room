@@ -47,3 +47,6 @@ P0 覆盖账号与权限、预约、教室审批、维修闭环，以及安装�
 - 人类开发者：[开发导航](docs/development/README.md) → [测试选择](docs/development/testing.md) → [贡献与文档维护](docs/contributing.md)。
 - 协作 Agent：[AGENTS.md](AGENTS.md)，遵守同一套业务约束、验证和提交要求。
 - 业务规则来源：[PRD](01_PRD.md)；原始设计与任务基线的阅读方式见[规格导读](docs/reference/README.md)。
+
+
+前端按“要办理的任务”组织入口：管理员从“账号与授权”分配职责和负责对象，审批与维修人员直接进入工作待办，师生从选座、申请、报修进入对应流程。全部界面步骤见[业务页面指南](docs/user-guide/pages.md)；本轮变更与验收状态见[当前进度](docs/progress.md)。

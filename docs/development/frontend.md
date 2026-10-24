@@ -9,7 +9,7 @@
 ./scripts/web dev
 ```
 
-打开 `http://localhost:8000`，用该环境的[演示账号与密码文件](demo-accounts.md)登录。能查询教室、刷新后仍保持登录，才说明前后端链路可用。管理员首页是用户管理，试预约请用学生账号。8000 是开发代理页，源码容器新装默认 18080，[现有服务器实例](../operations/current-instance.md)使用独立生产状态与 HTTPS 入口；不能混用它们的密码、状态目录或测试结果。原生后端更新需要 `native-restart`，仅重跑 `dev-up` 不替换运行中的 JAR。
+打开 `http://localhost:8000`，用该环境的[演示账号与密码文件](demo-accounts.md)登录。能查询教室、刷新后仍保持登录，才说明前后端链路可用。系统管理员首页是账号与授权，试预约请用学生账号。8000 是开发代理页，源码容器新装默认 18080，[现有服务器实例](../operations/current-instance.md)使用独立生产状态与 HTTPS 入口；不能混用它们的密码、状态目录或测试结果。原生后端更新需要 `native-restart`，仅重跑 `dev-up` 不替换运行中的 JAR。
 
 ## 代码地图与路由
 
@@ -28,13 +28,13 @@ Umi 只注册 `/* → App`。真实分发在 App 的 `nav`、`homePath`、`switc
 | --- | --- | --- |
 | `/login` | [Login.tsx](../../apps/web/src/pages/Login.tsx) | 未登录；成功后角色首页 |
 | `/seats` | [Seats.tsx](../../apps/web/src/pages/Seats.tsx) | `seat:search`；再次预约带入教室与座位 |
-| `/reservations` | [Reservations.tsx](../../apps/web/src/pages/Reservations.tsx) | 登录可见，数据按权限；`?id=UUID` 打开详情 |
+| `/reservations` | [Reservations.tsx](../../apps/web/src/pages/Reservations.tsx) | 登录可见，列表为本人记录；`?id=UUID` 打开详情 |
 | `/applications` | [Applications.tsx](../../apps/web/src/pages/Applications.tsx) | 按申请/审批权限显示视图；`?id=UUID` |
 | `/repairs` | [Repairs.tsx](../../apps/web/src/pages/Repairs.tsx) | 按报修/处理/管理权限显示视图；`?id=UUID` |
 | `/notifications` | [Notifications.tsx](../../apps/web/src/pages/Notifications.tsx) | 本人通知；送达管理另需权限 |
 | `/admin/users` | [Admin.tsx](../../apps/web/src/pages/Admin.tsx) → `Users` | `user:manage` |
 | `/admin/roles` | Admin → `Roles` | `role:manage` |
-| `/admin/spaces` | Admin → `Spaces` | `room:manage`；页内教室详情 |
+| `/admin/spaces` | Admin → `Spaces` | `room:manage` 或 `user:manage`；页内按各自权限维护教室或组织资料 |
 | `/admin/config` | Admin → `Config` | `config:manage` |
 | `/admin/statistics` | Admin → `Statistics` | `statistics:read` |
 | `/admin/audit` | Admin → `Audit` | `audit:read` |
@@ -79,7 +79,7 @@ flowchart LR
 4. 按服务端 `allowedActions` 显示动作，按 permission 显示入口。范围由后端验证；同一角色绑定的 permission/scope 必须同时成立。
 5. 检查桌面和 375px 的加载、空态、错误、弹窗、键盘与成功结果，同步用户手册。
 
-`PageHeading` 管标题层级，`Status` 管状态翻译/颜色，`Failure` 显示错误及请求号，`EmptyState` 解释空结果，`LoadingBlock` 表示加载，`Identifier` 展示短编号并复制完整 UUID。优先复用公共入口。
+`PageHeading` 管标题层级，`Status` 管状态翻译/颜色，`Failure` 显示错误及请求号，`EmptyState` 解释空结果，`LoadingBlock` 表示加载，`Identifier` 在详情展示短编号并复制完整 UUID；业务选项必须显示名称，不用 UUID 替代缺失名称。优先复用公共入口。
 
 时间用 `shanghai()`、`dateTime()`、`slotLabel()`；提交带偏移 RFC3339，整点、左闭右开。历史筛选结束日期转下一天 00:00 上界；14 天规则约束预约结束时刻。不能用浏览器本地时区替代上海时区。
 
@@ -89,7 +89,7 @@ flowchart LR
 
 ## 失败与重试
 
-下表中的自动保留请求、24小时保护、409广播/禁确认由公共 `useAction` 提供。Admin.tsx 的“保存授权”“配置权限”“每周开放时间”采用独立保存弹窗，不具有这整套自动行为；它们保留同一未改内容的请求键，冲突时需要关闭、刷新并重新打开。修改这些页面时按[用户恢复说明](../user-guide/faq.md)核对，不能把公共Hook行为当成所有表单现状。
+下表中的自动保留请求、24小时保护、409广播/禁确认由公共 `useAction` 提供。授权独立组件 AdminAccess.tsx 也会冻结未确认请求、保留原键重试、拦截冲突及过期重试，并提醒未保存退出。“配置权限”“每周开放时间”仍采用独立保存弹窗，冲突时需要关闭、刷新并重新打开。修改这些页面时按[用户恢复说明](../user-guide/faq.md)核对，不能把公共Hook行为当成所有表单现状。
 
 | 结果 | 页面处理 |
 | --- | --- |
@@ -147,3 +147,8 @@ git diff -- apps/web/src/services/generated
 交接提供 REQ、改动、实际命令/结果、源码和运行版本、桌面/375px 反馈、失败 requestId。不要上传密码、Cookie、CSRF、storageState 或 trace/HAR。浏览器默认关闭 trace/HAR/video，并运行真实 Chromium 失败报告隐私探针。
 
 [历史证据](../evidence/README.md)各自绑定原版本，不等于本轮重新验收。
+
+
+### 全角色交互回归
+
+`tests/browser/usability.spec.mjs` 覆盖 11 个种子账号的角色首页、工作标签、全部页面在桌面和 375px 下的可达性，以及跨院系授权教室名称与保存对象一致性、真实签到屏。与既有业务闭环一起在 PR CI 的打包版本上执行。手动开发预览用 `mfsu: false` 保持 React 单实例；运行预览时不要并行多次 `umi setup` 重写临时目录。

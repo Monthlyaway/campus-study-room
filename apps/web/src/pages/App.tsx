@@ -29,7 +29,7 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import { Link, history, useLocation } from "umi";
-import { can, canAny } from "../access";
+import { can, canAny, roleLabel } from "../access";
 import { clearCsrf } from "../services/api";
 import {
   getApiV1AuthMe,
@@ -51,73 +51,73 @@ const nav = [
   {
     path: "/seats",
     label: "查找座位",
-    icon: <BookOutlined />,
+    icon: <BookOutlined aria-hidden="true" />,
     permission: "seat:search",
-    group: "学习空间",
+    group: "个人使用",
   },
   {
     path: "/reservations",
-    label: "我的预约",
-    icon: <CalendarOutlined />,
-    group: "学习空间",
+    label: "我的座位预约",
+    icon: <CalendarOutlined aria-hidden="true" />,
+    group: "个人使用",
   },
   {
     path: "/applications",
     label: "教室申请",
-    icon: <TeamOutlined />,
-    group: "学习空间",
+    icon: <TeamOutlined aria-hidden="true" />,
+    group: "个人使用",
   },
   {
     path: "/repairs",
     label: "设施报修",
-    icon: <ToolOutlined />,
-    group: "学习空间",
+    icon: <ToolOutlined aria-hidden="true" />,
+    group: "个人使用",
   },
   {
     path: "/notifications",
     label: "通知中心",
-    icon: <BellOutlined />,
-    group: "学习空间",
+    icon: <BellOutlined aria-hidden="true" />,
+    group: "个人使用",
   },
   {
     path: "/admin/statistics",
     label: "使用统计",
-    icon: <BarChartOutlined />,
+    icon: <BarChartOutlined aria-hidden="true" />,
     permission: "statistics:read",
     group: "管理工作台",
   },
   {
     path: "/admin/spaces",
-    label: "空间管理",
-    icon: <ApartmentOutlined />,
+    label: "教室与座位",
+    icon: <ApartmentOutlined aria-hidden="true" />,
     permission: "room:manage",
     group: "管理工作台",
   },
   {
     path: "/admin/users",
-    label: "用户管理",
-    icon: <UserOutlined />,
+    label: "账号与授权",
+    icon: <UserOutlined aria-hidden="true" />,
     permission: "user:manage",
     group: "管理工作台",
   },
   {
     path: "/admin/roles",
-    label: "角色权限",
-    icon: <SafetyCertificateOutlined />,
+    label: "角色与职责",
+    icon: <SafetyCertificateOutlined aria-hidden="true" />,
     permission: "role:manage",
     group: "管理工作台",
   },
   {
     path: "/admin/config",
     label: "系统参数",
-    icon: <SettingOutlined />,
+    icon: <SettingOutlined aria-hidden="true" />,
     permission: "config:manage",
     group: "管理工作台",
   },
   {
     path: "/admin/audit",
     label: "操作审计",
-    icon: <AuditOutlined />,
+    icon: <AuditOutlined aria-hidden="true" />,
     permission: "audit:read",
     group: "管理工作台",
   },
@@ -128,6 +128,7 @@ function Main() {
   const [error, setError] = useState<Error>();
   const [mobile, setMobile] = useState(false);
   const [versionOpen, setVersionOpen] = useState(false);
+  const [dutiesOpen, setDutiesOpen] = useState(false);
   const version = useData<any>("/version");
   const refresh = () => {
     getApiV1AuthMe({})
@@ -196,15 +197,30 @@ function Main() {
     : can(user, "room_application:review_dept") ||
       can(user, "room_application:review_space")
     ? "/applications"
-    : can(user, "repair:work") || can(user, "repair:assign")
+    : canAny(user, ["repair:work", "repair:assign", "repair:read_scope", "repair:accept_scope"])
     ? "/repairs"
+    : can(user, "room_application:create")
+    ? "/applications"
     : "/reservations";
   const path =
     location.pathname === "/" || location.pathname === "/login"
       ? homePath
       : location.pathname;
-  const current = nav.find((n) => n.path === path);
-  const visible = nav.filter((n) => !n.permission || can(user, n.permission));
+  const reviews = canAny(user, ["room_application:review_dept", "room_application:review_space", "room_application:cancel_scope"]);
+  const repairsWork = canAny(user, ["repair:read_assigned", "repair:read_scope", "repair:assign", "repair:work", "repair:accept_scope"]);
+  const visible = nav.filter((n) => n.path === "/admin/spaces" ? canAny(user, ["room:manage", "user:manage"]) : !n.permission || can(user, n.permission)).map((n) => ({
+    ...n,
+    label: n.path === "/applications" && reviews ? "教室申请审批"
+      : n.path === "/repairs" && repairsWork ? "维修工作台"
+      : n.label,
+    group: (n.path === "/applications" && reviews) || (n.path === "/repairs" && repairsWork)
+      ? "管理工作台" : n.group,
+  }));
+  const current = visible.find((n) => n.path === path);
+  const duties = visible.filter((n) => n.permission || n.path === homePath ||
+    (n.path === "/applications" && (reviews || can(user, "room_application:create"))) ||
+    (n.path === "/repairs" && (repairsWork || can(user, "repair:create"))));
+  const roleNames = user.roles.map((code) => roleLabel({ code })).filter(Boolean);
   const defaultPath = homePath;
   const logout = async () => {
     try {
@@ -224,11 +240,11 @@ function Main() {
           <BookOutlined />
         </span>
         <div>
-          栖学<span>CAMPUS SPACE</span>
+          栖学<span>校园自习室</span>
         </div>
       </Link>
       <nav aria-label="主导航">
-        {["学习空间", "管理工作台"].map((group) => {
+        {["管理工作台", "个人使用"].map((group) => {
           const links = visible.filter((n) => n.group === group);
           return links.length ? (
             <div className="nav-group" key={group}>
@@ -237,6 +253,8 @@ function Main() {
                 <Link
                   key={n.path}
                   to={n.path}
+                  onClick={() => setMobile(false)}
+                  aria-current={path === n.path ? "page" : undefined}
                   className={`nav-item ${path === n.path ? "active" : ""}`}
                 >
                   {n.icon}
@@ -249,14 +267,9 @@ function Main() {
         })}
       </nav>
       <div className="sidebar-bottom">
-        <div className="sidebar-note">
-          <span className="tiny-dot" /> 空间有序，专注无扰。
-          <p>
-            每一次准时到达，
-            <br />
-            都是对共享空间的尊重。
-          </p>
-        </div>
+        <button className="duties-link" onClick={() => { setDutiesOpen(true); setMobile(false); }}>
+          <QuestionCircleOutlined /> 我能办理哪些业务？
+        </button>
         <button className="version-link" onClick={() => setVersionOpen(true)}>
           版本 {version.data?.releaseId || "查看"} <ArrowRightOutlined />
         </button>
@@ -311,12 +324,13 @@ function Main() {
         />
       );
   }
-  if (current?.permission && !can(user, current.permission))
+  const route = nav.find((n) => n.path === path);
+  if (route?.permission && !(path === "/admin/spaces" ? canAny(user, ["room:manage", "user:manage"]) : can(user, route.permission)))
     page = (
       <Result
         status="403"
         title="暂无页面访问权限"
-        subTitle="请联系管理员确认你的角色与数据范围。"
+        subTitle="这个页面需要单独授权。请联系系统管理员确认你能办理的业务和负责的教室。"
         extra={
           <Button onClick={() => history.push(defaultPath)}>
             回到我的空间
@@ -369,15 +383,11 @@ function Main() {
               <span className="today-label">
                 {shanghai().format("M月D日 dddd")}
               </span>
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                aria-label="查看通知"
-                onClick={() => history.push("/notifications")}
-              />
+              <Link to="/notifications" className="notification-link" aria-label="查看通知"><BellOutlined /></Link>
               <Dropdown
                 menu={{
                   items: [
+                    { key: "duties", label: "我的职责与可办业务", icon: <UserOutlined />, onClick: () => setDutiesOpen(true) },
                     {
                       key: "logout",
                       label: "退出登录",
@@ -387,19 +397,19 @@ function Main() {
                   ],
                 }}
               >
-                <button className="profile-button">
+                <button className="profile-button" aria-label={`${user.displayName}，打开账号菜单`}>
                   <Avatar
                     size={32}
                     style={{ background: "#e8ede6", color: "#173e3c" }}
                   >
                     {user.displayName?.slice(-2)}
                   </Avatar>
-                  <span>{user.displayName}</span>
+                  <span>{user.displayName}<small>{roleNames.join("、") || "校园账号"}</small></span>
                 </button>
               </Dropdown>
             </div>
           </header>
-          <main id="main-content" className="main-content">
+          <main id="main-content" className="main-content" tabIndex={-1}>
             <Failure error={error} />
             {page}
           </main>
@@ -409,6 +419,13 @@ function Main() {
           </footer>
         </div>
       </div>
+      <Drawer title="我的职责与可办业务" open={dutiesOpen} onClose={() => setDutiesOpen(false)}>
+        <h2>{user.displayName}</h2>
+        <p>{roleNames.join("、") || "校园账号"}</p>
+        <p className="muted">选择下面的任务开始办理。每个页面只会显示你有权查看的记录和当前可执行的操作。</p>
+        <div className="duty-links">{duties.map((n) => <Link key={n.path} to={n.path} onClick={() => setDutiesOpen(false)}>{n.icon}<span>{n.label}</span><ArrowRightOutlined /></Link>)}</div>
+        <p className="muted">本人已有的预约、教室申请和报修记录仍可从导航查看。需要增加工作职责时，请联系系统管理员；授权调整后重新登录。</p>
+      </Drawer>
       <Drawer
         title="当前版本"
         open={versionOpen}

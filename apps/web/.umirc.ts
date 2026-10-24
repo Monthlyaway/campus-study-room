@@ -5,6 +5,9 @@ export default defineConfig({
   npmClient: "pnpm",
   targets: { chrome: 100, firefox: 100, safari: 15, edge: 100 },
   hash: true,
+  // Keep a single React instance in development; eager MFSU duplicates React with this locked stack.
+  mfsu: false,
+  metas: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
   favicons: ["/favicon.svg"],
   proxy: {
     "/api/v1/repairs": {

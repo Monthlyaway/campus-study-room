@@ -1,0 +1,8 @@
+.repair-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.repair-toolbar p { margin: 0; max-width: 680px; }
+.repair-toolbar .ant-select { min-width: 210px; }
+.repair-deadline { font-variant-numeric: tabular-nums; }
+@media (max-width: 800px) {
+  .repair-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
+  .repair-toolbar .ant-select { width: 100%; }
+}

@@ -40,11 +40,13 @@ class RepairService {
     RepairOrder lock(UUID id){return orders.lock(id).orElseThrow(RepairException::missing);}
     Map<String,Object> detail(UUID id,RepairAccess access){
         RepairOrder order=find(id);if(!access.read(order))throw RepairException.missing();Set<String> rights=access.rights(order);
-        return tx.execute(s->detailData(find(id),access.principal.userId(),rights));
+        String resolvedRoomName=roomName(order.roomId,access.requestId);
+        return tx.execute(s->detailData(find(id),access.principal.userId(),rights,resolvedRoomName));
     }
-    Map<String,Object> detailData(RepairOrder r,UUID actor,Set<String> rights){
+    Map<String,Object> detailData(RepairOrder r,UUID actor,Set<String> rights,String resolvedRoomName){
         Optional<RepairRating> rating=ratings.findByOrderId(r.id);
         Map<String,Object> result=RepairDtos.order(r,RepairAccess.actions(r,actor,rights,rating.isPresent()));
+        result.put("roomName",resolvedRoomName);
         result.put("history",histories.findByOrderIdOrderByCreatedAtAscIdAsc(r.id).stream().map(RepairDtos::history).toList());
         result.put("acceptances",acceptances.findByOrderIdOrderByRoundNoAsc(r.id).stream().map(RepairDtos::acceptance).toList());
         result.put("rating",rating.map(RepairDtos::rating).orElse(null));
@@ -66,8 +68,19 @@ class RepairService {
         },PageRequest.of(page-1,size,Sort.by(Sort.Direction.DESC,"submittedAt").and(Sort.by("id"))));
         Set<UUID> ratedIds=new HashSet<>();if(!found.isEmpty())ratings.findByOrderIdIn(found.stream().map(r->r.id).toList()).forEach(r->ratedIds.add(r.orderId));
         List<Map<String,Object>> items=new ArrayList<>();
-        for(RepairOrder r:found){Set<String> rights=access.rights(r);items.add(RepairDtos.order(r,RepairAccess.actions(r,access.principal.userId(),rights,ratedIds.contains(r.id))));}
+        // Resolve display metadata only for already-authorized records, once per room on this page.
+        Map<UUID,String> roomNames=new HashMap<>();
+        for(RepairOrder r:found){
+            Set<String> rights=access.rights(r);
+            Map<String,Object> item=RepairDtos.order(r,RepairAccess.actions(r,access.principal.userId(),rights,ratedIds.contains(r.id)));
+            item.put("roomName",roomNames.computeIfAbsent(r.roomId,id->roomName(id,access.requestId)));
+            items.add(item);
+        }
         return RepairDtos.fields("items",items,"page",page,"size",size,"total",found.getTotalElements());
+    }
+    private String roomName(UUID room,UUID requestId){
+        try { return Objects.toString(core.room(room,requestId).get("name"),""); }
+        catch(RepairException unavailable){ return ""; } // Metadata failure must not hide an authorized order.
     }
     Map<String,Object> workers(UUID room,int page,int size,RepairAccess access){checkPage(page,size);return core.workers(access.principal,room,page,size,access.requestId);}
     Result create(UUID roomId,String title,String description,UUID key,Map<String,Object> body,RepairAccess access){
@@ -75,12 +88,13 @@ class RepairService {
         if(!access.permission("repair:create",roomId,null,null))throw RepairException.forbidden();
         Map<String,Object> room=core.room(roomId,access.requestId);if(!Boolean.TRUE.equals(room.get("enabled")))throw new RepairException(422,"ROOM_DISABLED","教室已停用，无法新建报修");
         String cleanTitle=RepairPolicy.text(title,100,true,"标题"),cleanDescription=RepairPolicy.text(description,2000,true,"故障说明");
+        String resolvedRoomName=Objects.toString(room.get("name"),"");
         return execute(key,"/api/v1/repairs",body,201,access,()->{
             Instant now=now();RepairOrder order=new RepairOrder(access.principal.userId(),roomId,cleanTitle,cleanDescription,now);orders.saveAndFlush(order);
             history(order,null,"上报故障",null,null,access.principal.userId(),access.requestId,now);
             audit(order,null,"REPAIR_SUBMITTED","上报故障",access.principal.userId(),access.requestId,now,"USER");
             deadline(order,"ASSIGN_OVERDUE",0,order.assignDueAt,now);
-            return detailData(order,access.principal.userId(),Set.of("own","read"));
+            return detailData(order,access.principal.userId(),Set.of("own","read"),resolvedRoomName);
         });
     }
     Result action(UUID id,String action,UUID key,Map<String,Object> body,RepairAccess access){
@@ -100,6 +114,8 @@ class RepairService {
             case "retry-sync"->{if(!rights.contains("repair:retry_sync"))throw RepairException.forbidden();}
             default->{}
         }
+        // Resolve metadata before the locking transaction; include it in the saved idempotent response.
+        String resolvedRoomName=roomName(before.roomId,access.requestId);
         int status=action.equals("start")||action.equals("retry-sync")||(action.equals("acceptance")&&decision.equals("ACCEPT"))?202:action.equals("rating")?201:200;
         return execute(key,"/api/v1/repairs/"+id+"/"+action,body,status,access,()->{
             RepairOrder r=lock(id);RepairPolicy.requireVersion(r.version,expected);
@@ -145,7 +161,7 @@ class RepairService {
             r.updatedAt=now;historyId=history(r,original,note,previousAssignee,r.assignedTo,actor,access.requestId,now);
             if(action.equals("assign"))notify(r,"ASSIGNED",historyId.toString(),access.requestId,now);
             audit(r,original,"REPAIR_"+action.toUpperCase(Locale.ROOT).replace('-','_'),note,actor,access.requestId,now,"USER");
-            orders.saveAndFlush(r);return detailData(r,actor,rights);
+            orders.saveAndFlush(r);return detailData(r,actor,rights,resolvedRoomName);
         });
     }
     Result cached(UUID key,String path,Map<String,Object> body,RepairAccess access){

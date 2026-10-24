@@ -173,6 +173,37 @@ public class AdminService {
     };
   }
 
+  /** Naming directory for authorization only; it does not grant access to room business data. */
+  @Transactional(readOnly = true)
+  public Object roleScopeRooms(UUID u, String search, int page, int size) {
+    access.require(u, "role:manage");
+    String needle = Objects.toString(search, "").trim().toLowerCase(Locale.ROOT)
+        .replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+    var found = rooms.findAll((root, query, cb) -> needle.isEmpty() ? cb.conjunction()
+        : cb.or(cb.like(cb.lower(root.get("name")), "%" + needle + "%", '\\'),
+                cb.like(cb.lower(root.get("code")), "%" + needle + "%", '\\')),
+        pageable(page, size, "code"));
+    return scopeRoomPage(found);
+  }
+
+  @Transactional(readOnly = true)
+  public Object notificationScopeRooms(UUID u, String search, int page, int size) {
+    access.require(u, "notification:manage");
+    return scopeRoomPage(rooms.managed(u, "notification:manage",
+        Objects.toString(search, "").trim().toLowerCase(Locale.ROOT), pageable(page, size, "code")));
+  }
+
+  PageData<Map<String, Object>> scopeRoomPage(Page<Room> found) {
+    Map<UUID, BuildingEntity> names = new HashMap<>();
+    buildings.findAllById(found.map(r -> r.buildingId).toSet()).forEach(b -> names.put(b.id, b));
+    Map<UUID, DepartmentEntity> departmentNames = new HashMap<>();
+    departments.findAllById(found.stream().map(r -> r.departmentId).filter(Objects::nonNull).distinct().toList())
+        .forEach(d -> departmentNames.put(d.id, d));
+    return page(found, r -> AdminViews.map("id", r.id, "name", r.name, "code", r.code,
+        "enabled", r.enabled, "buildingName", names.get(r.buildingId).name,
+        "departmentName", r.departmentId == null ? null : departmentNames.get(r.departmentId).name));
+  }
+
   boolean visibleRoom(UUID u, UUID room) {
     return access.admissible(u, room)
         || VISIBLE_PERMISSIONS.stream().anyMatch(p -> access.roomScope(u, p, room));
@@ -477,17 +508,23 @@ public class AdminService {
   }
 
   List<Map<String, Object>> bindings(UUID id) {
-    return userRoles.findByUserId(id).stream()
-        .map(
-            b ->
-                AdminViews.map(
-                    "id",
-                    b.id,
-                    "roleId",
-                    b.roleId,
-                    "scopes",
-                    scopes.findByUserRoleId(b.id).stream().map(AdminViews::scope).toList()))
-        .toList();
+    var bindings = userRoles.findByUserId(id);
+    var scopeByBinding = new HashMap<UUID, List<RoleScopeEntity>>();
+    bindings.forEach(b -> scopeByBinding.put(b.id, scopes.findByUserRoleId(b.id)));
+    var allScopes = scopeByBinding.values().stream().flatMap(Collection::stream).toList();
+    Map<UUID, Room> roomNames = new HashMap<>();
+    rooms.findAllById(allScopes.stream().map(s -> s.roomId).filter(Objects::nonNull).distinct().toList())
+        .forEach(r -> roomNames.put(r.id, r));
+    Map<UUID, DepartmentEntity> departmentNames = new HashMap<>();
+    departments.findAllById(allScopes.stream().map(s -> s.departmentId).filter(Objects::nonNull).distinct().toList())
+        .forEach(d -> departmentNames.put(d.id, d));
+    return bindings.stream().map(b -> AdminViews.map("id", b.id, "roleId", b.roleId,
+        "scopes", scopeByBinding.get(b.id).stream().map(s -> {
+          var result = AdminViews.scope(s);
+          if (s.roomId != null) result.put("roomName", roomNames.get(s.roomId).name);
+          if (s.departmentId != null) result.put("departmentName", departmentNames.get(s.departmentId).name);
+          return result;
+        }).toList())).toList();
   }
 
   void password(String p) {

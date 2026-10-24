@@ -14,8 +14,8 @@ const roleLabels: Record<string, string> = {
   STUDENT: "学生",
   ROOM_APPLICANT: "教室申请人",
   DEPT_APPROVER: "院系审批员",
-  SPACE_APPROVER: "空间审批员",
-  ROOM_ADMIN: "空间管理员",
+  SPACE_APPROVER: "教室审批员",
+  ROOM_ADMIN: "教室管理员",
   PROPERTY_DISPATCHER: "物业派单员",
   PROPERTY_ADMIN: "物业管理员",
   REPAIRER: "维修人员",
@@ -35,8 +35,8 @@ const permissionLabels: Record<string, string> = {
   "room_application:read_own": "查看本人教室申请",
   "room_application:cancel_own": "撤销本人申请",
   "room_application:cancel_scope": "撤销范围内申请",
-  "room_application:review_dept": "院系审批",
-  "room_application:review_space": "空间审批",
+  "room_application:review_dept": "申请人院系审批（第一步）",
+  "room_application:review_space": "教室使用审批（第二步）",
   "repair:create": "上报设施故障",
   "repair:read_own": "查看本人报修",
   "repair:read_assigned": "查看派给我的工单",
@@ -45,13 +45,14 @@ const permissionLabels: Record<string, string> = {
   "repair:cancel_scope": "取消范围内工单",
   "repair:assign": "派发维修工单",
   "repair:work": "处理维修工单",
+  "repair:accept_scope": "验收负责教室的维修结果",
   "repair:accept_own": "验收本人报修",
   "repair:rate_own": "评价本人报修",
-  "repair:retry_sync": "重试资源同步",
+  "repair:retry_sync": "重试暂停或恢复教室使用",
   "notification:read_own": "查看本人通知",
   "notification:mark_read_own": "标记本人通知已读",
   "notification:manage": "管理通知送达",
-  "room:manage": "管理空间与座位",
+  "room:manage": "设置教室、座位和开放时间",
   "room:display_code": "展示教室签到编码",
   "user:manage": "管理校园账号",
   "role:manage": "配置角色权限",
@@ -62,7 +63,7 @@ const permissionLabels: Record<string, string> = {
 export const roleLabel = (role?: { code?: string; name?: string; [key: string]: any }) =>
   role
     ? role.name && role.name !== role.code
-      ? role.name
+      ? ({ "空间审批员": "教室审批员", "空间管理员": "教室管理员" } as Record<string, string>)[role.name] || role.name
       : roleLabels[role.code || ""] || role.name || role.code || ""
     : "";
 export const permissionLabel = (permission: any) =>

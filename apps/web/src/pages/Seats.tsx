@@ -18,6 +18,7 @@ import {
   BookOutlined,
 } from "@ant-design/icons";
 import { history } from "umi";
+import { can } from "../access";
 import { items, query } from "../services/api";
 import { useSession } from "../services/session";
 import {
@@ -34,81 +35,114 @@ import {
 import type { Seat, Room, Page } from "../services/types";
 export function TimeFilter({
   onSearch,
+  onDraftChange,
+  searchLabel = "查询可预约座位",
   loading,
   maxHours = 4,
 }: {
   onSearch: (value: { startAt: string; endAt: string }) => void;
+  onDraftChange?: () => void;
+  searchLabel?: string;
   loading?: boolean;
   maxHours?: number;
 }) {
-  const [date, setDate] = useState(shanghai().add(1, "day").startOf("day"));
+  const [date, setDate] = useState(() =>
+    shanghai().add(1, "day").startOf("day")
+  );
   const [start, setStart] = useState(9);
   const [duration, setDuration] = useState(Math.min(2, maxHours));
   useEffect(() => {
     setDuration((d) => Math.min(d, maxHours));
   }, [maxHours]);
+  const startAt = dayjs.tz(
+    `${date.format("YYYY-MM-DD")} ${String(start).padStart(2, "0")}:00`,
+    "Asia/Shanghai"
+  );
+  const endAt = startAt.add(duration, "hour");
+  const timeError = !startAt.isAfter(shanghai())
+    ? "开始时间已过，请选择之后的整点。"
+    : endAt.isAfter(shanghai().add(14, "day"))
+    ? "结束时间须在未来 14 天内，请提前开始时间或缩短时长。"
+    : undefined;
   return (
-    <div className="time-filter">
-      <label>
-        使用日期
-        <DatePicker
-          value={date}
-          onChange={(v) => {
-            if (v) setDate(v);
-          }}
-          allowClear={false}
-          disabledDate={(v) =>
-            v.format("YYYY-MM-DD") < shanghai().format("YYYY-MM-DD") ||
-            v.format("YYYY-MM-DD") >
-              shanghai().add(14, "day").format("YYYY-MM-DD")
+    <>
+      <div className="time-filter">
+        <label>
+          使用日期
+          <DatePicker
+            aria-label="使用日期"
+            value={date}
+            onChange={(v) => {
+              if (v) {
+                setDate(v);
+                onDraftChange?.();
+              }
+            }}
+            allowClear={false}
+            disabledDate={(v) =>
+              v.format("YYYY-MM-DD") < shanghai().format("YYYY-MM-DD") ||
+              v.format("YYYY-MM-DD") >
+                shanghai().add(14, "day").format("YYYY-MM-DD")
+            }
+            format="MM月DD日 ddd"
+          />
+        </label>
+        <label>
+          开始时间
+          <Select
+            aria-label="开始时间"
+            value={start}
+            onChange={(value) => {
+              setStart(value);
+              onDraftChange?.();
+            }}
+            options={Array.from({ length: 24 }, (_, i) => ({
+              label: `${String(i).padStart(2, "0")}:00`,
+              value: i,
+            }))}
+          />
+        </label>
+        <label>
+          使用时长
+          <Select
+            aria-label="使用时长"
+            value={duration}
+            onChange={(value) => {
+              setDuration(value);
+              onDraftChange?.();
+            }}
+            options={Array.from({ length: maxHours }, (_, i) => ({
+              label: `${i + 1} 小时`,
+              value: i + 1,
+            }))}
+          />
+        </label>
+        <Button
+          type="primary"
+          icon={<SearchOutlined aria-hidden="true" />}
+          aria-label={searchLabel}
+          loading={loading}
+          disabled={!!timeError}
+          onClick={() =>
+            onSearch({ startAt: startAt.format(), endAt: endAt.format() })
           }
-          format="MM月DD日 ddd"
-        />
-      </label>
-      <label>
-        开始时间
-        <Select
-          value={start}
-          onChange={setStart}
-          options={Array.from({ length: 24 }, (_, i) => ({
-            label: `${String(i).padStart(2, "0")}:00`,
-            value: i,
-          }))}
-        />
-      </label>
-      <label>
-        专注时长
-        <Select
-          value={duration}
-          onChange={setDuration}
-          options={Array.from({ length: maxHours }, (_, i) => ({
-            label: `${i + 1} 小时`,
-            value: i + 1,
-          }))}
-        />
-      </label>
-      <Button
-        type="primary"
-        icon={<SearchOutlined />}
-        loading={loading}
-        onClick={() => {
-          const s = dayjs.tz(
-            `${date.format("YYYY-MM-DD")} ${String(start).padStart(2, "0")}:00`,
-            "Asia/Shanghai"
-          );
-          onSearch({
-            startAt: s.format(),
-            endAt: s.add(duration, "hour").format(),
-          });
-        }}
-      >
-        查找空间
-      </Button>
-    </div>
+        >
+          {searchLabel}
+        </Button>
+      </div>
+      <p className="time-summary" aria-live="polite">
+        {timeError ||
+          `使用时段：${slotLabel(
+            startAt.format(),
+            endAt.format()
+          )}（中国标准时间）`}
+      </p>
+    </>
   );
 }
 export default function Seats() {
   const { user } = useSession();
+  const mayReserve = can(user, "reservation:create");
   const [time, setTime] = useState<{ startAt: string; endAt: string }>();
   const [power, setPower] = useState(false);
   const repeatParams = new URLSearchParams(window.location.search);
@@ -123,6 +157,11 @@ export default function Seats() {
   const rooms = useData<Page<Room>>("/rooms?size=100");
   const campuses = useData<any>("/campuses");
   const buildings = useData<any>("/buildings");
+  const campusBuildingIds = new Set(
+    items(buildings.data)
+      .filter((b) => !campus || b.campusId === campus)
+      .map((b) => b.id)
+  );
   const result = useData<Page<Seat>>(
     time
       ? `/availability/seats?${query({
@@ -150,6 +189,7 @@ export default function Seats() {
     setSelected(seat);
     action.open({
       title: "确认预约",
+      confirmText: "确认预约这个座位",
       path: "/reservations",
       body: { seatId: seat.seatId || seat.id, ...time },
       success: "预约成功，请按时到教室签到",
@@ -177,9 +217,18 @@ export default function Seats() {
     <>
       <PageHeading
         eyebrow="FIND YOUR FOCUS"
-        title="找一个好位置"
-        description="选择一段时间，把空间留给专注。"
+        title="查找座位"
+        description="先选使用时间，再点座位号预约。到教室后，在“我的座位预约”输入当天签到码。"
       />
+      {!mayReserve && (
+        <Alert
+          className="mb-20"
+          type="info"
+          showIcon
+          title="你可以查询座位，暂未开通预约资格"
+          description="需要预约时，请联系系统管理员为账号开通个人预约权限。"
+        />
+      )}
       {repeatSeatId && (
         <Alert
           className="mb-20"
@@ -189,28 +238,29 @@ export default function Seats() {
           description="请选择新的使用时间并查询。历史座位会被突出显示，提交时将重新检查可用性。"
         />
       )}
-      <section className="focus-banner">
-        <div>
-          <Tag>自习空间</Tag>
-          <h2>今天，也向目标靠近一点。</h2>
-          <p>按时抵达，安静学习。你的下一段专注时光，从这里开始。</p>
-        </div>
-        <div className="focus-lineart" aria-hidden="true">
-          <BookOutlined />
-          <span>
-            MAKE ROOM
-            <br />
-            FOR IDEAS.
-          </span>
-        </div>
-      </section>
+      <ol className="task-steps" aria-label="预约步骤">
+        <li>
+          <b>1</b> 选择使用时段
+        </li>
+        <li>
+          <b>2</b> 点击空闲座位预约
+        </li>
+        <li>
+          <b>3</b> 开始后 15 分钟内签到
+        </li>
+      </ol>
       <section className="panel search-panel">
         <TimeFilter
           maxHours={user.bookingLimits?.reservationMaxHours || 4}
+          onDraftChange={() => {
+            setTime(undefined);
+            setSelected(undefined);
+          }}
           onSearch={(v) => {
             setTime(v);
             setPage(1);
             setSelected(undefined);
+            result.reload();
           }}
           loading={result.loading}
         />
@@ -227,6 +277,9 @@ export default function Seats() {
                 setRoom(undefined);
                 setPage(1);
               }}
+              loading={campuses.loading}
+              showSearch
+              optionFilterProp="label"
               options={items(campuses.data).map((c) => ({
                 value: c.id,
                 label: c.name,
@@ -242,6 +295,9 @@ export default function Seats() {
                 setRoom(undefined);
                 setPage(1);
               }}
+              loading={buildings.loading}
+              showSearch
+              optionFilterProp="label"
               options={items(buildings.data)
                 .filter((b) => !campus || b.campusId === campus)
                 .map((b) => ({ value: b.id, label: b.name }))}
@@ -255,15 +311,36 @@ export default function Seats() {
                 setRoom(v);
                 setPage(1);
               }}
-              options={items<Room>(rooms.data)
-                .filter((r) => !building || r.buildingId === building)
-                .map((r) => ({ value: r.id, label: r.name }))}
+              loading={rooms.loading}
+              showSearch
+              optionFilterProp="label"
+              options={[
+                ...items<Room>(rooms.data)
+                  .filter(
+                    (r) =>
+                      (!building || r.buildingId === building) &&
+                      (!campus || campusBuildingIds.has(r.buildingId))
+                  )
+                  .map((r) => ({ value: r.id, label: r.name })),
+                ...(room && !items<Room>(rooms.data).some((r) => r.id === room)
+                  ? [
+                      {
+                        value: room,
+                        label: rooms.loading
+                          ? "正在加载上次的教室…"
+                          : "上次的教室（当前不可选择）",
+                        disabled: true,
+                      },
+                    ]
+                  : []),
+              ]}
             />
           </div>
           <label className="power-filter">
             <ThunderboltOutlined /> 仅带插座{" "}
             <Switch
               size="small"
+              aria-label="仅显示带插座的座位"
               checked={power}
               onChange={(v) => {
                 setPower(v);
@@ -272,16 +349,35 @@ export default function Seats() {
             />
           </label>
         </div>
+        <p className="muted">
+          可选学校共享教室和你所属院系的教室；每次最多{" "}
+          {user.bookingLimits?.reservationMaxHours || 4} 小时，结束时间须在未来
+          14 天内。
+        </p>
+        <Failure
+          error={campuses.error || buildings.error || rooms.error}
+          onRetry={() => {
+            campuses.reload();
+            buildings.reload();
+            rooms.reload();
+          }}
+        />
       </section>
       <div className="section-line">
         <h2>
-          {time ? "可预约空间" : "为下一次专注做准备"}{" "}
+          {time ? "选择一个座位" : "先选择使用时间"}{" "}
           <span>{result.data ? `${result.data.total} 个座位` : ""}</span>
         </h2>
         <span className="muted">
           <ClockCircleOutlined /> 中国标准时间
         </span>
       </div>
+      {time && (
+        <p className="muted">
+          本次查询：{slotLabel(time.startAt, time.endAt)}
+          。点击座位后确认预约，查询本身不会保留座位。
+        </p>
+      )}
       <Failure error={result.error} onRetry={result.reload} />
       <LoadingBlock loading={result.loading}>
         {!time ? (
@@ -296,7 +392,7 @@ export default function Seats() {
                 <CheckOutlined /> 整点预约
               </span>
               <span>
-                <CheckOutlined /> 最多提前 14 天
+                <CheckOutlined /> 结束时间在未来 14 天内
               </span>
               <span>
                 <CheckOutlined /> 开始后 15 分钟内签到
@@ -325,15 +421,17 @@ export default function Seats() {
                       {seats[0].buildingName}
                     </p>
                   </div>
-                  <Tag color="success">{seats.length} 席可约</Tag>
+                  <Tag color="success">本页 {seats.length} 个空位</Tag>
                 </div>
-                <div className="room-front">前方 / 讲台</div>
+                <p className="muted">按座位编号排列，请按现场座位号入座。</p>
                 <div className="seat-grid">
                   {seats.map((s) => (
                     <button
                       key={s.seatId || s.id}
                       className={`seat ${
-                        selected?.seatId === s.seatId ||
+                        (selected &&
+                          (selected.seatId || selected.id) ===
+                            (s.seatId || s.id)) ||
                         repeatSeatId === (s.seatId || s.id)
                           ? "selected"
                           : ""
@@ -341,6 +439,7 @@ export default function Seats() {
                       aria-label={`预约 ${s.roomName} ${s.code} 号座位${
                         s.hasPower ? "，带插座" : ""
                       }`}
+                      disabled={!mayReserve}
                       onClick={() => pick(s)}
                     >
                       <span className="seat-back" />

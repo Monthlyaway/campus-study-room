@@ -65,7 +65,7 @@ export async function actor(browser, username, mobile = false) {
 export async function confirm(page, path, expectedStatus = [200, 201, 202, 204]) {
   const results = await Promise.allSettled([
     page.waitForResponse((response) => new URL(response.url()).pathname === `/api/v1${path}` && response.request().method() !== 'GET'),
-    modal(page).getByRole('button', { name: /^确\s*认$/ }).click(),
+    modal(page).locator('.ant-modal-footer button[aria-busy]').click(),
   ]);
   if (results.some((result) => result.status === 'rejected')) {
     const diagnostic = await page.evaluate(() => {

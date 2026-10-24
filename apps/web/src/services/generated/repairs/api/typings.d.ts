@@ -157,6 +157,8 @@ declare namespace RepairAPI {
     acceptDueAt?: any;
     createdAt?: string;
     updatedAt?: string;
+    /** 已授权工单所属教室名称，通过 core 内部 HTTP 读取；名称暂不可用时为空字符串。新写操作将当时名称连同原结果保存，幂等重放保持原结果；历史原结果可不含本字段。 */
+    roomName?: string;
   };
 
   type RepairOrderPage = {

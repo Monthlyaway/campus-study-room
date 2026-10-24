@@ -460,6 +460,13 @@ declare namespace CoreAPI {
     roomId?: string;
   };
 
+  type getApiV1NotificationScopeRoomsParams = {
+    page?: number;
+    size?: number;
+    /** Case-insensitive name or room code search. */
+    q?: string;
+  };
+
   type getApiV1NotificationsParams = {
     page?: number;
     size?: number;
@@ -486,6 +493,13 @@ declare namespace CoreAPI {
     startFrom?: string;
     /** Exclusive reservation start upper bound; must be later than startFrom. */
     startTo?: string;
+  };
+
+  type getApiV1RoleScopeRoomsParams = {
+    page?: number;
+    size?: number;
+    /** Case-insensitive name or room code search. */
+    q?: string;
   };
 
   type getApiV1RoomApplicationsIdParams = {
@@ -921,10 +935,35 @@ declare namespace CoreAPI {
     scopeType: "SELF" | "DEPARTMENT" | "ROOM" | "ALL" | "SHARED";
     departmentId?: string;
     roomId?: string;
+    /** Display name for an existing authorization target; never use as an identifier. */
+    roomName?: string;
+    /** Display name for an existing authorization target; never use as an identifier. */
+    departmentName?: string;
   };
 
   type RoleScopeEnvelope = {
     data: RoleScope;
+    requestId: string;
+  };
+
+  type RoleScopeRoom = {
+    id: string;
+    code: string;
+    name: string;
+    enabled: boolean;
+    buildingName: string;
+    departmentName: string;
+  };
+
+  type RoleScopeRoomPage = {
+    items: RoleScopeRoom[];
+    page: number;
+    size: number;
+    total: number;
+  };
+
+  type RoleScopeRoomPageEnvelope = {
+    data: RoleScopeRoomPage;
     requestId: string;
   };
 
